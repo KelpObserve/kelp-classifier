@@ -1,0 +1,50 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---- venvs / editor / OS ----
+.venv*/
+venv/
+.env
+.DS_Store
+.idea/
+.vscode/
+
+# ---- ALL data + derivatives (users bring their own) ----
+data/
+logs/
+tmp/
+*.h5
+*.npz
+*.ckpt
+*.pt
+
+# ---- Raw source pulls under data_collection/ ----
+data_collection/gbif/*.csv
+data_collection/gbif/*.tsv
+data_collection/obis/*.csv
+data_collection/obis/*.json
+data_collection/jncc/*.csv
+data_collection/jncc/*.mdb
+data_collection/source_statistics.csv
+
+# ---- Exploratory / other sources (kept only for the pull script) ----
+data_collection/other_sources_tried/*
+!data_collection/other_sources_tried/*.py
+!data_collection/other_sources_tried/*.md
+
+# ---- Pipeline outputs (regenerable) ----
+training/splits/*.json
+training/splits/*.txt
+training/results/
+
+# ---- Backups / legacy leftovers ----
+*.backup*
+*.legacy_*
+*.pre_*bak
+*.pre_b02match
+
+# ---- Runtime scratch ----
+*.log

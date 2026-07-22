@@ -1,0 +1,23 @@
+# Core deep learning + Clay
+torch==2.4.0+cu121
+lightning==2.6.5
+claymodel @ git+https://github.com/Clay-foundation/model.git@dfcf56b043ab90c7d50b7776a54123bff96a4d84
+
+# Data & IO
+numpy==2.4.4
+h5py==3.16.0
+PyYAML==6.0.3
+python-box==7.4.1
+
+# Remote sensing / STAC
+pystac==1.15.1
+pystac-client==0.9.0
+rasterio==1.4.4
+shapely==2.1.2
+
+# ML utils
+scikit-learn==1.9.0
+scipy==1.17.1
+
+# Plotting
+matplotlib==3.11.0
