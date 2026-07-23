@@ -16,6 +16,17 @@ Defined in [`common.py`](common.py) as `KELP_SPECIES`:
 - Undaria pinnatifida *(invasive)*
 - Phyllariopsis brevipes
 
+## Cross-source dedup (pre-fetch)
+
+The six raw source CSVs (GBIF/OBIS/JNCC × PRESENT/ABSENT) frequently contain
+the same physical observation logged in more than one database. The pre-fetch
+dedup consolidates them so we don't fetch duplicates:
+
+| Script | Role |
+|---|---|
+| [`dedup_candidates.py`](dedup_candidates.py) | Groups all six sources by `(occurrenceStatus, round(lat, 4), round(lon, 4), eventDate)`, combines species names, and picks a representative (source priority: GBIF > OBIS > JNCC, then alphabetically-first ID). Filters to eventDate ≥ 2016 (Sentinel-2 coverage). Emits `deduped_present_candidates.csv` and `deduped_absent_candidates.csv`. |
+| [`select_present_candidates.py`](select_present_candidates.py) | Narrows the deduped PRESENT pool to the candidates geographically closest to any ABSENT candidate: keeps all forced-P (within 50 m of an A, will co-cluster under the 50 m location-safety rule) plus the top-N free-P by nearest-A distance. Rationale: the split algorithm matches P to A within the same water bin, and geographic proximity is a strong proxy for water-bin membership. |
+
 ## Sources
 
 Every source produces two CSVs: `..._present.csv` and `..._absent.csv`.
