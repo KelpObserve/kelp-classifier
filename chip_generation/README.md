@@ -91,41 +91,16 @@ Under the hood both wrappers call [`chip_common.fetch_chips(...)`](chip_common.p
 
 ### Merging fetches
 
-Individual fetches land in per-source directories under `$KELP_DATA_DIR/`. [`merge_all_chips.py`](merge_all_chips.py) picks up **any** directory whose name contains `s2_chips_` (with a valid `chips.h5`), so future OBIS / JNCC / snap-fetch dirs are folded in automatically. It applies two dedup passes:
+Individual fetches land in per-source directories under `$KELP_DATA_DIR/`. [`merge_all_chips.py`](merge_all_chips.py) picks up **any** directory whose name contains `s2_chips_` (with a valid `chips.h5`), so future OBIS / JNCC / snap-fetch dirs are folded in automatically. It applies a `gbifID`-based dedup at merge time to collapse same-source refetches of the same scene.
 
-1. by `gbifID` (collapses same-source refetches of the same scene)
-2. by `(species, lat, lon, eventDate)` via `common.dedup_key` (collapses cross-source duplicates — same observation reported in both GBIF and OBIS)
+Cross-source duplicates (same observation reported in both GBIF and OBIS) are handled *pre-fetch* — see [`../data_collection/dedup_candidates.py`](../data_collection/dedup_candidates.py) which unifies the six raw source CSVs into deduplicated PRESENT/ABSENT candidate lists.
 
 Field names in the output CSV are the **union** across all source rows, so columns present in only some sources (e.g. `snap_lat/snap_lon/snap_dist_m` from snap-enabled fetches) are preserved rather than silently dropped. Chip data is **streamed** — each source `chips.h5` is opened once and chips are written to the merged file one at a time, so peak RAM stays O(one chip) instead of O(all chips).
 
 - **Merged output**: `$KELP_DATA_DIR/s2_chips_merged/chips.h5` (+ `chips_metadata.csv`)
 
 This is the file consumed by [`../training/`](../training/) (via `precompute_clay_embeddings.py`).
-
-## Metadata backfill
-
-Older fetch cycles wrote passing chips to `chips.h5` but left some of the QC
-metadata columns blank in `chips_metadata.csv` (`wf_region`, `b02_range`,
-`fill_region`). The chip data itself is fine — QC ran and passed at fetch
-time — but downstream code that reads the CSV coerces empty cells to 0,
-which broke the split-matching logic in training (P chips were treated as
-having water fraction 0 while ABSENT chips had real values around 0.6, so
-the histogram match aligned to a fake distribution).
-
-Two backfill scripts recompute the missing columns directly from the SCL /
-B02 bands in `chips.h5` using the same formulas as `chip_common.qc_chip()`.
-They are read-only against `chips.h5` and rewrite the CSV atomically after a
-timestamped backup:
-
-| Script | Recomputes | Formula |
-|---|---|---|
-| [`backfill_wf_region.py`](backfill_wf_region.py) | `wf_region`, `fill_region`, `cloud_region` (all if blank) | `(SCL[50:73,50:73]==class).mean()` for water(6), nodata(0), cloud/shadow/cirrus(3,8,9,10). |
-| [`backfill_b02_fill.py`](backfill_b02_fill.py) | `b02_range`, `fill_region` (whichever is blank) | `b02_range = P95 − P5` of non-zero B02 pixels in the 23×23 centre block (`0.0` if < 20 non-zero pixels). |
-
-Both scripts are idempotent — they skip rows whose target column already has
-a value, so running them repeatedly is safe.
-
-## Current chip counts (2026-07-17, post snap-refetch + coord/date dedup + QC backfill)
+## Current chip counts (2026-07-17)
 
 Merged file at `$KELP_DATA_DIR/s2_chips_merged/chips.h5`:
 
@@ -135,4 +110,4 @@ Merged file at `$KELP_DATA_DIR/s2_chips_merged/chips.h5`:
 | ABSENT (single + multi-scene) | 1,614 |
 | **Total** | **5,703** |
 
-Counts after: coord/date deduplication (one base chip per lat/lon/eventDate), the snap-eligible ABSENT re-fetch that lifted `wf_region` above threshold, and the `wf_region` / `b02_range` / `fill_region` backfill described above. Chips consumed by the training pipeline come from this file.
+These are the counts consumed by the training pipeline. Cross-source dedup runs at candidate time (`data_collection/dedup_candidates.py`); QC metadata (`wf_region`, `cloud_region`, `fill_region`, `b02_range`) is written by `chip_common.qc_chip` at fetch time.
