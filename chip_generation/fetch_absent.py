@@ -36,6 +36,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("candidates", help="path to candidate CSV")
     ap.add_argument("out_dir", help="output directory")
+    ap.add_argument("--max-chips", type=int, default=None,
+                    help="stop when this many OK chips have been written across all workers")
     ap.add_argument("--scenes", type=int, default=8, help="max scenes per record (default: 8)")
     ap.add_argument("--single", action="store_true", help="shortcut for --scenes 1")
     ap.add_argument("--exclude-existing", type=str,
@@ -85,7 +87,8 @@ def main():
     fetch_chips(candidates, QC_RELAXED_ABSENT, args.out_dir,
                 class_tag="absent_real", max_scenes_per_record=args.scenes,
                 exclude_scene_ids=dict(exclude),
-                disable_snap=args.disable_snap)
+                disable_snap=args.disable_snap,
+                max_chips=args.max_chips)
 
 
 if __name__ == "__main__":

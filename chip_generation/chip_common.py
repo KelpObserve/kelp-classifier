@@ -244,6 +244,10 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
     class_tag = state.get("class_tag", "")
     for record in subset:
         if state.get("stop"): return  # graceful global stop
+        mc = state.get("max_chips")
+        if mc is not None and state["counts"].get("ok", 0) >= mc:
+            state["stop"] = True
+            return
         sp = record.get("species") or ""
         if targets and sp in targets:
             # Hold h5_lock so the check-and-set with the increment inside the
@@ -388,7 +392,7 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
 
 def fetch_chips(candidates, qc, out_dir, class_tag,
                 max_scenes_per_record=1, exclude_scene_ids=None, workers=6,
-                species_targets=None, disable_snap=False):
+                species_targets=None, disable_snap=False, max_chips=None):
     """Fetch S2 chips for a list of candidate records.
 
     Arguments
@@ -424,7 +428,7 @@ def fetch_chips(candidates, qc, out_dir, class_tag,
     for r in candidates:
         r["class_tag"] = class_tag
 
-    max_chips = len(candidates) * max_scenes_per_record
+    h5_capacity = len(candidates) * max_scenes_per_record  # upper bound on chips written
     csv_path = out_dir / "chips_metadata.csv"
     csv_fh = csv_path.open("w", newline="")
     csv_writer = csv.DictWriter(csv_fh, fieldnames=list(dict.fromkeys(fields)))
@@ -435,7 +439,7 @@ def fetch_chips(candidates, qc, out_dir, class_tag,
     h5f.attrs["bands"] = np.array(BAND_NAMES, dtype="S")
     h5f.attrs["chip_size"] = CHIP_SIZE
     h5f.attrs["pixel_m"] = PIXEL_M
-    h5f.create_dataset("chips", shape=(max_chips, len(BANDS), CHIP_SIZE, CHIP_SIZE),
+    h5f.create_dataset("chips", shape=(h5_capacity, len(BANDS), CHIP_SIZE, CHIP_SIZE),
                        dtype=np.uint16, chunks=(1, 8, CHIP_SIZE, CHIP_SIZE), compression="lzf")
 
     state = {"h5": h5f, "csv": csv_writer, "idx": 0,
@@ -446,6 +450,7 @@ def fetch_chips(candidates, qc, out_dir, class_tag,
              "species_counts": {},
              "disable_snap": bool(disable_snap),
              "class_tag": class_tag,
+             "max_chips": max_chips,
              "stop": False}
 
     per_worker = (len(candidates) + workers - 1) // workers
