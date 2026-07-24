@@ -83,22 +83,12 @@ for src in SOURCES:
 
 print(f"after gbifID dedup: {len(refs)} chips")
 
-# Cross-source dedup by (species, lat, lon, date). Sources are iterated in
-# sorted order (alphabetical), so first-seen wins.
-seen_keys = set()
-kept_refs, kept_meta = [], []
-dropped_xsrc = 0
-for (src, idx, r) in refs:
-    k = dedup_key(r)
-    if k is not None and k in seen_keys:
-        dropped_xsrc += 1
-        continue
-    if k is not None:
-        seen_keys.add(k)
-    kept_refs.append((src, idx, r))
-    kept_meta.append(r)
-refs, all_meta = kept_refs, kept_meta
-print(f"cross-source dedup dropped {dropped_xsrc} chips; kept {len(refs)}")
+# Cross-source dedup by (species, lat, lon, date) used to run here, but it
+# collapsed multi-scene ABSENT _sN siblings (same species, lat, lon, and
+# eventDate; only sceneID differs) into a single row. Cross-source dedup now
+# runs pre-fetch — see data_collection/dedup_candidates.py — so no cross-source
+# duplicates should reach this point anyway.
+all_meta = [r for _, _, r in refs]
 
 from collections import Counter
 print(f"class balance: {Counter(r['occurrenceStatus'] for r in all_meta)}")
