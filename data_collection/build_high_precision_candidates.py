@@ -63,15 +63,34 @@ def main():
 
     combined = p_kept + a_all
     fields = list(p_all[0].keys())  # both files share the same schema
-    out = DC / "high_precision_candidates.csv"
-    with out.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        for r in combined: w.writerow({k: r.get(k, "") for k in fields})
+
     from collections import Counter
-    print(f"\nwrote {out.relative_to(DC.parent)}: {len(combined)} rows")
-    print(f"  by class:  {dict(Counter(r['occurrenceStatus'] for r in combined))}")
-    print(f"  by source: {dict(Counter(r.get('source','?') for r in combined).most_common())}")
+    def write(rows, path, label):
+        with path.open("w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=fields)
+            w.writeheader()
+            for r in rows: w.writerow({k: r.get(k, "") for k in fields})
+        print(f"wrote {path.relative_to(DC.parent)}: {len(rows)} rows  ({label})")
+        print(f"  by class:  {dict(Counter(r['occurrenceStatus'] for r in rows))}")
+        print(f"  by source: {dict(Counter(r.get('source','?') for r in rows).most_common())}")
+
+    # (1) Full high-precision set (all valid eventDates)
+    write(combined,
+          DC / "high_precision_candidates.csv",
+          "PRESENT ≤ 10m + all ABSENT, ≥ 2016")
+
+    # (2) PNEO-era subset: eventDate ≥ 2021-04-01 (PNEO 3 first light)
+    import re
+    def year_month(r):
+        m = re.match(r"(\d{4})-(\d{2})", (r.get("eventDate") or "").strip())
+        if not m: return (0, 0)
+        return (int(m.group(1)), int(m.group(2)))
+    pneo_cutoff = (2021, 4)
+    pneo_rows = [r for r in combined if year_month(r) >= pneo_cutoff]
+    print()
+    write(pneo_rows,
+          DC / "high_precision_pneo_era_candidates.csv",
+          "same, restricted to eventDate ≥ 2021-04 (PNEO 3+ era)")
 
 
 if __name__ == "__main__":
