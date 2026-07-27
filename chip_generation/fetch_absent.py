@@ -51,6 +51,8 @@ def main():
                          "default to 30 (strict).")
     ap.add_argument("--disable-snap", action="store_true",
                     help="hard-off snap-to-water for this run (e.g. A2 top-ups)")
+    ap.add_argument("--workers", type=int, default=6,
+                    help="concurrent worker threads (default: 6)")
     args = ap.parse_args()
 
     if args.single: args.scenes = 1
@@ -88,7 +90,8 @@ def main():
                 class_tag="absent_real", max_scenes_per_record=args.scenes,
                 exclude_scene_ids=dict(exclude),
                 disable_snap=args.disable_snap,
-                max_chips=args.max_chips)
+                max_chips=args.max_chips,
+                workers=args.workers)
 
 
 if __name__ == "__main__":

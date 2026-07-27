@@ -26,6 +26,7 @@ dedup consolidates them so we don't fetch duplicates:
 |---|---|
 | [`dedup_candidates.py`](dedup_candidates.py) | Groups all six sources by `(occurrenceStatus, round(lat, 4), round(lon, 4), eventDate)`, combines species names, and picks a representative (source priority: GBIF > OBIS > JNCC, then alphabetically-first ID). Filters to eventDate ≥ 2016 (Sentinel-2 coverage). Emits `deduped_present_candidates.csv` and `deduped_absent_candidates.csv`. |
 | [`select_present_candidates.py`](select_present_candidates.py) | Narrows the deduped PRESENT pool to the candidates geographically closest to any ABSENT candidate: keeps all forced-P (within 50 m of an A, will co-cluster under the 50 m location-safety rule) plus the top-N free-P by nearest-A distance. Rationale: the split algorithm matches P to A within the same water bin, and geographic proximity is a strong proxy for water-bin membership. |
+| [`build_high_precision_candidates.py`](build_high_precision_candidates.py) | Restricts the PRESENT pool further to records with `coordinateUncertaintyInMeters <= 10` m — well inside the 115 m half-width of the model's prediction region. All ABSENT records are kept (no unc filter on ABSENT). Emits `high_precision_candidates.csv` (used as the input to `chip_generation/fetch_present.py`). |
 
 ## Sources
 

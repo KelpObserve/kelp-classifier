@@ -58,7 +58,7 @@ Enabled by default via `snap_cap_m=300` in both QC dicts; set to 0 to disable.
 
 ## Coordinate uncertainty filter
 
-- **PRESENT** (`fetch_present.py`): candidates with `coordinateUncertaintyInMeters > 115` are dropped pre-fetch. 115 m is the half-width of the 23×23 prediction region — a PRESENT record whose true location is outside the region the model looks at is a noisy label.
+- **PRESENT** (`fetch_present.py`): candidates with `coordinateUncertaintyInMeters > 115` are dropped pre-fetch. 115 m is the half-width of the 23×23 prediction region — a PRESENT record whose true location is outside the region the model looks at is a noisy label. In practice we go tighter: the current PRESENT candidate list (`high_precision_candidates.csv`) restricts to `coordinateUncertaintyInMeters <= 10 m`, so the fetch operates well inside the 115 m safety filter.
 - **ABSENT** (`fetch_absent.py`): no unc pre-filter. An "no kelp seen" claim over an area is robust to positional imprecision — unlike a PRESENT record, which pinpoints a specific kelp bed. (Reviewer C2 originally symmetrised this filter for P/A parity; the intentional revert trades a small symmetry cost for meaningful ABSENT coverage.)
 
 ## Usage

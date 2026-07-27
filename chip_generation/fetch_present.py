@@ -28,6 +28,8 @@ if __name__ == "__main__":
                     help="JSON path with {species: target_chip_count} for early stop")
     ap.add_argument("--max-chips", type=int, default=None,
                     help="stop when this many OK chips have been written across all workers")
+    ap.add_argument("--workers", type=int, default=6,
+                    help="concurrent worker threads (default: 6)")
     args = ap.parse_args()
 
     raw = list(csv.DictReader(open(args.candidates)))
@@ -47,4 +49,5 @@ if __name__ == "__main__":
 
     fetch_chips(kept, QC_STRICT_PRESENT, args.out_dir,
                 class_tag="present", max_scenes_per_record=1,
-                species_targets=targets, max_chips=args.max_chips)
+                species_targets=targets, max_chips=args.max_chips,
+                workers=args.workers)
