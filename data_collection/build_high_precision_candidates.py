@@ -1,19 +1,19 @@
-"""build_high_precision_candidates.py — combine the deduped PRESENT+ABSENT
-candidates into a single CSV where PRESENT records are restricted to
-coordinateUncertaintyInMeters <= P_MAX_UNC_M (default 10 m) and ABSENT records
-are kept in full.
+"""build_high_precision_candidates.py — build a PRESENT-only high-precision
+candidate list, restricted to coordinateUncertaintyInMeters <= P_MAX_UNC_M
+(default 10 m).
 
 Rationale: high-precision PRESENT anchor points (diver GPS) give clean
-training signal, while ABSENT observations tend to have blank/loose
-uncertainty (marine biology transects log ranges, not points) and we want
-to keep them all.
+training signal. ABSENT is handled by a separate pipeline
+(deduped_absent_candidates.csv → fetch_absent.py) and must NOT be mixed
+in here: fetch_present.py stamps class_tag=present on every row it
+processes, so any ABSENT smuggled into this file would end up
+double-fetched and mislabeled.
 
 Reads:
   data_collection/deduped_present_candidates.csv
-  data_collection/deduped_absent_candidates.csv
 
 Writes:
-  data_collection/high_precision_candidates.csv  (combined)
+  data_collection/high_precision_candidates.csv  (PRESENT only)
 """
 import argparse
 import csv
@@ -40,9 +40,7 @@ def main():
     args = ap.parse_args()
 
     p_all = list(csv.DictReader((DC / "deduped_present_candidates.csv").open()))
-    a_all = list(csv.DictReader((DC / "deduped_absent_candidates.csv").open()))
     print(f"deduped_present_candidates.csv: {len(p_all)} rows")
-    print(f"deduped_absent_candidates.csv:  {len(a_all)} rows")
 
     p_kept = []
     n_blank = n_over = 0
@@ -61,8 +59,7 @@ def main():
           f"blank={'kept' if args.include_blank_unc else 'excluded'}): "
           f"kept {len(p_kept)} (dropped {n_blank} blank + {n_over} over-threshold)")
 
-    combined = p_kept + a_all
-    fields = list(p_all[0].keys())  # both files share the same schema
+    fields = list(p_all[0].keys())
 
     from collections import Counter
     def write(rows, path, label):
@@ -74,10 +71,10 @@ def main():
         print(f"  by class:  {dict(Counter(r['occurrenceStatus'] for r in rows))}")
         print(f"  by source: {dict(Counter(r.get('source','?') for r in rows).most_common())}")
 
-    # (1) Full high-precision set (all valid eventDates)
-    write(combined,
+    # (1) Full high-precision set (all valid eventDates, PRESENT only)
+    write(p_kept,
           DC / "high_precision_candidates.csv",
-          "PRESENT ≤ 10m + all ABSENT, ≥ 2016")
+          f"PRESENT ≤ {args.p_max_unc_m} m, ≥ 2016")
 
     # (2) PNEO-era subset: eventDate ≥ 2021-04-01 (PNEO 3 first light)
     import re
@@ -86,7 +83,7 @@ def main():
         if not m: return (0, 0)
         return (int(m.group(1)), int(m.group(2)))
     pneo_cutoff = (2021, 4)
-    pneo_rows = [r for r in combined if year_month(r) >= pneo_cutoff]
+    pneo_rows = [r for r in p_kept if year_month(r) >= pneo_cutoff]
     print()
     write(pneo_rows,
           DC / "high_precision_pneo_era_candidates.csv",
