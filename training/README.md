@@ -14,8 +14,8 @@ Train and evaluate a binary kelp-presence classifier on top of frozen
    `$KELP_DATA_DIR/clay_cache/identity.npz`.
 3. **Balanced training** — subsample the larger of (PRESENT, ABSENT) in train
    so both classes have equal count per batch.
-4. **MLP head** on top of the 2048-D embedding (Clay CLS + centre-pool concat,
-   5×5 patches). Focal loss, α=0.5, γ=2.
+4. **MLP head** on top of the 2048-D embedding (Clay CLS + centre-pool concat;
+   pool size configurable via `KELP_POOL_SIZE`, default 5×5). Focal loss, α=0.5, γ=2.
 5. **Model selection** by best val `macro\_f1`; test evaluated at threshold
    `0.5` (default) AND at `t*` (per-model threshold that maximises val
    `macro\_f1`).
@@ -41,8 +41,76 @@ retains the older component-graph + macro-region pipeline for reference.
   `claymodel.module.ClayMAEModule.load_from_checkpoint(..., model_size="large",
   shuffle=False, mask_ratio=0, map_location="cuda")`
   (map_location="cuda" avoids peak CPU-RAM pressure during the ckpt load).
-- Encoder output: CLS token (1024-D) + mean of central 5×5 patches
-  (`patches[11:16, 11:16]` on the 28×28 patch grid) → concatenated to 2048-D.
+- Encoder output: CLS token (1024-D) + mean of a central `POOL_SIZE × POOL_SIZE`
+  window on the 28×28 patch grid → concatenated to 2048-D. Default pool 5×5
+  (`patches[11:16, 11:16]`); see § "Centre-pool size" below to change it.
+
+## Centre-pool size
+
+The head's spatial embedding is the mean of a `POOL_SIZE × POOL_SIZE` window of
+Clay patch tokens centred on the chip centre. `KELP_POOL_SIZE` (env var, read
+in [`config.py`](../config.py)) controls it end-to-end: the aggregation done in
+[`precompute_clay_embeddings.py`](precompute_clay_embeddings.py), the cache
+filename (`clay_cache/identity_p{POOL_SIZE}.npz`), and the results directory
+(`results/head_seed{SEED}_p{POOL_SIZE}/`) all pick it up from there.
+
+**Why it exists.** GBIF/OBIS PRESENT records are point observations with
+`coordinateUncertaintyInMeters ≤ 10 m` (after the current fetch tightening) —
+one Sentinel-2 pixel of positional uncertainty. The chip is anchored on that
+point (or its snapped water pixel for ABSENT). Smaller pool → the classifier's
+decision is informed by a tighter neighbourhood around the anchor, at the cost
+of spatial averaging that stabilised the historical 5×5 run. Larger pool →
+more context, coarser effective footprint.
+
+**Valid values and effective footprint.**
+
+| `KELP_POOL_SIZE` | Patch slice on 28×28 grid | Effective footprint (native S2 metres) |
+|---:|---|---|
+| 1 | `[13:14, 13:14]`   | ~46 × 46 m   (1 Clay patch) |
+| 2 | `[13:15, 13:15]`   | ~92 × 92 m   (2×2 patches straddling the true centre) |
+| 3 | `[12:15, 12:15]`   | ~137 × 137 m |
+| 5 | `[11:16, 11:16]`   | ~229 × 229 m (default; matches the historical run) |
+| 7 | `[10:17, 10:17]`   | ~320 × 320 m |
+
+The chip centre falls at patch ≈ 13.9 (chip pixel 111.5 in Clay's 224-space,
+divided by the 8-pixel patch width). Odd pool sizes centre on patch 13 —
+consistent with the original `[11:16]` window (11+15 midpoint = 13). Even pool
+sizes take `[13:13+POOL_SIZE]`, the window that most tightly straddles the
+true centre.
+
+**Reminder about the addressable-vs-effective distinction.** The output raster
+resolution is a rasterisation choice (see the deployment notes) and can be
+10 m regardless of `POOL_SIZE`. `POOL_SIZE` controls the *effective footprint*
+— how large a neighbourhood contributes to each prediction. Clay's patch is
+the floor: no `POOL_SIZE` value gets you a genuine 10 × 10 m footprint.
+
+**Usage.**
+
+```bash
+# Sharpen the head to a single centre patch.
+export KELP_POOL_SIZE=1
+python precompute_clay_embeddings.py       # writes identity_p1.npz
+for seed in 42 123 456; do HEAD_SEED=$seed python train_head.py; done  # → results/head_seed{S}_p1/
+```
+
+The Clay forward pass depends only on the chip; the pool is a cheap mean over
+patch tokens. In principle the cache could store the whole patch grid so a
+single Clay pass supports every pool; we store the pooled embedding instead
+to keep the cache small (~46 MB vs ~1.2 GB for 7×7). Trying a new pool costs
+one Clay pass (~10 min on GPU) + one head-training pass per seed.
+
+**Migration.** Existing runs used the un-tagged `clay_cache/identity.npz` and
+`results/head_seed{SEED}/`. To keep those results comparable under the new
+convention, rename them:
+
+```bash
+mv $KELP_DATA_DIR/clay_cache/identity.npz $KELP_DATA_DIR/clay_cache/identity_p5.npz
+# per seed:
+mv training/results/head_seed42 training/results/head_seed42_p5
+```
+
+Alternatively re-run `precompute_clay_embeddings.py` and `train_head.py` with
+`KELP_POOL_SIZE=5` to regenerate them under the tagged names.
 
 ## Splits (algorithm)
 

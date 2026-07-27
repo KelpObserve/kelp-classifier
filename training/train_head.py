@@ -50,6 +50,8 @@ SPLITS = REPO / "splits"
 OUT_ROOT = REPO / "results"
 
 SEED = int(os.environ.get("HEAD_SEED", 42))
+# EMBED_DIM stays 2048 (CLS 1024 + mean-pooled centre 1024) regardless of
+# POOL_SIZE — the pool is a spatial mean, not a concat.
 EMBED_DIM = 2048
 BATCH_TRAIN = 64
 LR = 1e-3
@@ -156,6 +158,7 @@ def main():
     # set at module top before torch imports; here we pin the RNGs and force
     # deterministic cuDNN + cuBLAS ops. warn_only=False → any non-deterministic
     # op raises loudly instead of silently drifting the reported metric.
+    print(f"[config] POOL_SIZE={config.POOL_SIZE}  cache={config.CLAY_CACHE_NPZ.name}")
     torch.manual_seed(SEED); random.seed(SEED); np.random.seed(SEED)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(SEED)
@@ -267,11 +270,12 @@ def main():
     print(f"  @ t=0.5:  bal_acc={default['balanced_acc']:.4f}  ABSENT R/P={default['rec_absent']:.3f}/{default['prec_absent']:.3f}  ROC={default['roc_auc']:.3f}")
     print(f"  @ t={best_t:.2f}:  bal_acc={tuned['balanced_acc']:.4f}  ABSENT R/P={tuned['rec_absent']:.3f}/{tuned['prec_absent']:.3f}")
 
-    out_dir = OUT_ROOT / f"head_seed{SEED}"
+    out_dir = OUT_ROOT / f"head_seed{SEED}_p{config.POOL_SIZE}"
     out_dir.mkdir(parents=True, exist_ok=True)
     torch.save(model.state_dict(), out_dir / "model.pt")
     (out_dir / "results.json").write_text(json.dumps({
         "seed": SEED,
+        "pool_size": config.POOL_SIZE,
         "history": history,
         "test_default_t0.5": default,
         "test_tuned": tuned,

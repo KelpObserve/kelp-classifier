@@ -49,6 +49,10 @@ def load_result(path: Path):
         d = r["test_default_t0.5"]
         t = r.get("test_tuned", d)
         seed = r.get("seed") or cfg.get("seed")
+        pool = r.get("pool_size") or cfg.get("pool_size")
+        cs = f"seed={seed}"
+        if pool is not None:
+            cs += f" pool={pool}"
         return {
             "run_tag": tag,
             "source_dir": str(path.parent),
@@ -64,7 +68,7 @@ def load_result(path: Path):
             "test_present_recall": round(d["rec_present"], 4),
             "test_present_precision": round(d["prec_present"], 4),
             "epochs": ep,
-            "config_summary": f"seed={seed}",
+            "config_summary": cs,
         }
     # Older format
     tm = r.get("test_metrics")

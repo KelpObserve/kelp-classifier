@@ -25,9 +25,23 @@ CHIPS_META = CHIPS_DIR / "chips_metadata.csv"
 CLAY_CKPT = Path(os.environ.get("KELP_CLAY_CKPT", DATA_DIR / "clay" / "v1.5" / "clay-v1.5.ckpt"))
 CLAY_META = REPO_ROOT / "configs" / "metadata.yaml"
 
+# --- Centre-pool size (spatial receptive field of the head) -------------------
+# Number of Clay patches per side averaged into the head's centre-pool component.
+# Full grid is 28×28 after Clay's 128→224 resize; each patch ≈ 46 m native
+# (8 px at 224² → 128/28·8 ≈ 8/28·1280 m). The chip centre falls at patch ≈13.9.
+# Valid values: 1, 2, 3, 5, 7. 5 matches the original run (~230 m footprint);
+# smaller values sharpen the classifier toward the chip centre pixel.
+# See training/README.md § "Centre-pool size".
+POOL_SIZE = int(os.environ.get("KELP_POOL_SIZE", 5))
+assert POOL_SIZE in {1, 2, 3, 5, 7}, (
+    f"KELP_POOL_SIZE must be one of 1, 2, 3, 5, 7 (got {POOL_SIZE})"
+)
+
 # --- Cached Clay embeddings ---------------------------------------------------
+# Cache path is pool-tagged so different POOL_SIZE runs don't silently share
+# incompatible embeddings.
 CLAY_CACHE_DIR = DATA_DIR / "clay_cache"
-CLAY_CACHE_NPZ = CLAY_CACHE_DIR / "identity.npz"
+CLAY_CACHE_NPZ = CLAY_CACHE_DIR / f"identity_p{POOL_SIZE}.npz"
 
 # --- Per-record allowed_max_days annotations (built by data_collection) -------
 ABSENT_WINDOWS_JSON = DATA_DIR / "absent_windows.json"

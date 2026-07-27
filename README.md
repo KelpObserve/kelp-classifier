@@ -41,6 +41,7 @@ Set these in your shell (`export …`) or in a `.env` file at the repo root (loa
 | `KELP_CLAY_CKPT` | `$KELP_DATA_DIR/clay/v1.5/clay-v1.5.ckpt` | Path to the Clay v1.5 checkpoint (download from the [Clay Foundation release page](https://github.com/Clay-foundation/model/releases)) |
 | `KELP_LOGS_DIR` | `$KELP_DATA_DIR/../logs` | Where nohup / long-running scripts write logs |
 | `KELP_TMP_DIR`  | `$KELP_DATA_DIR/../tmp`  | Where one-off scripts drop scratch files |
+| `KELP_POOL_SIZE` | `5` | Centre-pool size (patches per side) for the head's spatial embedding. One of `1`, `2`, `3`, `5`, `7`. Smaller = tighter effective footprint around the chip centre pixel. See [`training/README.md`](training/README.md#centre-pool-size). |
 
 ### Expected `KELP_DATA_DIR` layout
 
@@ -50,7 +51,7 @@ $KELP_DATA_DIR/
 ├── s2_chips_merged/
 │   ├── chips.h5                     # Merged 128×128 S2 chips (8 bands)
 │   └── chips_metadata.csv           # One row per chip
-├── clay_cache/identity.npz          # Cached Clay embeddings (built once)
+├── clay_cache/identity_p{N}.npz     # Cached Clay embeddings, one file per KELP_POOL_SIZE
 ├── absent_windows.json              # Per-A time-window annotations
 └── jncc_mr/                         # Optional: JNCC MDB snapshot (~1.7 GB)
 ```
