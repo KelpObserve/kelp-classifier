@@ -16,11 +16,18 @@ Same guarantees as the 3-seed splitter in make_splits.py:
     Free-P: for each split's A chips, greedy nearest-b02 matching within
       the same water bin.
 
+Cluster granularity + coarse bins mean any single seed leaves some residual
+train/val divergence on water/cloud. `--n-candidates N` runs the splitter N
+times with consecutive seeds and keeps the split whose worst per-class KS D
+(over {PRESENT, ABSENT} × {water, cloud}) is smallest — cheap way to trade
+CPU for tighter distribution matching without touching the location-safety
+or bin-stratification guarantees.
+
 Reads:  chips_metadata.csv (via config.CHIPS_META)
 Writes: splits/split_single.json  ({"train_chip_ids": [...], "val_chip_ids": [...]})
         splits/a_split_single.json (intermediate A-only view)
 
-CLI:  python make_single_split.py [--seed 42] [--train-frac 0.85]
+CLI:  python make_single_split.py [--seed 42] [--train-frac 0.85] [--n-candidates 1]
 """
 import argparse
 import json
@@ -145,17 +152,82 @@ def subselect_present_two_way(all_rows, clusters, cluster_split, a_by_split, see
             for k in ("train", "val")}
 
 
+# ---------- Distribution-divergence scoring (for --n-candidates) ----------
+
+def _feat(row, key):
+    """Return float(row[key]) or None if missing/unparseable."""
+    v = row.get(key, "")
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def score_split(rows, a_by_split, picked_p):
+    """Return dict of KS D over the four (class, feature) pairs plus the max.
+
+    Score is the max KS statistic; lower is better. Uses scipy.stats.ks_2samp;
+    imported lazily so single-candidate runs don't need scipy installed.
+    """
+    from scipy.stats import ks_2samp  # lazy
+    by_g = {r["gbifID"]: r for r in rows}
+
+    def bucket(k):
+        # Return dict split → list[chip rows] restricted to occurrenceStatus == k.
+        out = {"train": [], "val": []}
+        # ABSENT chips are indexed by row index directly.
+        for split_name, indices in a_by_split.items():
+            for i in indices:
+                if rows[i].get("occurrenceStatus") == k:
+                    out[split_name].append(rows[i])
+        # PRESENT chips are indexed by gbifID via picked_p.
+        for split_name, gids in picked_p.items():
+            for g in gids:
+                r = by_g.get(g)
+                if r is not None and r.get("occurrenceStatus") == k:
+                    out[split_name].append(r)
+        return out
+
+    scores = {}
+    for label in ("PRESENT", "ABSENT"):
+        b = bucket(label)
+        for feat in ("wf_region", "cloud_region"):
+            tr = [x for x in (_feat(r, feat) for r in b["train"]) if x is not None]
+            va = [x for x in (_feat(r, feat) for r in b["val"])   if x is not None]
+            if len(tr) < 2 or len(va) < 2:
+                scores[f"{label}.{feat}"] = float("nan")
+                continue
+            scores[f"{label}.{feat}"] = float(ks_2samp(tr, va).statistic)
+        # ABSENT of a single-cluster-only bin can have zero val chips; guard.
+    scores["max"] = max(v for v in scores.values() if v == v)  # skip NaN
+    return scores
+
+
+def run_candidate(rows, clusters, seed, train_frac):
+    """One splitter run for a given seed. Returns (cluster_split, a_by_split, picked_p)."""
+    cluster_split, a_by_split = stratified_a_split_two_way(rows, clusters, seed, train_frac)
+    picked_p = subselect_present_two_way(rows, clusters, cluster_split, a_by_split, seed)
+    return cluster_split, a_by_split, picked_p
+
+
 # ---------- main ----------
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--seed", type=int, default=DEFAULT_SEED,
-                    help=f"RNG seed (default: {DEFAULT_SEED})")
+                    help=f"Base RNG seed (default: {DEFAULT_SEED}). With --n-candidates>1, "
+                         "consecutive seeds {seed, seed+1, ...} are tried.")
     ap.add_argument("--train-frac", type=float, default=DEFAULT_TRAIN_FRAC,
                     help=f"Fraction of A chips going to train (default: {DEFAULT_TRAIN_FRAC})")
+    ap.add_argument("--n-candidates", type=int, default=1,
+                    help="If >1, run the splitter this many times with consecutive seeds "
+                         "and keep the one whose worst per-class KS D over water+cloud is "
+                         "smallest. Requires scipy.")
     args = ap.parse_args()
     if not 0.5 <= args.train_frac <= 0.95:
         raise SystemExit("--train-frac must be between 0.5 and 0.95")
+    if args.n_candidates < 1:
+        raise SystemExit("--n-candidates must be >= 1")
 
     config.SPLITS_DIR.mkdir(exist_ok=True, parents=True)
 
@@ -178,13 +250,32 @@ def main():
     print(f"location clusters (radius {CLUSTER_RADIUS_KM*1000:.0f} m): "
           f"{len(clusters)} total  ({n_a} A-carrying, of which {n_mixed} mixed P/A;  {n_p_only} P-only)")
 
-    print(f"\nseed={args.seed}  train_frac={args.train_frac}")
-    cluster_split, a_by_split = stratified_a_split_two_way(rows, clusters, args.seed, args.train_frac)
+    if args.n_candidates == 1:
+        chosen_seed = args.seed
+        print(f"\nseed={chosen_seed}  train_frac={args.train_frac}")
+        cluster_split, a_by_split, picked_p = run_candidate(rows, clusters, chosen_seed, args.train_frac)
+    else:
+        print(f"\nsearching {args.n_candidates} candidates (seeds {args.seed}..{args.seed + args.n_candidates - 1})  "
+              f"train_frac={args.train_frac}")
+        candidates = []  # (max_ks, seed, cluster_split, a_by_split, picked_p, scores)
+        for cand_seed in range(args.seed, args.seed + args.n_candidates):
+            cs, abs_, pp = run_candidate(rows, clusters, cand_seed, args.train_frac)
+            scores = score_split(rows, abs_, pp)
+            candidates.append((scores["max"], cand_seed, cs, abs_, pp, scores))
+        candidates.sort(key=lambda t: t[0])
+        print("  top 5 candidates by max KS D (lower = tighter distribution match):")
+        for max_d, sd, _, _, _, sc in candidates[:5]:
+            print(f"    seed={sd:>4}  max_D={max_d:.3f}  "
+                  f"P.wf={sc['PRESENT.wf_region']:.3f} P.cl={sc['PRESENT.cloud_region']:.3f} "
+                  f"A.wf={sc['ABSENT.wf_region']:.3f} A.cl={sc['ABSENT.cloud_region']:.3f}")
+        worst = candidates[-1]
+        print(f"  worst candidate: seed={worst[1]}  max_D={worst[0]:.3f}")
+        max_d, chosen_seed, cluster_split, a_by_split, picked_p, chosen_scores = candidates[0]
+        print(f"\nchose seed={chosen_seed}  max_D={max_d:.3f}")
+
     tot_a = sum(len(v) for v in a_by_split.values())
     n_tr = len(a_by_split["train"]); n_va = len(a_by_split["val"])
     print(f"  A split: train={n_tr} ({100*n_tr/tot_a:.1f}%)  val={n_va} ({100*n_va/tot_a:.1f}%)  total={tot_a}")
-
-    picked_p = subselect_present_two_way(rows, clusters, cluster_split, a_by_split, args.seed)
     by_g = {rows[i]["gbifID"]: rows[i] for i in present}
     for k in ("train", "val"):
         a_rows_k = [rows[i] for i in a_by_split[k]]
@@ -195,15 +286,16 @@ def main():
         print(f"    P: {_dist_summary(p_rows_k)}")
 
     a_only = {
-        "seed": args.seed,
+        "seed": chosen_seed,
         "train_a_ids": [rows[i]["gbifID"] for i in a_by_split["train"]],
         "val_a_ids":   [rows[i]["gbifID"] for i in a_by_split["val"]],
     }
     (config.SPLITS_DIR / "a_split_single.json").write_text(json.dumps(a_only))
 
     final = {
-        "seed": args.seed,
+        "seed": chosen_seed,
         "train_frac": args.train_frac,
+        "n_candidates": args.n_candidates,
         "train_chip_ids": sorted(set([rows[i]["gbifID"] for i in a_by_split["train"]] + picked_p["train"])),
         "val_chip_ids":   sorted(set([rows[i]["gbifID"] for i in a_by_split["val"]]   + picked_p["val"])),
     }

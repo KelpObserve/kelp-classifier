@@ -2,10 +2,12 @@
 
 Reads:
   splits/split_single.json    (built by make_single_split.py)
-  clay_cache/identity.npz     (Clay v1.5 embeddings, built by precompute_clay_embeddings.py)
+  clay_cache/identity.npz     (CLS + centre 7×7 patches, built by
+                               precompute_clay_embeddings.py; pool aggregation
+                               done here at load time per KELP_POOL_SIZE)
 Writes:
-  results/head_single/results.json  (history + val metrics at t=0.5 and val-tuned t*)
-  results/head_single/model.pt      (state_dict of the best-val_macro_f1 model)
+  results/head_single_p{POOL_SIZE}/results.json   (history + val metrics)
+  results/head_single_p{POOL_SIZE}/model.pt       (state_dict of best-val_macro_f1)
 
 CLI: python train_single.py [--seed 42] [--epochs 80]
 """
@@ -37,6 +39,8 @@ import torch.nn.functional as F
 from sklearn.metrics import (roc_auc_score, balanced_accuracy_score,
                              precision_recall_fscore_support, average_precision_score,
                              confusion_matrix)
+
+from patch_pool import cache_local_slice
 
 EMBED_DIM = 2048
 BATCH_TRAIN = 64
@@ -74,8 +78,18 @@ def load_data():
     print(f"[split] train={len(train_ids)} val={len(val_ids)} chips (before embed-cache filter)")
 
     npz = np.load(config.CLAY_CACHE_NPZ, allow_pickle=True)
+    assert "centre_patches" in npz.files, (
+        f"{config.CLAY_CACHE_NPZ} is old-format (has {sorted(npz.files)}); "
+        f"expected 'cls' + 'centre_patches'. Re-run precompute_clay_embeddings.py."
+    )
     ids  = list(map(str, npz["gbif_ids"]))
-    embs = npz["emb"]
+    cls_all     = npz["cls"]              # (N, 1024)
+    patches_all = npz["centre_patches"]   # (N, CACHE_K, CACHE_K, 1024)
+    lo, hi = cache_local_slice(config.POOL_SIZE)
+    pool_all = patches_all[:, lo:hi, lo:hi, :].mean(axis=(1, 2))
+    embs = np.concatenate([cls_all, pool_all], axis=1).astype(np.float32)
+    print(f"[cache] {config.CLAY_CACHE_NPZ.name}  N={len(ids)}  pool={config.POOL_SIZE} "
+          f"(cache slice [{lo}:{hi}])")
     idx_of = {g: i for i, g in enumerate(ids)}
 
     def build(id_set):
@@ -217,12 +231,13 @@ def main():
           f"ABSENT R/P={tuned['rec_absent']:.3f}/{tuned['prec_absent']:.3f}  "
           f"PRESENT R/P={tuned['rec_present']:.3f}/{tuned['prec_present']:.3f}")
 
-    out_dir = config.RESULTS_DIR / "head_single"
+    out_dir = config.RESULTS_DIR / f"head_single_p{config.POOL_SIZE}"
     out_dir.mkdir(exist_ok=True, parents=True)
     torch.save(model.state_dict(), out_dir / "model.pt")
     with (out_dir / "results.json").open("w") as f:
         json.dump({
             "seed": args.seed,
+            "pool_size": config.POOL_SIZE,
             "history": history,
             "val_default_t0.5": default,
             "val_tuned": tuned,

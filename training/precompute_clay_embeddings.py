@@ -188,14 +188,24 @@ def main():
                 if (i0 + B) % 500 == 0 or i0 + B == N:
                     print(f"  {i0 + B}/{N}  {time.time()-t0:.0f}s", flush=True)
 
-    # Merge: existing cache + new embeddings, restricted to `wanted` set, in wanted order
+    # Merge: keep ALL valid cached chips + newly embedded ones. Older versions
+    # restricted the output to `wanted`, which turned any delta run (a small
+    # chip-ID list) into a cache-wipe: the previously-cached ~5k chips would
+    # be silently dropped and only the delta's ~6 remained. The cache is now
+    # additive — feed a small list to extend, delete identity.npz to shrink.
+    # scene_of covers previously-cached chips; new chips get sceneIDs from
+    # row_by_id.
     for gid, c, p in zip(new_ids, new_cls, new_patches):
         existing_cls[gid]     = c
         existing_patches[gid] = p
-    final_ids     = [g for g in wanted if g in existing_cls]
+        scene_of[gid] = row_by_id[gid][1].get("sceneID", "") if gid in row_by_id else ""
+    final_ids     = sorted(existing_cls.keys())
     final_cls     = np.stack([existing_cls[g]     for g in final_ids])
     final_patches = np.stack([existing_patches[g] for g in final_ids])
-    final_scenes  = np.array([row_by_id[g][1].get("sceneID","") for g in final_ids])
+    final_scenes  = np.array([scene_of.get(g, "") for g in final_ids])
+    n_carried = len(final_ids) - len(new_ids)
+    print(f"cache summary: {len(final_ids)} chips total "
+          f"({n_carried} carried over from previous cache + {len(new_ids)} newly embedded)")
     OUT.parent.mkdir(exist_ok=True, parents=True)
     # #4 (reviewer): np.savez isn't atomic. A crash mid-write can leave the
     # file half-baked — either a BadZipFile (recoverable) or, worse, a
