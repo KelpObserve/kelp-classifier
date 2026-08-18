@@ -31,6 +31,8 @@ CLAY_META = REPO_ROOT / "configs" / "metadata.yaml"
 # (8 px at 224² → 128/28·8 ≈ 8/28·1280 m). The chip centre falls at patch ≈13.9.
 # Valid values: 1, 2, 3, 5, 7. 5 matches the original run (~230 m footprint);
 # smaller values sharpen the classifier toward the chip centre pixel.
+# The cache stores the raw centre 7×7 patches (see training/patch_pool.py
+# CACHE_K), so POOL_SIZE is a train-time-only knob — no Clay re-run needed.
 # See training/README.md § "Centre-pool size".
 POOL_SIZE = int(os.environ.get("KELP_POOL_SIZE", 5))
 assert POOL_SIZE in {1, 2, 3, 5, 7}, (
@@ -38,10 +40,11 @@ assert POOL_SIZE in {1, 2, 3, 5, 7}, (
 )
 
 # --- Cached Clay embeddings ---------------------------------------------------
-# Cache path is pool-tagged so different POOL_SIZE runs don't silently share
-# incompatible embeddings.
+# Single cache file for all pool sizes: stores CLS + centre 7×7 patch tokens.
+# `train_head.py` slices + means at load time to build the 2048-D input for
+# the head.
 CLAY_CACHE_DIR = DATA_DIR / "clay_cache"
-CLAY_CACHE_NPZ = CLAY_CACHE_DIR / f"identity_p{POOL_SIZE}.npz"
+CLAY_CACHE_NPZ = CLAY_CACHE_DIR / "identity.npz"
 
 # --- Per-record allowed_max_days annotations (built by data_collection) -------
 ABSENT_WINDOWS_JSON = DATA_DIR / "absent_windows.json"

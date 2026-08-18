@@ -26,7 +26,7 @@ Train and evaluate a binary kelp-presence classifier on top of frozen
 |---|---|
 | [`make_splits.py`](make_splits.py) | Generate matched train/val/test splits per seed (default seeds: 42, 123, 456). Writes `splits/split_seed<S>.json` per seed + `splits/a_split_seed<S>.json` (A-only intermediate) + `splits/used_chip_ids.txt` (union across all seeds). |
 | [`verify_splits.py`](verify_splits.py) | Verify all splits satisfy the location-safety and distribution constraints. |
-| [`precompute_clay_embeddings.py`](precompute_clay_embeddings.py) | Reads used chips (per `splits/used_chip_ids.txt`), runs Clay v1.5, saves `identity.npz` (one 2048-D embedding per chip). |
+| [`precompute_clay_embeddings.py`](precompute_clay_embeddings.py) | Reads used chips (per `splits/used_chip_ids.txt`), runs Clay v1.5, saves `identity.npz` — CLS (1024-D) + centre 7×7 patch tokens per chip. Pool-independent; `train_head.py` picks the pool at load time. |
 | [`train_head.py`](train_head.py) | Trains the MLP head on cached embeddings, for the split identified by env-var `HEAD_SEED`. |
 | [`compile_results.py`](compile_results.py) | Aggregates every `results.json` under `$KELP_DATA_DIR/../**` into `results/all_runs.csv`. |
 
@@ -62,6 +62,14 @@ decision is informed by a tighter neighbourhood around the anchor, at the cost
 of spatial averaging that stabilised the historical 5×5 run. Larger pool →
 more context, coarser effective footprint.
 
+**How it flows through the pipeline.** The cache stores the raw CLS token +
+the centre `CACHE_K × CACHE_K` (default 7×7) patch tokens per chip
+([`patch_pool.py`](patch_pool.py)). Pool aggregation happens at head-training
+time in [`train_head.py`](train_head.py) — it slices a `POOL_SIZE × POOL_SIZE`
+window inside the cached 7×7, means it, and concatenates with CLS. One Clay
+pass covers every pool size ≤ CACHE_K. To go above 7 (e.g. try pool=9), widen
+`CACHE_K` and re-run precompute.
+
 **Valid values and effective footprint.**
 
 | `KELP_POOL_SIZE` | Patch slice on 28×28 grid | Effective footprint (native S2 metres) |
@@ -87,30 +95,31 @@ the floor: no `POOL_SIZE` value gets you a genuine 10 × 10 m footprint.
 **Usage.**
 
 ```bash
-# Sharpen the head to a single centre patch.
-export KELP_POOL_SIZE=1
-python precompute_clay_embeddings.py       # writes identity_p1.npz
-for seed in 42 123 456; do HEAD_SEED=$seed python train_head.py; done  # → results/head_seed{S}_p1/
+# One Clay pass — writes clay_cache/identity.npz (~940 MB for 4.6k chips,
+# CLS + centre 7×7 patch tokens per chip).
+python precompute_clay_embeddings.py
+
+# Sweep pool sizes without re-running Clay.
+for POOL in 1 2 3 5; do
+  for SEED in 42 123 456; do
+    KELP_POOL_SIZE=$POOL HEAD_SEED=$SEED python train_head.py
+  done
+done
+# → results/head_seed{SEED}_p{POOL}/
 ```
 
-The Clay forward pass depends only on the chip; the pool is a cheap mean over
-patch tokens. In principle the cache could store the whole patch grid so a
-single Clay pass supports every pool; we store the pooled embedding instead
-to keep the cache small (~46 MB vs ~1.2 GB for 7×7). Trying a new pool costs
-one Clay pass (~10 min on GPU) + one head-training pass per seed.
+Cache size: `N × (1 + K²) × 1024 × 4 bytes`. For N=4,609 and K=7 that's
+~940 MB, versus ~46 MB for a single pool-specific cache. The trade is worth
+it as soon as you touch more than one pool — a Clay pass is ~10 min on GPU,
+head training is a few minutes per seed.
 
-**Migration.** Existing runs used the un-tagged `clay_cache/identity.npz` and
-`results/head_seed{SEED}/`. To keep those results comparable under the new
-convention, rename them:
-
-```bash
-mv $KELP_DATA_DIR/clay_cache/identity.npz $KELP_DATA_DIR/clay_cache/identity_p5.npz
-# per seed:
-mv training/results/head_seed42 training/results/head_seed42_p5
-```
-
-Alternatively re-run `precompute_clay_embeddings.py` and `train_head.py` with
-`KELP_POOL_SIZE=5` to regenerate them under the tagged names.
+**Migration.** The old pipeline wrote a pool-specific cache
+(`identity_p{POOL}.npz`, 2048-D per chip). The new pipeline writes a single
+`identity.npz` (CLS + centre 7×7 patches) and `train_head.py` refuses old
+caches with a clear error. Re-run `precompute_clay_embeddings.py` once after
+this refactor; the pool-specific files can then be deleted (kept around for
+now — they don't cost much and let old trained heads be reproduced from their
+matching cache).
 
 ## Splits (algorithm)
 

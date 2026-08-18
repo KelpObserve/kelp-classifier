@@ -43,6 +43,8 @@ from sklearn.metrics import (average_precision_score, balanced_accuracy_score,
                              confusion_matrix, precision_recall_fscore_support,
                              roc_auc_score)
 
+from patch_pool import cache_local_slice
+
 REPO = Path(__file__).resolve().parent
 META_CSV = config.CHIPS_META
 CACHE = config.CLAY_CACHE_NPZ
@@ -110,10 +112,22 @@ def load_chip_data(seed):
     assert len(keep) == len(all_ids), (
         f"metadata match {len(keep)} != split chip_ids {len(all_ids)}")
 
-    # Load embedding cache
+    # Load embedding cache. New format stores CLS + centre patches; we build
+    # the 2048-D input on the fly by mean-pooling the POOL_SIZE×POOL_SIZE
+    # window inside the cached centre patches.
     cache = np.load(CACHE)
+    assert "centre_patches" in cache.files, (
+        f"{CACHE} is old-format (has {sorted(cache.files)}); expected "
+        f"'cls' + 'centre_patches'. Re-run precompute_clay_embeddings.py."
+    )
     row_by_id = {gid: i for i, gid in enumerate(cache["gbif_ids"])}
-    emb = cache["emb"]
+    cls_all     = cache["cls"]              # (N, 1024)
+    patches_all = cache["centre_patches"]   # (N, CACHE_K, CACHE_K, 1024)
+    lo, hi = cache_local_slice(config.POOL_SIZE)
+    pool_all = patches_all[:, lo:hi, lo:hi, :].mean(axis=(1, 2))  # (N, 1024)
+    emb = np.concatenate([cls_all, pool_all], axis=1).astype(np.float32)  # (N, 2048)
+    print(f"[cache] {CACHE.name}  N={emb.shape[0]}  pool={config.POOL_SIZE} "
+          f"(cache slice [{lo}:{hi}])")
     missing = [r["gbifID"] for r in keep if r["gbifID"] not in row_by_id]
     # C3 (reviewer): missing embeddings must not silently drop. If a split
     # chip is missing from the cache the training set is not what was planned;
@@ -158,7 +172,7 @@ def main():
     # set at module top before torch imports; here we pin the RNGs and force
     # deterministic cuDNN + cuBLAS ops. warn_only=False → any non-deterministic
     # op raises loudly instead of silently drifting the reported metric.
-    print(f"[config] POOL_SIZE={config.POOL_SIZE}  cache={config.CLAY_CACHE_NPZ.name}")
+    print(f"[config] POOL_SIZE={config.POOL_SIZE}  cache={config.CLAY_CACHE_NPZ.name} (shared across pools)")
     torch.manual_seed(SEED); random.seed(SEED); np.random.seed(SEED)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(SEED)

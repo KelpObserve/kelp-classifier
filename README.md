@@ -51,7 +51,7 @@ $KELP_DATA_DIR/
 ├── s2_chips_merged/
 │   ├── chips.h5                     # Merged 128×128 S2 chips (8 bands)
 │   └── chips_metadata.csv           # One row per chip
-├── clay_cache/identity_p{N}.npz     # Cached Clay embeddings, one file per KELP_POOL_SIZE
+├── clay_cache/identity.npz          # Cached Clay CLS + centre 7×7 patches (pool-independent)
 ├── absent_windows.json              # Per-A time-window annotations
 └── jncc_mr/                         # Optional: JNCC MDB snapshot (~1.7 GB)
 ```

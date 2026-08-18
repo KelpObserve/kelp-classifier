@@ -2,10 +2,16 @@
 
 Input: text file with one chip gbifID per line (defaults to splits/used_chip_ids.txt)
 Reads chips from the merged HDF5 by matching gbifID → row index in chips_metadata.csv.
-Writes ONE embedding per chip to data/clay_cache/identity.npz.
 
-Now that ABSENT chips come from real multi-scene observations, we no longer
-need the 8-augmentation cache.
+Cache format (single file, pool-independent):
+    identity.npz
+      gbif_ids       (N,)                — chip IDs in the order emb rows land
+      scene_ids      (N,)                — sceneID snapshot for stale-cache detection
+      cls            (N, 1024)  float32  — Clay CLS token
+      centre_patches (N, K, K, 1024) float32 — centre K×K patch tokens (K=CACHE_K)
+
+`train_head.py` slices centre_patches by the requested POOL_SIZE and means at
+load time — the Clay pass runs once and covers every pool experiment.
 
 Usage:
   python precompute_clay_embeddings.py [chip_ids.txt]
@@ -31,6 +37,7 @@ while _here != _here.parent:
         _sys.path.insert(0, str(_here)); break
     _here = _here.parent
 import config
+from patch_pool import PATCH_GRID, CACHE_K, CACHE_LO, CACHE_HI
 
 CHIPS_H5  = config.CHIPS_H5
 META_CSV  = config.CHIPS_META
@@ -42,28 +49,6 @@ OUT = config.CLAY_CACHE_NPZ
 CLAY_BAND_IDX = [1, 2, 3, 4, 5, 6]
 CLAY_KEYS = ["blue", "green", "red", "rededge1", "nir", "swir16"]
 CLAY_WAVES = [0.493, 0.560, 0.665, 0.704, 0.842, 1.610]
-
-# Clay v1.5 patch grid on our chips: 128→224 resize, patch=8 → 28×28 tokens.
-PATCH_GRID = 28
-
-
-def centre_pool_slice(pool_size, grid=PATCH_GRID):
-    """Return (lo, hi) indices for a pool_size×pool_size window centred on the
-    chip centre in a ``grid``×``grid`` patch grid.
-
-    The chip centre falls at patch ≈ 13.9 after the 128→224 resize (chip pixel
-    111.5 / patch width 8). Odd pool_sizes centre on patch 13 — matching the
-    original 5×5 [11:16] convention (11+15 midpoint = 13). Even pool_sizes take
-    the [13:13+pool_size] window that straddles the true centre.
-    """
-    if pool_size % 2 == 1:
-        c = 13
-        lo = c - pool_size // 2
-    else:
-        lo = 13
-    hi = lo + pool_size
-    assert 0 <= lo and hi <= grid, f"pool {pool_size} out of grid {grid}"
-    return lo, hi
 
 
 def latlon_time(meta):
@@ -104,10 +89,8 @@ def main():
     wanted = [line.strip() for line in ids_path.open() if line.strip()]
     wanted_set = set(wanted)
     print(f"loaded {len(wanted)} chip IDs from {ids_path}")
-    pool_lo, pool_hi = centre_pool_slice(config.POOL_SIZE)
-    print(f"POOL_SIZE={config.POOL_SIZE} → patches[{pool_lo}:{pool_hi}, "
-          f"{pool_lo}:{pool_hi}] on the {PATCH_GRID}×{PATCH_GRID} patch grid "
-          f"→ cache={OUT.name}")
+    print(f"caching CLS + centre {CACHE_K}×{CACHE_K} patches "
+          f"(grid[{CACHE_LO}:{CACHE_HI}, {CACHE_LO}:{CACHE_HI}]) → {OUT.name}")
 
     # Locate wanted chips in the merged HDF5 via chips_metadata.csv
     meta_all = list(csv.DictReader(META_CSV.open()))
@@ -117,34 +100,40 @@ def main():
     # still match what's in metadata. A re-fetch can re-order scenes at a base
     # gbifID and hand a different sceneID to `gbifID_s1` than last time; without
     # this check the stale embedding is silently reused (reviewer finding C1).
-    existing_emb = {}
+    # An old-format cache (only "emb", no "cls"/"centre_patches") is invalidated
+    # wholesale — its shape can't feed the head at multiple pool sizes.
+    existing_cls = {}
+    existing_patches = {}
     scene_of = {}  # cached gbifID → sceneID (for logging invalidation)
     if OUT.exists():
         cached = np.load(OUT)
-        # Materialize arrays ONCE — otherwise cached["emb"][i] re-reads the
-        # entire 37 MB array from the npz each iteration and each dict-value
-        # view keeps its parent array alive → RAM blows up on large caches.
-        cached_ids    = list(cached["gbif_ids"])
-        cached_scenes = list(cached["scene_ids"]) if "scene_ids" in cached.files else [""] * len(cached_ids)
-        cached_emb    = cached["emb"]  # single materialization
-        invalidated = 0
-        for i, gid in enumerate(cached_ids):
-            cs = cached_scenes[i] if i < len(cached_scenes) else ""
-            row = row_by_id.get(gid)
-            current_scene = row[1].get("sceneID", "") if row else ""
-            if not cs or cs != current_scene:
-                invalidated += 1
-                continue
-            existing_emb[gid] = cached_emb[i].copy()  # detach from parent
-            scene_of[gid] = cs
-        del cached, cached_emb  # free npz + parent array before Clay load
-        print(f"existing cache: {len(existing_emb)} valid, {invalidated} invalidated (missing/stale sceneID)")
+        if "centre_patches" not in cached.files:
+            print(f"existing cache is old-format ({sorted(cached.files)}) — ignoring, re-embedding all chips")
+        else:
+            cached_ids     = list(cached["gbif_ids"])
+            cached_scenes  = list(cached["scene_ids"]) if "scene_ids" in cached.files else [""] * len(cached_ids)
+            cached_cls     = cached["cls"]              # (M, 1024) — single materialisation
+            cached_patches = cached["centre_patches"]   # (M, K, K, 1024)
+            invalidated = 0
+            for i, gid in enumerate(cached_ids):
+                cs = cached_scenes[i] if i < len(cached_scenes) else ""
+                row = row_by_id.get(gid)
+                current_scene = row[1].get("sceneID", "") if row else ""
+                if not cs or cs != current_scene:
+                    invalidated += 1
+                    continue
+                existing_cls[gid]     = cached_cls[i].copy()      # detach from parent
+                existing_patches[gid] = cached_patches[i].copy()
+                scene_of[gid] = cs
+            del cached_cls, cached_patches
+            print(f"existing cache: {len(existing_cls)} valid, {invalidated} invalidated (missing/stale sceneID)")
+        del cached  # free npz before Clay load
     missing = [g for g in wanted if g not in row_by_id]
     if missing:
         print(f"WARN: {len(missing)} requested IDs missing from chips.h5 (first 5: {missing[:5]})")
 
     # New chips to compute; keep already-cached ones as-is
-    todo = [(g, *row_by_id[g]) for g in wanted if g in row_by_id and g not in existing_emb]
+    todo = [(g, *row_by_id[g]) for g in wanted if g in row_by_id and g not in existing_cls]
     print(f"embedding {len(todo)} new chips (skipping {len(wanted) - len(todo) - len(missing)} cached)")
 
     with h5py.File(CHIPS_H5, "r") as f:
@@ -164,7 +153,8 @@ def main():
         # E1 fix: batch Clay encoder to amortise H2D + kernel launch cost
         BATCH = 32
         N = len(todo)
-        new_emb = np.zeros((N, 2048), dtype=np.float32)
+        new_cls     = np.zeros((N, 1024), dtype=np.float32)
+        new_patches = np.zeros((N, CACHE_K, CACHE_K, 1024), dtype=np.float32)
         new_ids = [gid for gid, _, _ in todo]
         t0 = time.time()
         with torch.no_grad():
@@ -192,17 +182,20 @@ def main():
                 if isinstance(out, tuple): out = out[0]
                 cls = out[:, 0, :]
                 patches = out[:, 1:, :].reshape(B, PATCH_GRID, PATCH_GRID, 1024)
-                centre = patches[:, pool_lo:pool_hi, pool_lo:pool_hi, :].mean(dim=(1, 2))
-                new_emb[i0:i0 + B] = torch.cat([cls, centre], dim=-1).cpu().numpy()
+                centre = patches[:, CACHE_LO:CACHE_HI, CACHE_LO:CACHE_HI, :]
+                new_cls[i0:i0 + B]     = cls.cpu().numpy()
+                new_patches[i0:i0 + B] = centre.cpu().numpy()
                 if (i0 + B) % 500 == 0 or i0 + B == N:
                     print(f"  {i0 + B}/{N}  {time.time()-t0:.0f}s", flush=True)
 
     # Merge: existing cache + new embeddings, restricted to `wanted` set, in wanted order
-    for gid, e in zip(new_ids, new_emb):
-        existing_emb[gid] = e
-    final_ids = [g for g in wanted if g in existing_emb]
-    final_emb = np.stack([existing_emb[g] for g in final_ids])
-    final_scenes = np.array([row_by_id[g][1].get("sceneID","") for g in final_ids])
+    for gid, c, p in zip(new_ids, new_cls, new_patches):
+        existing_cls[gid]     = c
+        existing_patches[gid] = p
+    final_ids     = [g for g in wanted if g in existing_cls]
+    final_cls     = np.stack([existing_cls[g]     for g in final_ids])
+    final_patches = np.stack([existing_patches[g] for g in final_ids])
+    final_scenes  = np.array([row_by_id[g][1].get("sceneID","") for g in final_ids])
     OUT.parent.mkdir(exist_ok=True, parents=True)
     # #4 (reviewer): np.savez isn't atomic. A crash mid-write can leave the
     # file half-baked — either a BadZipFile (recoverable) or, worse, a
@@ -214,10 +207,11 @@ def main():
     # `.npz` (identity.tmp.npz) — otherwise savez writes identity.npz.tmp.npz
     # and the os.replace(identity.npz.tmp, ...) below then fails.
     tmp = OUT.with_name(OUT.stem + ".tmp" + OUT.suffix)  # identity.tmp.npz
-    np.savez(tmp, gbif_ids=np.array(final_ids), scene_ids=final_scenes, emb=final_emb)
+    np.savez(tmp, gbif_ids=np.array(final_ids), scene_ids=final_scenes,
+             cls=final_cls, centre_patches=final_patches)
     import os as _os
     _os.replace(tmp, OUT)
-    print(f"wrote {OUT}  shape={final_emb.shape}  (atomic; with scene_ids for cache validation)")
+    print(f"wrote {OUT}  cls={final_cls.shape}  centre_patches={final_patches.shape}  (atomic)")
 
 
 if __name__ == "__main__":
