@@ -76,9 +76,15 @@ CLUSTER_RADIUS_KM = 0.05
 EARTH_R_KM = 6371.0
 
 # Bin widths for stratification / matching
-WATER_W = 0.10   # wf_region bin
+WATER_W = 0.10   # wf_region bin (coarse bucketing; matching also uses raw water via LAMBDA_W)
 CLOUD_W = 0.05   # cloud_region bin
 P_A_RATIO_TARGET = 2  # P/A target per A chip (achieved ~1.9:1 in practice)
+# Weight for water term in the free-P nearest-neighbour matching distance.
+# Distance = LAMBDA_W * |water_a - water_c| + |b02_a - b02_c|. Set so that a
+# 0.05 water gap costs the same as a ~100 uint16 b02 gap (b02 IQR is ~300-500,
+# so 100 is a small-but-nonzero penalty — enough to break within-bin ties in
+# favour of closer water fraction, not so large that b02 matching collapses).
+LAMBDA_W = 2000.0
 
 DEFAULT_SEEDS = (42, 123, 456)
 
@@ -223,8 +229,10 @@ def subselect_present(all_rows, clusters, cluster_split, a_by_split, seed):
         if not p_idxs: continue
         primary_wbin = Counter(water_bin(all_rows[i]) for i in p_idxs).most_common(1)[0][0]
         mean_b02 = float(np.mean([b02(all_rows[i]) for i in p_idxs]))
+        mean_wf  = float(np.mean([_num(all_rows[i], "wf_region") for i in p_idxs]))
         p_free_clusters.append({
             "wbin": primary_wbin,
+            "water": mean_wf,
             "b02": mean_b02,
             "gids": [all_rows[i]["gbifID"] for i in p_idxs],
             "taken": False,
@@ -238,25 +246,35 @@ def subselect_present(all_rows, clusters, cluster_split, a_by_split, seed):
     for split_name, indices in a_by_split.items():
         for i in indices:
             r = all_rows[i]
-            a_by_wbin[water_bin(r)].append((split_name, b02(r)))
+            a_by_wbin[water_bin(r)].append((split_name, b02(r), _num(r, "wf_region")))
 
     picked_free = {"train": [], "val": [], "test": []}
     for wbin, a_list in a_by_wbin.items():
         pool = list(free_by_wbin.get(wbin, []))
         rng.shuffle(pool)
         rng.shuffle(a_list)
-        for (split_name, a_val) in a_list:
+        # Per-split chip-count target: P_A_RATIO_TARGET × A_count_in_this_bin_for_that_split.
+        # Enforcing this bounds high-water bins (where P clusters carry 3-5 chips each)
+        # from over-contributing to the split, keeping P's water median aligned with A's.
+        target = defaultdict(int)
+        for split_name, _b02, _wf in a_list:
+            target[split_name] += P_A_RATIO_TARGET
+        chips_picked = defaultdict(int)
+        for (split_name, a_b02, a_water) in a_list:
             for _ in range(P_A_RATIO_TARGET):
+                if chips_picked[split_name] >= target[split_name]:
+                    break
                 best_i, best_d = -1, float("inf")
                 for i, c in enumerate(pool):
                     if c["taken"]: continue
-                    d = abs(c["b02"] - a_val)
+                    d = LAMBDA_W * abs(c["water"] - a_water) + abs(c["b02"] - a_b02)
                     if d < best_d:
                         best_d, best_i = d, i
                 if best_i < 0:
                     break
                 pool[best_i]["taken"] = True
                 picked_free[split_name].extend(pool[best_i]["gids"])
+                chips_picked[split_name] += len(pool[best_i]["gids"])
 
     return {k: sorted(set(forced_p[k]) | set(picked_free[k]))
             for k in ("train", "val", "test")}

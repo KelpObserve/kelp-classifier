@@ -141,42 +141,54 @@ Two independent stages produce the split JSON per seed:
    (0.75 / 0.15 / 0.15 of the bin total, measured in A chip count).
 
 Cluster granularity limits how close the achievable ratio is to 75/15/15.
-Overall achieved split ratios are **74–77 / 10–13 / 12–15%**.
+Overall achieved split ratios are **74–78 / 12–13 / 10–13%**.
 
 **Guarantees**:
-- All 1,614 A chips are placed; no A chip is dropped.
+- All 1,533 A chips are placed; no A chip is dropped.
 - Exact-location safety on ALL chips (P as well as A): any two chips within
   50 m end up in the same split.
 
-### Stage B — hierarchical PRESENT subselection (~2.1:1 P:A)
+### Stage B — hierarchical PRESENT subselection (~1.9:1 P:A)
 
 Two sources of P per split:
 
 1. **FORCED-P** — P chips inside A-carrying clusters go to the same split
-   as those clusters (exact-location safety). The 22 mixed P/A clusters in
+   as those clusters (exact-location safety). The 14 mixed P/A clusters in
    the current pool contribute this way.
-2. **FREE-P** — P-only clusters participate in the greedy nearest-b02
-   assignment:
+2. **FREE-P** — P-only clusters participate in the greedy nearest-neighbour
+   assignment inside each A chip's water bin:
    - Per water bin, iterate the split's A chips in seeded random order.
-   - For each A chip, take its `P_A_RATIO_TARGET = 2` nearest-b02 free
-     clusters in the same water bin and assign them to the A chip's split.
+   - Matching distance is `LAMBDA_W · |wf_A − wf_cluster| + |b02_A − b02_cluster|`
+     with `LAMBDA_W = 2000` — b02 is the primary key, but water shifts within
+     the coarse `WATER_W = 0.10` bin still contribute to the tie-break.
+   - **Per-bin chip-count cap**: keep picking clusters until `chips_in_bin`
+     reaches `P_A_RATIO_TARGET · A_in_bin_in_split`, then stop. This avoids
+     high-water bins over-contributing because their P-only clusters carry
+     2–5 chips each (cluster-count cap would have added 3–5× more chips
+     per pick in dense bins, dragging the aggregate water median up).
    - Whole clusters are picked atomically — a free cluster with 2 co-located
      P chips (rare) goes as a unit, keeping P-P exact-location safety intact.
 
-This preserves water-fraction alignment exactly (choice is water-bin
-constrained), approximates the b02 range as tightly as the free pool allows,
-and enforces exact-location safety P-side.
+This preserves water-fraction alignment as tightly as the bin+distance
+matching allows, approximates the b02 range within each water bin, and
+enforces exact-location safety P-side. The chip-count cap trades ~10 %
+fewer P chips in the splits (union: 4,609 vs 5,064 without the cap) for
+much tighter cloud + water distributions between P and A.
 ### L2 sanity (linear classifier on QC only)
 
-Trained on the split's train, evaluated on its test:
+Trained on the split's train, evaluated on its test. Numbers below are
+from the pre-2026-07-27 pipeline (cloud-first P fetch, no chip-count cap,
+no `LAMBDA_W`); pending re-run on the current splits:
 
 |                                | Seed 42 | Seed 123 | Seed 456 |
 |---                             |---:     |---:      |---:      |
 | ROC using **water + cloud** only | ~0.55  | ~0.55    | ~0.53    |
 | ROC using **all 4 QC** features  | ~0.64  | ~0.63    | ~0.61    |
 
-Both far below the model's ~0.85 test ROC, confirming the model finds
-signal beyond QC (see "Model vs QC-baseline gap" in Results).
+Both far below the model's ~0.97 test ROC (see Results below), confirming
+the model finds signal beyond QC. The QC baseline should get *lower* on
+the current splits because the P/A cloud gap the QC classifier used to
+exploit is now closed.
 
 ### Split JSON format
 
@@ -204,73 +216,81 @@ tied to the split files currently in `splits/`.
 ## Results (canonical run)
 
 Trained with default settings on the split files produced by the current
-`make_splits.py`. See [`results/all_runs.csv`](results/all_runs.csv) for
-history.
+`make_splits.py` (2026-07-28 pipeline: date-first P fetch, chip-count-capped
+per-bin matcher with `LAMBDA_W = 2000` water term, mislabel cleanup).
+See [`results/all_runs.csv`](results/all_runs.csv) for history.
 
-**3-seed mean (SEEDS 42 / 123 / 456, 50 m exact-location safety pipeline)**:
+**3-seed mean (SEEDS 42 / 123 / 456)**:
 
 | Metric | Value |
 |---|---|
-| **Test ROC-AUC** | **0.893 ± 0.009** |
-| Test balanced_acc @ t=0.5 | 0.816 ± 0.031 |
-| Test macro_F1 @ 0.5 | 0.812 ± 0.021 |
-| Test ABSENT recall @ 0.5 | 0.761 ± 0.082 |
-| Test ABSENT precision @ 0.5 | 0.736 ± 0.012 |
-| Test PRESENT recall @ 0.5 | 0.871 ± 0.021 |
+| **Test ROC-AUC** | **0.974 ± 0.007** |
+| Test balanced_acc @ t=0.5 | 0.901 ± 0.016 |
+| Test macro_F1 @ 0.5 | 0.906 ± 0.010 |
+| Test ABSENT recall @ 0.5 | 0.852 ± 0.044 |
+| Test ABSENT precision @ 0.5 | 0.900 ± 0.021 |
+| Test PRESENT recall @ 0.5 | 0.951 ± 0.014 |
+| Test PRESENT precision @ 0.5 | 0.927 ± 0.018 |
 
-**Per-split detail at threshold 0.5** (evaluated on the saved model per seed):
+**Per-seed test-set detail at threshold 0.5**:
 
-#### Seed 42
+| Seed | N_A | N_P | ROC-AUC | bal_acc | macro_F1 | ABSENT prec/rec/F1 | PRESENT prec/rec/F1 | Confusion |
+|---|---:|---:|---:|---:|---:|---|---|---|
+| 42  | 150 | 302 | 0.972 | 0.887 | 0.899 | 0.924 / 0.807 / 0.861 | 0.910 / 0.967 / 0.937 | `[[121, 29], [10, 292]]` |
+| 123 | 198 | 374 | 0.968 | 0.899 | 0.902 | 0.889 / 0.854 / 0.871 | 0.924 / 0.944 / 0.934 | `[[169, 29], [21, 353]]` |
+| 456 | 191 | 374 | 0.981 | 0.918 | 0.917 | 0.886 / 0.895 / 0.891 | 0.946 / 0.941 / 0.944 | `[[171, 20], [22, 352]]` |
 
-| Split | N_A | N_P | ROC-AUC | bal_acc | macro_F1 | ABSENT prec/rec/F1 | PRESENT prec/rec/F1 |
-|---|---:|---:|---:|---:|---:|---|---|
-| train | 1222 | 2698 | 0.977 | 0.932 | 0.905 | 0.792 / 0.981 / 0.877 | 0.990 / 0.884 / 0.934 |
-| val   |  161 |  335 | 0.934 | 0.869 | 0.851 | 0.741 / 0.888 / 0.808 | 0.941 / 0.851 / 0.893 |
-| test  |  231 |  493 | 0.897 | 0.833 | 0.821 | 0.720 / 0.814 / 0.764 | 0.907 / 0.852 / 0.879 |
+Confusion matrix format: `[[TN, FP], [FN, TP]]` with PRESENT as the positive
+class (i.e. rows are ABSENT, PRESENT ground truth; cols are the same).
 
-#### Seed 123
+**Split sizes at generation** (from `make_splits.py`, before batch balancing):
 
-| Split | N_A | N_P | ROC-AUC | bal_acc | macro_F1 | ABSENT prec/rec/F1 | PRESENT prec/rec/F1 |
-|---|---:|---:|---:|---:|---:|---|---|
-| train | 1208 | 2594 | 0.981 | 0.946 | 0.936 | 0.877 / 0.955 / 0.914 | 0.978 / 0.938 / 0.957 |
-| val   |  206 |  495 | 0.871 | 0.810 | 0.813 | 0.745 / 0.723 / 0.734 | 0.886 / 0.897 / 0.892 |
-| test  |  200 |  432 | 0.881 | 0.773 | 0.783 | 0.750 / 0.645 / 0.694 | 0.846 / 0.900 / 0.872 |
+| Seed | Train A/P | Val A/P | Test A/P |
+|---|---|---|---|
+| 42  | 1196 / 2284 | 187 / 346 | 150 / 302 |
+| 123 | 1133 / 2164 | 202 / 391 | 198 / 374 |
+| 456 | 1157 / 2221 | 185 / 335 | 191 / 374 |
 
-#### Seed 456
+Training subsamples the P majority in `train` to match A count per batch
+(each epoch sees `train_A` P chips + all `train_A` A chips).
 
-| Split | N_A | N_P | ROC-AUC | bal_acc | macro_F1 | ABSENT prec/rec/F1 | PRESENT prec/rec/F1 |
-|---|---:|---:|---:|---:|---:|---|---|
-| train | 1210 | 2648 | 0.959 | 0.901 | 0.871 | 0.742 / 0.953 / 0.834 | 0.975 / 0.849 / 0.908 |
-| val   |  199 |  442 | 0.899 | 0.828 | 0.817 | 0.711 / 0.804 / 0.755 | 0.906 / 0.853 / 0.879 |
-| test  |  205 |  433 | 0.901 | 0.843 | 0.832 | 0.738 / 0.824 / 0.779 | 0.912 / 0.861 / 0.886 |
+### Threshold-tuned results
 
-### Sanity: model vs QC-only baseline (post-training checks)
+Val-set threshold optimisation moves `t*` marginally away from 0.5 (t* ∈
+{0.47, 0.49, 0.52}), producing essentially identical test metrics — good
+sign that val→test threshold generalises. See each seed's
+`results.json:test_tuned`.
 
-A logistic regression fit to the QC columns alone (`wf_region`, `cloud_region`, `fill_region`, `b02_range`) on the same train fold, evaluated on the same test:
+### Pipeline changes since the 0.89 ROC baseline
 
-| Seed | QC-only test ROC | Model test ROC | Gap |
-|---:|---:|---:|---:|
-| 42  | 0.635 | 0.845 | +0.210 |
-| 123 | 0.632 | 0.897 | +0.265 |
-| 456 | 0.611 | 0.856 | +0.245 |
+The 3-seed mean jumped from 0.893 to 0.974 test ROC (+0.081) after four
+data-quality fixes:
 
-Mean gap = **+0.24 ROC** — the model finds a large amount of signal
-beyond what QC metadata can explain. (For contrast, the pre-fix pipeline
-reached only +0.18 gap because the QC leak baseline itself was much higher.)
+1. **Mislabel removal**: 145 chips where the same ABSENT observation had
+   been fetched twice (once mislabeled `class_tag=present`) were dropped.
+2. **PRESENT-only candidate CSV**: `build_high_precision_candidates.py`
+   was fixed to stop mixing ABSENT rows into the PRESENT fetch input.
+3. **Symmetric cloud policy**: `QC_STRICT_PRESENT` now uses `sort="date"`
+   (first-acceptable by date proximity) instead of "cleanest-first". P
+   was previously cherry-picked to the very cleanest scene while A kept
+   multiple scenes — this leaked "cleanest scene = PRESENT" as a QC
+   shortcut. P cloud mean moved from ~0.011 → ~0.028 (A ~0.036, gap
+   0.025 → 0.008).
+4. **Chip-count cap + water term in matcher**: replaced cluster-count
+   matching with chip-count matching per bin, and added `LAMBDA_W` water
+   penalty. Fixed cluster-spillover in dense high-water bins and
+   sharpened within-bin water alignment.
+
+### Sanity: model vs QC-only baseline
+
+**Pending re-run on the current splits.** The pre-2026-07-27 numbers
+(cloud-first P, no cap) were mean gap +0.24; expected to increase further
+on the new splits because the QC baseline can no longer exploit the
+P/A cloud gap.
 
 ### Sanity: model score vs b02_range on test set
 
-Residual correlation between model probability of PRESENT and each chip's
-`b02_range` (test set):
-
-| Seed | overall | within PRESENT only | within ABSENT only |
-|---:|---:|---:|---:|
-| 42  | −0.264 | −0.239 | −0.124 |
-| 123 | −0.069 | −0.106 | +0.202 |
-| 456 | −0.344 | −0.414 | −0.141 |
-
-Direction is expected — high `b02_range` biases the model slightly toward
-ABSENT. Magnitude is moderate; seed 123 is essentially decorrelated.
+**Pending re-run on the current splits.**
 
 
 ## Head architectures

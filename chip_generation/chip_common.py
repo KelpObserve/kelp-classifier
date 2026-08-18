@@ -43,6 +43,9 @@ QC_STRICT_PRESENT = dict(
     region_b02_range_min=30,  # ≥30 uint16 dynamic range in B02 (rejects atmospheric distortion)
     time_window_days=30,      # search ±30 d around eventDate
     snap_cap_m=300,           # if reported coord fails water QC, snap up to 300 m to nearest water
+    sort="date",              # first-acceptable by date proximity (symmetric with ABSENT policy;
+                              # avoids cherry-picking cleanest scene, which biased P cloud lower
+                              # than A cloud in matched splits)
 )
 
 QC_RELAXED_ABSENT = dict(
@@ -194,14 +197,22 @@ def qc_chip(chip: np.ndarray, qc: dict, lon=None, lat=None, item=None):
 # ---------------- STAC search helper ----------------
 
 def search_scenes(client, lon, lat, date, qc, time_window_days=None):
-    """Return (cloud_cover, item) tuples sorted cleanest-first, one per day.
+    """Return (sort_key, item) tuples sorted, one per day.
 
-    Scene-level cloud_cover serves two purposes:
-      1. Efficiency pre-screen: skip scenes with global cloud > scene_cloud_max
-         (typically 60%). Without this we'd STAC-search + read + reject a huge
-         number of pathologically cloudy scenes.
-      2. Sort key: within accepted scenes, try cleanest first.
-    The correctness check is still chip-level (cloud_region in qc_chip).
+    Sort ordering is controlled by qc["sort"]:
+      - "cloud"  (default): cleanest-first, sort_key = eo:cloud_cover
+      - "date"           : closest-to-eventDate first, sort_key = |days_off|
+                            (breaks tie on cloud_cover)
+
+    Scene-level cloud_cover pre-screen (scene_cloud_max, typically 60%) is
+    applied in both orderings — the difference is only which passing scene
+    the caller sees first. Chip-level QC (cloud_region in qc_chip) still
+    decides usability.
+
+    For PRESENT we use "date" ordering: the classifier trains on the same
+    date-proximity policy as ABSENT (which keeps multi-scene), so P chips
+    aren't systematically cherry-picked to be cleaner than A chips at the
+    same threshold.
 
     time_window_days: optional int, overrides qc["time_window_days"] when
     provided. Used by ABSENT fetch — each candidate carries a per-record
@@ -229,9 +240,14 @@ def search_scenes(client, lon, lat, date, qc, time_window_days=None):
         if d in seen: continue
         seen.add(d)
         cc = item.properties.get("eo:cloud_cover", 100)
-        out.append((cc, item))
-    out.sort(key=lambda x: x[0])
-    return out
+        days_off = abs((item.datetime.date() - date).days)
+        out.append((cc, days_off, item))
+    sort_mode = qc.get("sort", "cloud")
+    if sort_mode == "date":
+        out.sort(key=lambda x: (x[1], x[0]))  # closest date, then cleanest
+    else:
+        out.sort(key=lambda x: (x[0], x[1]))  # cleanest, then closest date
+    return [(cc, item) for cc, _, item in out]
 
 
 # ---------------- driver: fetch chips for a set of records ----------------
