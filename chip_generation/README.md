@@ -111,3 +111,68 @@ Merged file at `$KELP_DATA_DIR/s2_chips_merged/chips.h5`:
 | **Total** | **5,703** |
 
 These are the counts consumed by the training pipeline. Cross-source dedup runs at candidate time (`data_collection/dedup_candidates.py`); QC metadata (`wf_region`, `cloud_region`, `fill_region`, `b02_range`) is written by `chip_common.qc_chip` at fetch time.
+
+## Post-fetch cleanup (`filter_merged.py`)
+
+After the initial merge, [`filter_merged.py`](filter_merged.py) applies three
+correctness rules to the merged pool. This is a one-shot cleanup — indexes
+are renumbered afterwards, so **do not run consumers that reference
+`chipIndex` / `merged_index` between this and the split/cache rebuild**.
+
+| Rule | What it removes | Why |
+|---|---|---|
+| **1. Multi-species same-day ABSENT contradictions** | Any ABSENT chip whose `(lat, lon, eventDate)` also carries a PRESENT of a different species. | An any-kelp binary detector treats these ABSENT rows as wrong labels: kelp of *some* species was there on that date. |
+| **2. Mixed-fetch bases** | All chips (single-scene "original" + all `_sN` multi-scene siblings) at any base gbifID that has both. | The pattern that produced the OBIS misalignment bug. Re-fetched cleanly in the next stage. |
+| **3. Beyond-window ABSENT chips** | ABSENT chips whose \|sceneDate − eventDate\| exceeds their per-record `allowed_max_days` (30 or 60), flagged by `find_absent_beyond_window.py` against `absent_windows.json`. | An "no kelp seen" claim is only valid within a bounded time window around the observation date. |
+
+Two helper scripts feed rule 3:
+
+| Script | Role |
+|---|---|
+| [`find_absent_beyond_window.py`](find_absent_beyond_window.py) | For each ABSENT chip in the merged pool, checks whether `|sceneDate − eventDate|` exceeds its `allowed_max_days` (looked up in `$KELP_DATA_DIR/absent_windows.json`; fallback 30 d if the gbifID isn't in the JSON). Emits `absent_beyond_window.csv` — the flag list consumed by `filter_merged.py` rule 3. |
+| [`../data_collection/annotate_absent_windows.py`](../data_collection/annotate_absent_windows.py) | Produces `absent_windows.json` in the first place: for every raw ABSENT record, `30` if a PRESENT within 1 km + ±90 d exists, else `60`. |
+
+Backs up the merged HDF5/CSV before rewriting.
+
+## Submerged subset (`assemble_submerged.py`)
+
+Deep-water kelp species (blade sub-surface at 5-30 m) have a distinct
+spectral signature from surface-floating species (e.g. *Chorda filum*). The
+Sesimbra site targets four such species, so the training pool is subset to
+just those:
+
+- *Saccorhiza polyschides*
+- *Laminaria hyperborea*
+- *Laminaria ochroleuca*
+- *Phyllariopsis brevipes*
+
+[`assemble_submerged.py`](assemble_submerged.py) copies matching chips from
+`s2_chips_merged/` to `s2_chips_submerged/` without refetching:
+
+- **PRESENT filter (strict):** the chip's species field (a comma-separated
+  list preserved from `dedup_candidates.py`) must contain one of the four
+  target species. Falls back to raw source CSVs when the merged CSV row is
+  missing a species label.
+- **ABSENT filter (species-agnostic):** no species requirement. For an
+  "any target-species kelp" detector, any chip where the surveyor reported
+  no kelp of *any* species is valid negative signal — a JNCC survey that
+  checked 8 species and found none is a stronger negative than one that
+  only checked one.
+- **Output:** `$KELP_DATA_DIR/s2_chips_submerged/{chips.h5,chips_metadata.csv}`.
+  Same schema as the merged pool.
+
+To grow the submerged pool with observations that were never fetched into
+the merged pool in the first place, run
+[`../data_collection/build_submerged_candidates.py`](../data_collection/build_submerged_candidates.py)
+first (produces `submerged_{present,absent}_candidates.csv`), feed those
+CSVs to `fetch_present.py` / `fetch_absent.py`, re-run `merge_all_chips.py`,
+then re-run `assemble_submerged.py`.
+
+**Current submerged counts** (used by the deep-water-species training runs
+described in [`../training/README.md#chip-subsets-kelp_chips_subset`](../training/README.md#chip-subsets-kelp_chips_subset)):
+
+| Class | Chips |
+|---|---:|
+| PRESENT (4 target species) | ~2,200 |
+| ABSENT (any species) | ~1,500 |
+| **Total** | **3,733** |
