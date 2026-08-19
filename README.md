@@ -109,3 +109,19 @@ calibration differences across the geographically-different splits, not model qu
 
 See [`training/README.md`](training/README.md) for the full method, splits algorithm
 description, and per-seed detail.
+
+## Model catalog
+
+Four trained heads live in the repo. All share the same MLP architecture
+(dropout 0.3, focal loss α=0.5 γ=2.0); they differ in *training subset*,
+*input dimensionality*, and *effective spatial footprint*.
+
+| Model | Subset | Input dim | Footprint | Purpose |
+|---|---|---:|---|---|
+| `merged_p1` | merged (all species) | 2048 | ~46 m | General Europe-wide model. |
+| `submerged_p1` | submerged (4 deep-water spp.) | 2048 | ~46 m | Sharpens response to *Saccorhiza polyschides* et al. |
+| `submerged_p5` | submerged | 2048 | ~229 m | Best on submerged pool sweep + Sesimbra CCMar. Deployment-recommended for wide-area maps. |
+| `submerged_pixel` | submerged | 2054 | ~46 m Clay context + 10 m raw S2 | Runs at every 10 m pixel during rasterisation. Sharper outputs; worse on the tiny CCMar test. |
+
+Full training-vs-test results and Sesimbra CCMar pixel-aggregated evaluation
+are in [`training/README.md`](training/README.md#model-catalog).

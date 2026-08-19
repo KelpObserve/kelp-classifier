@@ -333,3 +333,141 @@ done
 # 5. Compile all results
 python compile_results.py
 ```
+
+## Chip subsets (`KELP_CHIPS_SUBSET`)
+
+The `KELP_CHIPS_SUBSET` env var routes every downstream artefact through a
+subset-specific suffix so runs on different pools never collide. Two subsets
+are currently in use:
+
+| Value | Chips | Purpose |
+|---|---:|---|
+| `merged` (default) | ~4,600 P + ~1,500 A | Full pool across all kelp species — the "general" model. |
+| `submerged` | ~2,200 P + ~1,500 A | Restricted to four deep-water species relevant to Sesimbra/Arrábida: *Saccorhiza polyschides*, *Laminaria hyperborea*, *Laminaria ochroleuca*, *Phyllariopsis brevipes*. ABSENT is species-agnostic (any chip with no PRESENT observation qualifies). |
+
+Each subset carries its own:
+- `$KELP_DATA_DIR/s2_chips_{subset}/{chips.h5,chips_metadata.csv}` — chips + metadata
+- `$KELP_DATA_DIR/clay_cache/identity_{subset}.npz` — Clay embedding cache
+- `$KELP_DATA_DIR/clay_cache/raw_center_{subset}.npz` — raw S2 pixel cache (pixel head only)
+- `training/splits_{subset}/` — split JSONs
+- `training/results_{subset}/` — trained heads + eval outputs
+
+The `merged` subset uses un-suffixed paths for backward compatibility with
+pre-subset runs. Assembly of the `submerged` subset from the merged pool is
+in [`chip_generation/assemble_submerged.py`](../chip_generation/assemble_submerged.py).
+
+## Deployment split (`split_single.json`)
+
+The 3-seed splits (§ Splits above) leave 10–13 % of chips in a test set for
+honest evaluation. For the **deployment** head — the one used in
+`rasterise.py` and `rasterise_pixel.py` to produce actual Sesimbra maps — we
+want maximum training data, so `make_single_split.py` produces a single
+train/val split with no test set:
+
+- Same 50 m location safety and (cloud_bin, water_bin) balancing as
+  `make_splits.py`, but only two partitions instead of three.
+- `--n-candidates 50` runs the greedy P subselection 50 times with different
+  seeds and keeps the split with the lowest KL divergence between P and A on
+  the (cloud, water) marginals — a tighter match than any single-seed draw.
+- Writes `splits_{subset}/split_single.json`.
+- `train_single.py` (chip head) and `train_single_pixel.py` (pixel head) read
+  this file and skip the test-set stage.
+
+The 3-seed splits are used for model comparison (pool sweep, pixel vs pool
+sweep) because they give per-metric std across seeds. The single split is
+used only to train the final deployment head.
+
+## Model catalog
+
+Four trained heads currently live in the repo. All use the same MLP
+architecture (`hidden→512→128→1`, dropout 0.3, focal loss α=0.5 γ=2.0);
+they differ in *input dimensionality* and *training subset*.
+
+| Model | Subset | Input dim | Notes |
+|---|---|---:|---|
+| **`merged_p1`** | merged | 2048 | CLS ‖ centre patch (pool=1, ~46 m footprint). General model. |
+| **`submerged_p1`** | submerged | 2048 | Same 2048-D input but trained on 4-species pool. Sharpens spectral response to deep-water kelp species. |
+| **`submerged_p5`** | submerged | 2048 | CLS ‖ mean of centre 5×5 patches (~229 m footprint). Wider context; best on the submerged pool sweep. |
+| **`submerged_pixel`** | submerged | 2054 | CLS ‖ centre patch (14,14) ‖ raw S2 6-band at chip centre (64, 64). Head runs at every 10 m pixel during rasterisation (interpolated Clay + per-pixel raw S2). |
+
+### 3-seed test-set metrics (submerged pool sweep + pixel head)
+
+From `training/results_submerged/pixel/pixel_vs_pool.csv`, seeds 42/123/456,
+threshold t=0.5:
+
+| Config | ROC-AUC (mean ± std) | PR-AUC | macro F1 |
+|---|---:|---:|---:|
+| `submerged_p1` | 0.866 ± 0.025 | 0.894 ± 0.031 | 0.787 ± 0.031 |
+| `submerged_p2` | 0.869 ± 0.035 | 0.893 ± 0.031 | 0.778 ± 0.016 |
+| `submerged_p3` | **0.894 ± 0.012** | **0.916 ± 0.017** | 0.816 ± 0.013 |
+| `submerged_p5` | 0.891 ± 0.009 | 0.907 ± 0.022 | **0.818 ± 0.024** |
+| `submerged_pixel` | 0.877 ± 0.011 | 0.903 ± 0.011 | 0.792 ± 0.037 |
+
+Pool ≥ 3 wins on the 3-seed val ROC; the pixel head is within the seed
+noise of pool={1,2}. Adding 6 raw S2 features to pool=1's centre patch does
+not measurably help *chip-level* prediction on our labels — as expected,
+because Clay's patch token already encodes the same neighbourhood.
+
+## Pixel head
+
+**Design.** Every chip is centred on its observation coord (PRESENT: reported
+GPS ≤ 10 m unc; ABSENT: snap-to-water). The labelled pixel is therefore
+always the chip-centre S2 pixel (64, 64) — which sits inside Clay patch
+(14, 14) on the 28×28 patch grid. At training time this is functionally
+equivalent to pool=1 with 6 extra spectral features; the win is at
+*inference*.
+
+**Training input (2054-D per chip):**
+- CLS token (1024) — chip-global context
+- Clay patch (14, 14) (1024) — the centre patch, cached at local (4, 4) in
+  the stored 7×7 window
+- Raw S2 (6) — Clay-normalised reflectance at pixel (64, 64), cached
+  separately by [`precompute_raw_center.py`](precompute_raw_center.py)
+
+**Inference (rasterise_pixel.py).** Bilinearly upsample the 28×28 Clay
+patch grid to 128×128, concatenate with per-pixel raw S2, run the head at
+every one of the 16,384 pixels per chip. Sesimbra bbox = 40 chip anchors →
+~655k head calls; runs in a few seconds on GPU.
+
+## Sesimbra rasterisation + CCMar evaluation
+
+`rasterise.py` (chip head) and `rasterise_pixel.py` (pixel head) tile the
+Sesimbra/Arrábida bbox with overlapping 128×128 chips (stride 64 = half-chip
+overlap), run Clay + head over each chip, and mosaic with overlap averaging.
+
+`training/apply_bathymetry_mask.py` fetches EMODnet bathymetry via WCS and
+masks pixels deeper than a threshold (30 m default; removes 55.9 % of
+Arrábida pixels).
+
+### Pixel-aggregated CCMar evaluation
+
+CCMar has 60 quadrat events (53 PRESENT + 7 ABSENT) from the Aquaserv 2026
+survey. Their GPS points fall inside just 34 unique S2 pixels — the test is
+tiny and dominated by geometry — but it's the only real-world ground truth
+we have for the Sesimbra site. OR-based pixel aggregation: a pixel is
+PRESENT if *any* event landing in it is PRESENT.
+
+From `training/results_submerged/sesimbra_model_comparison_with_pixel.csv`
+(n=34 pixels: 32 P / 2 A; best-threshold F1):
+
+| Model | ROC-AUC | F1_PRESENT | F1_ABSENT |
+|---|---:|---:|---:|
+| `merged_p1` | 0.828 | 0.897 | 0.400 |
+| `submerged_p1` | 0.812 | 0.877 | 0.364 |
+| `submerged_p5` | **0.984** | **0.984** | **0.800** |
+| `submerged_pixel` | 0.719 | 0.815 | 0.286 |
+
+**Interpretation.** `submerged_p5` dominates, but with only 2 negative
+pixels the F1_ABSENT column is 3 events wide — a single flip changes the
+number by 0.15. The pixel head loses because per-pixel decisions concentrate
+probability into 10 m spots that don't necessarily land on the same pixel as
+the CCMar quadrat centre; pool=5's ~229 m footprint smooths over that
+misalignment. This experiment does not prove per-pixel supervision is
+useless — it proves that chip-level supervision does not transfer to
+sub-46 m spatial precision on the CCMar geometry, which is what we expected.
+
+Overlay figures (red-heatmap PNGs) in `training/results_submerged/`:
+- `sesimbra_pool1_depth30_over_pneo.png` — pool=1 vs PNEO base
+- `sesimbra_pool1_depth30_with_ccmar.png` — pool=1 vs CCMar markers
+- `sesimbra_pixel_depth30_over_pneo.png` — pixel head vs PNEO base
+- `sesimbra_pixel_depth30_with_ccmar.png` — pixel head vs CCMar markers
