@@ -25,9 +25,24 @@ Train and evaluate a binary kelp-presence classifier on top of frozen
 | File | Purpose |
 |---|---|
 | [`make_splits.py`](make_splits.py) | Generate matched train/val/test splits per seed (default seeds: 42, 123, 456). Writes `splits/split_seed<S>.json` per seed + `splits/a_split_seed<S>.json` (A-only intermediate) + `splits/used_chip_ids.txt` (union across all seeds). |
+| [`make_single_split.py`](make_single_split.py) | Deployment split — one train/val partition (no test) with N-candidate min-divergence P selection. Writes `splits/split_single.json`. |
 | [`verify_splits.py`](verify_splits.py) | Verify all splits satisfy the location-safety and distribution constraints. |
 | [`precompute_clay_embeddings.py`](precompute_clay_embeddings.py) | Reads used chips (per `splits/used_chip_ids.txt`), runs Clay v1.5, saves `identity.npz` — CLS (1024-D) + centre 7×7 patch tokens per chip. Pool-independent; `train_head.py` picks the pool at load time. |
+| [`precompute_raw_center.py`](precompute_raw_center.py) | Pixel-head-only: caches Clay-normalised raw S2 reflectance at pixel (64, 64) for every chip. |
 | [`train_head.py`](train_head.py) | Trains the MLP head on cached embeddings, for the split identified by env-var `HEAD_SEED`. |
+| [`train_single.py`](train_single.py) | Trains the deployment chip head on the single train/val split. |
+| [`train_pixel_head.py`](train_pixel_head.py) | Trains the pixel head (2054-D input) on a 3-seed split, for pool-vs-pixel comparison. |
+| [`train_single_pixel.py`](train_single_pixel.py) | Trains the deployment pixel head on `split_single.json`. |
+| [`rasterise.py`](rasterise.py) | Dense P(kelp) raster over a bbox from an S2 scene, chip-level head (28×28 patch grid per chip → bilinear upsample to 10 m). |
+| [`rasterise_pixel.py`](rasterise_pixel.py) | Dense per-pixel P(kelp) raster — bilinear-upsampled Clay context + per-pixel raw S2 → head at every 10 m pixel. |
+| [`apply_bathymetry_mask.py`](apply_bathymetry_mask.py) | Fetch EMODnet bathymetry (WCS) and mask raster pixels deeper than `--max-depth-m`. |
+| [`predict_at_points.py`](predict_at_points.py) | Chip-oracle predictions at specific lat/lon points (e.g. CCMar quadrat centres). |
+| [`plot_sesimbra_map.py`](plot_sesimbra_map.py) | Coastline + P(kelp) heatmap + CCMar quadrat markers. |
+| [`plot_pneo_overlay.py`](plot_pneo_overlay.py) | S2 prediction heatmap over PNEO RGB base + optional CCMar overlay. |
+| [`plot_model_comparison.py`](plot_model_comparison.py) | Grouped bar chart across models (per-species F1 + Sesimbra pixel-agg AUC/F1). |
+| [`plot_pixel_vs_pool.py`](plot_pixel_vs_pool.py) | Pixel head vs pool={1,2,3,5} chip head, 3-seed mean±std. |
+| [`plot_pool_sweep_generic.py`](plot_pool_sweep_generic.py) | Aggregate 3-seed pool sweep results into a comparison plot. |
+| [`eval_by_species.py`](eval_by_species.py) | Per-species + ABSENT F1 for a trained head on its deployment val set. |
 | [`compile_results.py`](compile_results.py) | Aggregates every `results.json` under `$KELP_DATA_DIR/../**` into `results/all_runs.csv`. |
 
 Legacy: [`make_splits.py.legacy_2026_07_17_pre_matched`](make_splits.py.legacy_2026_07_17_pre_matched)
@@ -429,15 +444,96 @@ patch grid to 128×128, concatenate with per-pixel raw S2, run the head at
 every one of the 16,384 pixels per chip. Sesimbra bbox = 40 chip anchors →
 ~655k head calls; runs in a few seconds on GPU.
 
-## Sesimbra rasterisation + CCMar evaluation
+## Rasterisation (dense P(kelp) maps)
 
-`rasterise.py` (chip head) and `rasterise_pixel.py` (pixel head) tile the
-Sesimbra/Arrábida bbox with overlapping 128×128 chips (stride 64 = half-chip
-overlap), run Clay + head over each chip, and mosaic with overlap averaging.
+Given a bbox and an S2 L2A scene ID, both `rasterise.py` and
+`rasterise_pixel.py` produce a Float32 GeoTIFF of P(kelp) at 10 m resolution
+in the scene's UTM CRS. They share the same tiling / masking pipeline; they
+differ only in how the head is applied.
 
-`training/apply_bathymetry_mask.py` fetches EMODnet bathymetry via WCS and
-masks pixels deeper than a threshold (30 m default; removes 55.9 % of
-Arrábida pixels).
+**Pipeline (both scripts).**
+
+1. **STAC lookup** — fetch the scene item from Earth-Search
+   (element84 STAC), then read the 6 Clay bands (blue/green/red/rededge1/
+   nir/swir16) + SCL over the bbox from the L2A COGs, aligned to the scene's
+   native 10 m UTM grid via `from_bounds`.
+2. **Tile with overlap** — cover the bbox with 128×128 chip anchors on a
+   `stride_px` (default 64 = half-chip overlap) grid. Half-chip overlap
+   means every interior pixel is covered by 4 chips → smoother mosaic
+   boundaries.
+3. **Batch Clay** — for each batch of `batch` anchors, resize 128→224,
+   normalise per Clay's per-band mean/std, run Clay v1.5 encoder → CLS +
+   28×28 patch grid.
+4. **Apply head** (differs — see below).
+5. **Mosaic with overlap averaging** — sum probabilities into `prob_sum`
+   and increment `prob_cnt` per pixel; final `prob = prob_sum / prob_cnt`.
+6. **SCL land / cloud / cirrus mask** — post-hoc set land (SCL 4/5/7/11),
+   cloud (SCL 3/8/9/10), and nodata (SCL 0) pixels to NaN. This does not
+   influence Clay or the head, only the final raster.
+
+**Head application — `rasterise.py` (chip head):**
+Run the head at every one of the 28×28 patch positions per chip →
+28×28 probability grid, then bilinearly upsample to 128×128 before
+splatting into the mosaic. Native resolution is ~46 m (one Clay patch);
+the 10 m raster is a smooth upsample of that. 784 head calls per chip.
+
+**Head application — `rasterise_pixel.py` (pixel head):**
+Bilinearly upsample the 28×28 Clay patch grid to 128×128 (per-pixel Clay
+context), concatenate with per-pixel raw S2 (already Clay-normalised),
+broadcast CLS, then run the 2054-D head at every one of the 16,384 pixels
+per chip. Native resolution is 10 m — each pixel gets its own decision
+from its own spectra + interpolated neighbourhood. 20× more head calls
+per chip than the chip version; head runs per-chip inside a batched
+Clay pass to bound VRAM.
+
+### Depth masking (optional)
+
+Kelp beds in Arrábida sit above ~30 m depth; deeper pixels in the raster
+are false positives from open-water spectra. `apply_bathymetry_mask.py`
+fetches EMODnet bathymetry via WCS (public, no auth, ~115 m native),
+reprojects onto the raster grid, and NaN-masks pixels where depth exceeds
+`--max-depth-m` (default 30 m). Over the Arrábida bbox this removes 55.9 %
+of pixels — mostly the deep water south of the shelf break.
+
+**Cache round-trip.** `--bathy-out` writes the fetched bathymetry to disk
+in the raw EMODnet convention (negative = below sea level). `--bathy-cache`
+loads that file back on subsequent runs instead of refetching. Both paths
+apply the sign flip on read, so round-trips are lossless.
+
+### CLI examples
+
+```bash
+# Chip-head raster over Sesimbra/Arrábida using the pool=1 deployment head
+python training/rasterise.py \
+    --bbox -9.235 38.395 -9.170 38.425 \
+    --scene S2A_29SMC_20260609_0_L2A \
+    --head  training/results_submerged/head_single_p1/model.pt \
+    --out   training/results_submerged/sesimbra_arrabida_prob.tif
+
+# Same bbox, pixel head
+python training/rasterise_pixel.py \
+    --bbox -9.235 38.395 -9.170 38.425 \
+    --scene S2A_29SMC_20260609_0_L2A \
+    --head  training/results_submerged/head_single_pixel/model.pt \
+    --out   training/results_submerged/sesimbra_arrabida_prob_pixel.tif
+
+# 30 m depth mask + save the bathymetry for future reuse
+python training/apply_bathymetry_mask.py \
+    --raster    training/results_submerged/sesimbra_arrabida_prob_pixel.tif \
+    --out       training/results_submerged/sesimbra_arrabida_prob_pixel_depth30.tif \
+    --max-depth-m 30 \
+    --bathy-out training/results_submerged/emodnet_bathy_arrabida.tif
+
+# Overlay figures — heatmap over PNEO RGB, and heatmap under CCMar quadrat markers
+python training/plot_pneo_overlay.py \
+    --raster       training/results_submerged/sesimbra_arrabida_prob_pixel_depth30.tif \
+    --pneo         /path/to/000598128_1_2_STD_A \
+    --ccmar        /path/to/kelp_observations_with_coordinates.csv \
+    --out-prefix   training/results_submerged/sesimbra_pixel_depth30 \
+    --pool-label   'pixel head'
+```
+
+## Sesimbra CCMar evaluation
 
 ### Pixel-aggregated CCMar evaluation
 
