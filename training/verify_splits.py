@@ -33,7 +33,7 @@ import config
 
 REPO = Path(__file__).resolve().parent
 META = config.CHIPS_META
-SPLITS = REPO / "splits"
+SPLITS = config.SPLITS_DIR
 
 # Radius is imported from make_splits so the two files cannot silently
 # disagree if one is changed. cluster_by_location is still re-implemented

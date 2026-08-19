@@ -16,8 +16,17 @@ REPO_ROOT = Path(__file__).resolve().parent
 # --- Data root (all data + intermediate artefacts live here) ------------------
 DATA_DIR = Path(os.environ.get("KELP_DATA_DIR", "~/kelp-data")).expanduser()
 
-# --- Sentinel-2 chips (merged across sources) --------------------------------
-CHIPS_DIR  = DATA_DIR / "s2_chips_merged"
+# --- Chip subset selector ----------------------------------------------------
+# Chooses which pool of chips scripts read from. Default "merged" preserves
+# historical behaviour; "submerged" points at the deep-submerged-kelp subset
+# assembled by chip_generation/assemble_submerged.py. Splits + Clay cache +
+# results dirs are also suffixed when subset != "merged" so runs on different
+# pools don't overwrite each other.
+CHIPS_SUBSET = os.environ.get("KELP_CHIPS_SUBSET", "merged")
+_SUFFIX = "" if CHIPS_SUBSET == "merged" else f"_{CHIPS_SUBSET}"
+
+# --- Sentinel-2 chips (subset per KELP_CHIPS_SUBSET) -------------------------
+CHIPS_DIR  = DATA_DIR / f"s2_chips_{CHIPS_SUBSET}"
 CHIPS_H5   = CHIPS_DIR / "chips.h5"
 CHIPS_META = CHIPS_DIR / "chips_metadata.csv"
 
@@ -42,16 +51,19 @@ assert POOL_SIZE in {1, 2, 3, 5, 7}, (
 # --- Cached Clay embeddings ---------------------------------------------------
 # Single cache file for all pool sizes: stores CLS + centre 7×7 patch tokens.
 # `train_head.py` slices + means at load time to build the 2048-D input for
-# the head.
+# the head. Cache filename is suffixed by the chip subset so pool-independent
+# caches for different subsets don't collide.
 CLAY_CACHE_DIR = DATA_DIR / "clay_cache"
-CLAY_CACHE_NPZ = CLAY_CACHE_DIR / "identity.npz"
+CLAY_CACHE_NPZ = CLAY_CACHE_DIR / f"identity{_SUFFIX}.npz"
 
 # --- Per-record allowed_max_days annotations (built by data_collection) -------
 ABSENT_WINDOWS_JSON = DATA_DIR / "absent_windows.json"
 
 # --- Splits + results (regenerated locally, gitignored) -----------------------
-SPLITS_DIR  = REPO_ROOT / "training" / "splits"
-RESULTS_DIR = REPO_ROOT / "training" / "results"
+# Suffix by chip subset so runs on different pools don't overwrite each other
+# (backward-compatible: "merged" keeps the historical un-suffixed paths).
+SPLITS_DIR  = REPO_ROOT / "training" / f"splits{_SUFFIX}"
+RESULTS_DIR = REPO_ROOT / "training" / f"results{_SUFFIX}"
 
 # --- Logs / tmp (workspace only) ----------------------------------------------
 LOGS_DIR = Path(os.environ.get("KELP_LOGS_DIR", DATA_DIR.parent / "logs"))

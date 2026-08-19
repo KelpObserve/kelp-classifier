@@ -48,8 +48,8 @@ from patch_pool import cache_local_slice
 REPO = Path(__file__).resolve().parent
 META_CSV = config.CHIPS_META
 CACHE = config.CLAY_CACHE_NPZ
-SPLITS = REPO / "splits"
-OUT_ROOT = REPO / "results"
+SPLITS = config.SPLITS_DIR
+OUT_ROOT = config.RESULTS_DIR
 
 SEED = int(os.environ.get("HEAD_SEED", 42))
 # EMBED_DIM stays 2048 (CLS 1024 + mean-pooled centre 1024) regardless of

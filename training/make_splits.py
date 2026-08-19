@@ -62,7 +62,7 @@ import config
 # ---------- constants ----------
 
 META_CSV = config.CHIPS_META
-OUT_DIR  = Path(__file__).parent / "splits"
+OUT_DIR  = config.SPLITS_DIR
 
 SPLIT_RATIOS = (0.75, 0.15, 0.15)      # train / val / test
 
