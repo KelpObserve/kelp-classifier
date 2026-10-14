@@ -87,9 +87,20 @@ Every source produces two CSVs: `..._present.csv` and `..._absent.csv`.
 
 ## Aggregated statistics
 
-Built by [`build_source_stats.py`](build_source_stats.py) → [`source_statistics.csv`](source_statistics.csv).
+`source_statistics.csv` is a locally generated, git-ignored output; it is not
+included in a clone. After running the source extractors above, regenerate it
+from the repository root with:
 
-Current totals:
+```bash
+python data_collection/build_source_stats.py
+```
+
+The [builder](build_source_stats.py) reads the six GBIF/OBIS/JNCC source CSVs
+listed in its `SOURCE_FILES` and writes `data_collection/source_statistics.csv`.
+Missing inputs are reported and skipped, so a partial source download produces
+partial statistics.
+
+Historical source snapshot totals (not recomputed by cloning the repository):
 
 | Source | Class | Records | Post-2016 |
 |---|---|---:|---:|

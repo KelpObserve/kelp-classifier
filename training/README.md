@@ -43,10 +43,18 @@ Train and evaluate a binary kelp-presence classifier on top of frozen
 | [`plot_pixel_vs_pool.py`](plot_pixel_vs_pool.py) | Pixel head vs pool={1,2,3,5} chip head, 3-seed mean±std. |
 | [`plot_pool_sweep_generic.py`](plot_pool_sweep_generic.py) | Aggregate 3-seed pool sweep results into a comparison plot. |
 | [`eval_by_species.py`](eval_by_species.py) | Per-species + ABSENT F1 for a trained head on its deployment val set. |
-| [`compile_results.py`](compile_results.py) | Aggregates every `results.json` under `$KELP_DATA_DIR/../**` into `results/all_runs.csv`. |
+| [`compile_results.py`](compile_results.py) | Summarises test results from immediate run subdirectories of `config.RESULTS_DIR` into a local, git-ignored `all_runs.csv`. |
 
-Legacy: [`make_splits.py.legacy_2026_07_17_pre_matched`](make_splits.py.legacy_2026_07_17_pre_matched)
-retains the older component-graph + macro-region pipeline for reference.
+The supported split implementation is [`make_splits.py`](make_splits.py).
+Local `make_splits.py.legacy_*` backups are git-ignored and are not distributed.
+
+`all_runs.csv` is generated locally after training by running
+`python training/compile_results.py` from the repository root. Its default path
+is `training/results/all_runs.csv`; `KELP_CHIPS_SUBSET` selects a different
+results directory. The compiler includes runs with saved test metrics and skips
+validation-only deployment heads, so a fresh clone may produce an empty summary.
+For the versioned reference-run evidence, use
+[`release_run_summary.json`](release_run_summary.json).
 
 ## Clay model
 
