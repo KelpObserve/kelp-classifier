@@ -85,7 +85,8 @@ def main():
                xlabel=f'Easting (m, {crs})', ylabel='Northing (m)')
         width=view[1]-view[0]; height=view[3]-view[2]
         add_scale_bar(ax, view[0]+width*.04, view[2]+height*.06,
-                      length_m=100 if width<1000 else 1000, height_m=height*.008)
+                      length_m=50 if width<300 else 100 if width<1000 else 1000,
+                      height_m=height*.008)
         ax.text(.97,.95,'N ↑',transform=ax.transAxes,ha='right',fontsize=12,zorder=7)
         title = 'CCMar quadrats — geographic coordinates' if args.observations_only else f'S2 submerged head {args.pool_label} — P(kelp)'
         ax.set_title('Arrábida | '+title+'\nVector coastline, land/water and depth contours',fontsize=13)

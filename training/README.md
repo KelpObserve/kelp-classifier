@@ -575,7 +575,7 @@ approximately 115 m, even though this extract was resampled onto the 10 m
 prediction grid. Contours do not resolve quadrat-scale depth variation and are
 not suitable for navigation. See [EMODnet bathymetry](https://emodnet.ec.europa.eu/en/bathymetry).
 
-`sesimbra_quadrats_observations_map.png` shows a 500 m-wide observation-only
+`sesimbra_quadrats_observations_map.png` shows a 190 m-wide observation-only
 close-up. Markers retain distinct geographic coordinates; coincident coordinates
 are grouped as in the existing plotting code, with no S2-pixel snapping.
 The PNGs are rendered at 140 dpi; vector-coastline detail is independent of
@@ -583,7 +583,7 @@ prediction resolution. A cartographic coastline has no guaranteed uniform
 metre-scale accuracy.
 
 To regenerate the observation-only close-up, use the overlay command above
-with `--observations-only --zoom-around 38.4090 -9.2020 250` and
+with `--observations-only --zoom-around 38.409117 -9.202282 95` and
 `--out-prefix training/results_submerged/sesimbra_quadrats`.
 
 ### Published checkpoint paths
