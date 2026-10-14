@@ -91,7 +91,7 @@ def main():
         title = 'CCMar quadrats — geographic coordinates' if args.observations_only else f'S2 submerged head {args.pool_label} — P(kelp)'
         ax.set_title('Arrábida | '+title+'\nVector coastline, land/water and depth contours',fontsize=13)
         fig.text(.09,.055,'Coastline © OpenStreetMap contributors · openstreetmap.org/copyright (ODbL)\n'
-                 'Bathymetry: EMODnet, ~115 m source grid (resampled); contours are approximate. No satellite background.',fontsize=8,color='#46545d')
+                 'Bathymetry: EMODnet, ~115 m source grid (resampled); contours are approximate.',fontsize=8,color='#46545d')
         out=Path(f'{args.out_prefix}_{variant}.png'); out.parent.mkdir(parents=True,exist_ok=True)
         fig.savefig(out,dpi=140); plt.close(fig); print(out)
 
