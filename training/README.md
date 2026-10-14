@@ -413,7 +413,7 @@ threshold t=0.5:
 | `submerged_p5` | 0.891 ± 0.009 | 0.907 ± 0.022 | **0.818 ± 0.024** |
 | `submerged_pixel` | 0.877 ± 0.011 | 0.903 ± 0.011 | 0.792 ± 0.037 |
 
-Pool ≥ 3 wins on the 3-seed val ROC; the pixel head is within the seed
+Pool sizes 3 and 5 have the highest 3-seed mean test ROC-AUC; the pixel head is within the seed
 noise of pool={1,2}. Adding 6 raw S2 features to pool=1's centre patch does
 not measurably help *chip-level* prediction on our labels — as expected,
 because Clay's patch token already encodes the same neighbourhood.
