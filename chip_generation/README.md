@@ -100,9 +100,10 @@ Field names in the output CSV are the **union** across all source rows, so colum
 - **Merged output**: `$KELP_DATA_DIR/s2_chips_merged/chips.h5` (+ `chips_metadata.csv`)
 
 This is the file consumed by [`../training/`](../training/) (via `precompute_clay_embeddings.py`).
-## Current chip counts (2026-07-17)
+## Historical chip counts (2026-07-17)
 
-Merged file at `$KELP_DATA_DIR/s2_chips_merged/chips.h5`:
+Historical snapshot of `$KELP_DATA_DIR/s2_chips_merged/chips.h5`.
+For the verified 2026-10-14 inventory, see the [top-level README](../README.md):
 
 | Class | Chips |
 |---|---:|

@@ -49,3 +49,19 @@ training/results/
 
 # ---- Runtime scratch ----
 *.log
+
+# Licensed imagery must never be reintroduced.
+training/results_submerged/*_over_pneo.png
+
+# Published deployment artifacts; other generated heads remain ignored.
+!training/results/
+training/results/*
+!training/results/pool_sweep_metrics.png
+!training/results/head_single_p1/
+training/results/head_single_p1/*
+!training/results/head_single_p1/model.pt
+!training/results/head_single_p1/results.json
+!training/results_submerged/head_single_p1/model.pt
+!training/results_submerged/head_single_p5/model.pt
+!training/results_submerged/head_single_pixel/model.pt
+!training/splits/split_single.json

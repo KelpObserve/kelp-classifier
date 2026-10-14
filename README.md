@@ -81,38 +81,51 @@ JNCC ┘                              │
                                                                     val-tuned threshold calibration)
 ```
 
-## Reference dataset
+## Dataset and run status (verified 2026-10-14)
 
-The reference run of the pipeline (as of the initial public release) produced:
+The current training-server metadata contains:
 
-- **PRESENT**: 4,089 chips (single-scene, cleanest S2 scene in each event window)
-- **ABSENT**: 1,614 chips (up to 8 multi-scene per unique observation, 243 unique locations)
-- **Sources**: GBIF Europe (2016+), OBIS, JNCC Marine Recorder v52 (UK, 2016+)
+| Pool | PRESENT | ABSENT | Total |
+|---|---:|---:|---:|
+| Merged, all species | 6,077 | 1,533 | 7,610 |
+| Submerged, four target species | 2,202 | 1,533 | 3,735 |
 
-See [`data_collection/DATA_SOURCES.md`](data_collection/DATA_SOURCES.md) for the full
-source manifest.
+These are **current pool inventories**, not counts of chips used by every
+checkpoint. Matching, splitting and balancing select smaller training sets.
+The archived Sesimbra experiment page records an earlier submerged snapshot
+of 3,733 chips (2,200 P / 1,533 A). The 5,703-chip pool from 17 July is historical.
+Sources are GBIF, OBIS and JNCC; see the
+[source manifest](data_collection/DATA_SOURCES.md).
 
-## Reference results (3-seed mean, MLP head, matched splits)
+## Reference results (merged, pool=5, seeds 42/123/456)
 
-| Metric | Value |
+Recomputed from the server's saved `head_seed{42,123,456}_p5/results.json`
+files on 2026-10-14; these are existing trained runs, not a new training run.
+The 0.893 initial baseline has been superseded. Machine-readable evidence is
+in [`training/release_run_summary.json`](training/release_run_summary.json).
+
+| Metric | Mean ± population std |
 |---|---|
-| **Test ROC-AUC** | **0.893 ± 0.009** |
-| Test balanced_acc @ t=0.5 | 0.816 ± 0.031 |
-| Test macro_F1 @ 0.5 | 0.812 ± 0.021 |
-| Test ABSENT recall @ 0.5 | 0.761 ± 0.082 |
-| Test ABSENT precision @ 0.5 | 0.736 ± 0.012 |
-| Test PRESENT recall @ 0.5 | 0.871 ± 0.021 |
+| Test ROC-AUC | 0.974 ± 0.005 |
+| Test balanced accuracy @ 0.5 | 0.903 ± 0.011 |
+| Test macro F1 @ 0.5 | 0.907 ± 0.007 |
+| Test ABSENT recall @ 0.5 | 0.856 ± 0.031 |
+| Test ABSENT precision @ 0.5 | 0.898 ± 0.014 |
+| Test PRESENT recall @ 0.5 | 0.950 ± 0.010 |
+| Test PRESENT precision @ 0.5 | 0.928 ± 0.013 |
 
-**ROC-AUC is the primary metric** — threshold-independent, stable across seeds.
-`balanced_acc` and `macro_F1` are threshold-sensitive; the wobble reflects
-calibration differences across the geographically-different splits, not model quality.
-
-See [`training/README.md`](training/README.md) for the full method, splits algorithm
-description, and per-seed detail.
+ROC-AUC is threshold-independent; the other metrics use threshold 0.5.
+These merged-pool scores must not be attributed to the submerged heads.
+For the submerged pool, the committed three-seed sweep reports ROC-AUC
+**0.866 ± 0.025** for pool=1 and **0.891 ± 0.009** for pool=5.
+The separate Sesimbra evaluation has only 34 unique S2 pixels (32 P / 2 A),
+so its high pool=5 ROC-AUC of 0.984 is not a Europe-wide performance estimate.
+See the [training documentation](training/README.md) for the evaluation protocols.
 
 ## Model catalog
 
-Four trained heads live in the repo. All share the same MLP architecture
+Four deployment heads are versioned as explicit exceptions to the `*.pt` ignore rule.
+See the [checkpoint paths and checksums](training/model_manifest.json) for Zenodo packaging. All share the same MLP architecture
 (dropout 0.3, focal loss α=0.5 γ=2.0); they differ in *training subset*,
 *input dimensionality*, and *effective spatial footprint*.
 

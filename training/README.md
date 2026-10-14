@@ -38,7 +38,7 @@ Train and evaluate a binary kelp-presence classifier on top of frozen
 | [`apply_bathymetry_mask.py`](apply_bathymetry_mask.py) | Fetch EMODnet bathymetry (WCS) and mask raster pixels deeper than `--max-depth-m`. |
 | [`predict_at_points.py`](predict_at_points.py) | Chip-oracle predictions at specific lat/lon points (e.g. CCMar quadrat centres). |
 | [`plot_sesimbra_map.py`](plot_sesimbra_map.py) | Coastline + P(kelp) heatmap + CCMar quadrat markers. |
-| [`plot_pneo_overlay.py`](plot_pneo_overlay.py) | S2 prediction heatmap over PNEO RGB base + optional CCMar overlay. |
+| [`plot_cartographic_overlay.py`](plot_cartographic_overlay.py) | S2 predictions over vector land/water and EMODnet depth; CCMar coordinates and zoom support. |
 | [`plot_model_comparison.py`](plot_model_comparison.py) | Grouped bar chart across models (per-species F1 + Sesimbra pixel-agg AUC/F1). |
 | [`plot_pixel_vs_pool.py`](plot_pixel_vs_pool.py) | Pixel head vs pool={1,2,3,5} chip head, 3-seed mean±std. |
 | [`plot_pool_sweep_generic.py`](plot_pool_sweep_generic.py) | Aggregate 3-seed pool sweep results into a comparison plot. |
@@ -239,51 +239,35 @@ tied to the split files currently in `splits/`.
 
 ## Results (canonical run)
 
-Trained with default settings on the split files produced by the current
-`make_splits.py` (2026-07-28 pipeline: date-first P fetch, chip-count-capped
-per-bin matcher with `LAMBDA_W = 2000` water term, mislabel cleanup).
-See [`results/all_runs.csv`](results/all_runs.csv) for history.
+The merged pool=5 reference below is recomputed from the saved server
+results for seeds 42/123/456, verified 2026-10-14. These are existing runs;
+no training was performed for this documentation update. The archived text
+previously reported 0.974 ± 0.007; the saved files give 0.974 ± 0.005
+(population standard deviation). See [release_run_summary.json](release_run_summary.json)
+for per-seed scores, counts and the current data inventory.
 
-**3-seed mean (SEEDS 42 / 123 / 456)**:
-
-| Metric | Value |
+| Metric | Mean ± population std |
 |---|---|
-| **Test ROC-AUC** | **0.974 ± 0.007** |
-| Test balanced_acc @ t=0.5 | 0.901 ± 0.016 |
-| Test macro_F1 @ 0.5 | 0.906 ± 0.010 |
-| Test ABSENT recall @ 0.5 | 0.852 ± 0.044 |
-| Test ABSENT precision @ 0.5 | 0.900 ± 0.021 |
-| Test PRESENT recall @ 0.5 | 0.951 ± 0.014 |
-| Test PRESENT precision @ 0.5 | 0.927 ± 0.018 |
+| Test ROC-AUC | 0.974 ± 0.005 |
+| Test balanced accuracy @ 0.5 | 0.903 ± 0.011 |
+| Test macro F1 @ 0.5 | 0.907 ± 0.007 |
+| Test ABSENT recall @ 0.5 | 0.856 ± 0.031 |
+| Test ABSENT precision @ 0.5 | 0.898 ± 0.014 |
+| Test PRESENT recall @ 0.5 | 0.950 ± 0.010 |
+| Test PRESENT precision @ 0.5 | 0.928 ± 0.013 |
 
-**Per-seed test-set detail at threshold 0.5**:
-
-| Seed | N_A | N_P | ROC-AUC | bal_acc | macro_F1 | ABSENT prec/rec/F1 | PRESENT prec/rec/F1 | Confusion |
-|---|---:|---:|---:|---:|---:|---|---|---|
-| 42  | 150 | 302 | 0.972 | 0.887 | 0.899 | 0.924 / 0.807 / 0.861 | 0.910 / 0.967 / 0.937 | `[[121, 29], [10, 292]]` |
-| 123 | 198 | 374 | 0.968 | 0.899 | 0.902 | 0.889 / 0.854 / 0.871 | 0.924 / 0.944 / 0.934 | `[[169, 29], [21, 353]]` |
-| 456 | 191 | 374 | 0.981 | 0.918 | 0.917 | 0.886 / 0.895 / 0.891 | 0.946 / 0.941 / 0.944 | `[[171, 20], [22, 352]]` |
-
-Confusion matrix format: `[[TN, FP], [FN, TP]]` with PRESENT as the positive
-class (i.e. rows are ABSENT, PRESENT ground truth; cols are the same).
-
-**Split sizes at generation** (from `make_splits.py`, before batch balancing):
-
-| Seed | Train A/P | Val A/P | Test A/P |
-|---|---|---|---|
-| 42  | 1196 / 2284 | 187 / 346 | 150 / 302 |
-| 123 | 1133 / 2164 | 202 / 391 | 198 / 374 |
-| 456 | 1157 / 2221 | 185 / 335 | 191 / 374 |
-
-Training subsamples the P majority in `train` to match A count per batch
-(each epoch sees `train_A` P chips + all `train_A` A chips).
+The current pool contains 7,610 merged chips (6,077 P / 1,533 A) and
+3,735 submerged chips (2,202 P / 1,533 A). These inventory counts are not
+retrospective claims about checkpoint training data. The archived HTML
+experiment uses an earlier 3,733-chip submerged snapshot. The committed
+single-deployment splits contain 4,257 train / 776 val IDs for merged and
+3,235 train / 500 val IDs for submerged, before training-time balancing.
+Deployment splits have no held-out test set.
 
 ### Threshold-tuned results
 
-Val-set threshold optimisation moves `t*` marginally away from 0.5 (t* ∈
-{0.47, 0.49, 0.52}), producing essentially identical test metrics — good
-sign that val→test threshold generalises. See each seed's
-`results.json:test_tuned`.
+Per-seed validation-tuned thresholds and corresponding test metrics are
+included in `release_run_summary.json`; headline metrics above use 0.5.
 
 ### Pipeline changes since the 0.89 ROC baseline
 
@@ -357,8 +341,8 @@ are currently in use:
 
 | Value | Chips | Purpose |
 |---|---:|---|
-| `merged` (default) | ~4,600 P + ~1,500 A | Full pool across all kelp species — the "general" model. |
-| `submerged` | ~2,200 P + ~1,500 A | Restricted to four deep-water species relevant to Sesimbra/Arrábida: *Saccorhiza polyschides*, *Laminaria hyperborea*, *Laminaria ochroleuca*, *Phyllariopsis brevipes*. ABSENT is species-agnostic (any chip with no PRESENT observation qualifies). |
+| `merged` (default) | 6,077 P + 1,533 A | Full pool across all kelp species — the "general" model. |
+| `submerged` | 2,202 P + 1,533 A | Restricted to four deep-water species relevant to Sesimbra/Arrábida: *Saccorhiza polyschides*, *Laminaria hyperborea*, *Laminaria ochroleuca*, *Phyllariopsis brevipes*. ABSENT is species-agnostic (any chip with no PRESENT observation qualifies). |
 
 Each subset carries its own:
 - `$KELP_DATA_DIR/s2_chips_{subset}/{chips.h5,chips_metadata.csv}` — chips + metadata
@@ -394,7 +378,10 @@ used only to train the final deployment head.
 
 ## Model catalog
 
-Four trained heads currently live in the repo. All use the same MLP
+Four deployment checkpoints are explicitly versioned, together with their
+`results.json` files and deployment split JSONs. Other `*.pt` files remain ignored.
+[model_manifest.json](model_manifest.json) records exact paths, sizes and SHA-256
+checksums for Zenodo packaging. The Clay backbone is a separate download. All use the same MLP
 architecture (`hidden→512→128→1`, dropout 0.3, focal loss α=0.5 γ=2.0);
 they differ in *input dimensionality* and *training subset*.
 
@@ -524,10 +511,11 @@ python training/apply_bathymetry_mask.py \
     --max-depth-m 30 \
     --bathy-out training/results_submerged/emodnet_bathy_arrabida.tif
 
-# Overlay figures — heatmap over PNEO RGB, and heatmap under CCMar quadrat markers
-python training/plot_pneo_overlay.py \
+# Overlay figures — vector land/water + depth, with CCMar markers
+python training/plot_cartographic_overlay.py \
     --raster       training/results_submerged/sesimbra_arrabida_prob_pixel_depth30.tif \
-    --pneo         /path/to/000598128_1_2_STD_A \
+    --land         training/results_submerged/arrabida_land_osm.geojson \
+    --bathy        training/results_submerged/arrabida_elevation_emodnet.tif \
     --ccmar        /path/to/kelp_observations_with_coordinates.csv \
     --out-prefix   training/results_submerged/sesimbra_pixel_depth30 \
     --pool-label   'pixel head'
@@ -563,7 +551,53 @@ useless — it proves that chip-level supervision does not transfer to
 sub-46 m spatial precision on the CCMar geometry, which is what we expected.
 
 Overlay figures (red-heatmap PNGs) in `training/results_submerged/`:
-- `sesimbra_pool1_depth30_over_pneo.png` — pool=1 vs PNEO base
+- `sesimbra_pool1_depth30_over_map.png` — pool=1 over land/water and depth contours
 - `sesimbra_pool1_depth30_with_ccmar.png` — pool=1 vs CCMar markers
-- `sesimbra_pixel_depth30_over_pneo.png` — pixel head vs PNEO base
+- `sesimbra_pixel_depth30_over_map.png` — pixel head over land/water and depth contours
 - `sesimbra_pixel_depth30_with_ccmar.png` — pixel head vs CCMar markers
+
+
+### Cartographic sources and spatial detail
+
+The replacement figures contain no satellite-image background. Land polygons
+come from OpenStreetMap coastline ways fetched on 2026-10-14 through
+`https://api.openstreetmap.org/api/0.6/map?bbox=-9.24,38.39,-9.16,38.43`,
+merged and clipped to the prediction bounds. The mainland polygon is on the
+north-central side of the coastline; closed coastline rings supply islands.
+The GeoJSON includes source and ODbL attribution. See
+[OpenStreetMap copyright](https://www.openstreetmap.org/copyright).
+
+Depth contours use the existing EMODnet Arrábida extract. Its legacy cache
+stored **positive depth**; `arrabida_elevation_emodnet.tif` negates that cache
+to the standard elevation convention (negative below sea level), with provenance
+in its GeoTIFF tags. The original cache is unchanged. EMODnet's source grid is
+approximately 115 m, even though this extract was resampled onto the 10 m
+prediction grid. Contours do not resolve quadrat-scale depth variation and are
+not suitable for navigation. See [EMODnet bathymetry](https://emodnet.ec.europa.eu/en/bathymetry).
+
+`sesimbra_quadrats_observations_map.png` shows a 500 m-wide observation-only
+close-up. Markers retain distinct geographic coordinates; coincident coordinates
+are grouped as in the existing plotting code, with no S2-pixel snapping.
+The PNGs are rendered at 140 dpi; vector-coastline detail is independent of
+prediction resolution. A cartographic coastline has no guaranteed uniform
+metre-scale accuracy.
+
+To regenerate the observation-only close-up, use the overlay command above
+with `--observations-only --zoom-around 38.4090 -9.2020 250` and
+`--out-prefix training/results_submerged/sesimbra_quadrats`.
+
+### Published checkpoint paths
+
+| Model | Checkpoint |
+|---|---|
+| `merged_p1` | [`results/head_single_p1/model.pt`](results/head_single_p1/model.pt) |
+| `submerged_p1` | [`results_submerged/head_single_p1/model.pt`](results_submerged/head_single_p1/model.pt) |
+| `submerged_p5` | [`results_submerged/head_single_p5/model.pt`](results_submerged/head_single_p5/model.pt) |
+| `submerged_pixel` | [`results_submerged/head_single_pixel/model.pt`](results_submerged/head_single_pixel/model.pt) |
+
+For Zenodo, include these four files, their adjacent `results.json`, the two
+`split_single.json` files, `model_manifest.json`, `configs/metadata.yaml`, and
+the matching inference code. Checkpoints are plain PyTorch state dictionaries;
+load with `torch.load(path, map_location="cpu", weights_only=True)`. The manifest
+records architecture, input dimension, pool size and validation-tuned threshold.
+The separately licensed Clay v1.5 backbone is not bundled.

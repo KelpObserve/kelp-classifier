@@ -769,23 +769,30 @@ footer a { color: var(--ink-secondary); }
     change its numbers.
   </p>
 
+  <p>Cartographic background: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>
+    (vector coastline, ODbL) and <a href="https://emodnet.ec.europa.eu/en/bathymetry">EMODnet bathymetry</a>
+    (~115 m source grid, resampled). Depth contours are approximate; no satellite background is used.</p>
+  <figure>
+    <img src="sesimbra_quadrats_observations_map.png" alt="CCMar quadrats at geographic coordinates over coastline and depth contours">
+    <figcaption>Observation-only close-up: land, water and approximate depth. Distinct coordinates are preserved without S2-pixel snapping.</figcaption>
+  </figure>
   <h3>Overlays — pool = 1 (~ 46 m footprint, depth-masked)</h3>
   <div class="figures two">
     <figure>
-      <img src="sesimbra_pool1_depth30_over_pneo.png" alt="Pool=1 prediction over PNEO base">
-      <figcaption>Pool = 1 P(kelp) heatmap over the PNEO RGB base (~1 m). Red = high P(kelp). Bilinear upsample of ~46 m patch predictions.</figcaption>
+      <img src="sesimbra_pool1_depth30_over_map.png" alt="Pool=1 prediction over cartographic land/water and depth">
+      <figcaption>Pool = 1 P(kelp) heatmap over vector coastline and EMODnet depth contours. Red = high P(kelp). Bilinear upsample of ~46 m patch predictions.</figcaption>
     </figure>
     <figure>
       <img src="sesimbra_pool1_depth30_with_ccmar.png" alt="Pool=1 prediction with CCMar quadrat markers">
-      <figcaption>Pool = 1 heatmap with CCMar quadrat markers. Green points = PRESENT, marker area ∝ mean cover_pct.</figcaption>
+      <figcaption>Pool = 1 heatmap with CCMar quadrat markers. Green points = PRESENT; hollow red points = empty. Markers retain geographic coordinates.</figcaption>
     </figure>
   </div>
 
   <h3>Overlays — pixel head (per-10 m decision, depth-masked)</h3>
   <div class="figures two">
     <figure>
-      <img src="sesimbra_pixel_depth30_over_pneo.png" alt="Pixel head prediction over PNEO base">
-      <figcaption>Pixel head P(kelp) heatmap over PNEO. Each 10 m pixel gets its own decision from its own spectra + interpolated Clay context.</figcaption>
+      <img src="sesimbra_pixel_depth30_over_map.png" alt="Pixel head prediction over cartographic land/water and depth">
+      <figcaption>Pixel head P(kelp) heatmap over vector coastline and EMODnet depth contours. Each 10 m pixel gets its own decision from its own spectra + interpolated Clay context.</figcaption>
     </figure>
     <figure>
       <img src="sesimbra_pixel_depth30_with_ccmar.png" alt="Pixel head prediction with CCMar quadrat markers">
@@ -915,7 +922,7 @@ footer a { color: var(--ink-secondary); }
 </section>
 
 <footer>
-  Generated for the KelpObserve project (Sintef).
+  Generated for the KelpObserve project.
   See <a href="../README.md"><code>training/README.md</code></a> for method detail and
   <a href="../../README.md">top-level README</a> for pipeline overview.
 </footer>
