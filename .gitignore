@@ -11,12 +11,15 @@ venv/
 .idea/
 .vscode/
 
-# External arrays, caches and model binaries
+# External arrays, caches and comparison model binaries
 /data/
 *.h5
 *.npz
 *.ckpt
 *.pt
+# Include only the two published final classifiers.
+!/training/final_models/small_mlp_pool5/model.pt
+!/training/final_models/mlp_pool1/model.pt
 *.joblib
 
 # Raw source exports

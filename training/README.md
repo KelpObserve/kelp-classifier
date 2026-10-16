@@ -212,7 +212,8 @@ The [final-model report](final_models/README.md) owns partition counts,
 hyperparameters, selected thresholds and metrics. The
 [checkpoint catalog](final_models/model_manifest.json) records hashes, and
 [final_model_io.py](final_model_io.py) loads each architecture and applies its
-saved threshold to matching embeddings. Binary checkpoints are excluded from Git.
+saved threshold to matching embeddings. Both final checkpoints are included in
+Git under `training/final_models/`; comparison checkpoints remain external.
 See the [final fitting commands](../docs/REPRODUCIBILITY.md#fit-final-heads-and-apply-them)
 and [inference example](../docs/REPRODUCIBILITY.md#predict-from-saved-embeddings).
 

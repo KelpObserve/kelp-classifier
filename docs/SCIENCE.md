@@ -291,7 +291,9 @@ not independent test results.
 
 ### Checkpoints and reproduction
 
-Binary checkpoints and embeddings are external inputs. The
+The two final classifier checkpoints are included under `training/final_models`.
+Comparison checkpoints, the pretrained Clay backbone and embeddings remain
+external inputs. The
 [reproduction guide](REPRODUCIBILITY.md) owns environment setup, configuration
 and ordered commands, including a [CPU inference example](REPRODUCIBILITY.md#predict-from-saved-embeddings).
 The [final-model catalog](../training/final_models/model_manifest.json) records

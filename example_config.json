@@ -105,14 +105,13 @@
       "access_uri": ""
     },
     "FINAL_MODELS_DIR": {
-      "description": "Final all-selected-chip train/validation manifests, metrics and model catalog. Training writes model.pt here; checkpoints remain Git-ignored.",
+      "description": "Final train/validation manifests, metrics, model catalog and the two published model.pt checkpoints are included. New training writes to a fresh configured directory.",
       "reference": "training/train_final_models.py"
     },
     "FINAL_CHECKPOINTS_DIR": {
       "description": "Contains small_mlp_pool5/model.pt and mlp_pool1/model.pt; resolve catalog relative paths here.",
       "reference": "training/final_models/model_manifest.json",
-      "access_uri": "",
-      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git."
+      "availability": "Included in repository: small_mlp_pool5/model.pt and mlp_pool1/model.pt. Verify SHA-256 against the final-model catalog."
     },
     "FULL_NUISANCE_EMBEDDINGS": {
       "description": "Frozen full-chip Clay cache using 128-to-224 resizing and derived encoder GSD 128*10/224 m; companion protocol.json is required. Contains chip_ids, sha256, CLS vectors and central 7x7 patch-token windows. Used by comparison replay and to construct matching pool1 or pool5 embeddings for the final heads.",

@@ -239,7 +239,7 @@
       "path_key": "FINAL_CHECKPOINTS_DIR",
       "relative_path": "small_mlp_pool5/model.pt",
       "sha256": "9226d83f958d86d5fb4c4cbdc11ed1fa57ea4e296e26feca97eda35003037c87",
-      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "access": "Included in repository under training/final_models; available in a normal Git clone.",
       "catalog": "training/final_models/model_manifest.json"
     },
     {
@@ -248,7 +248,7 @@
       "path_key": "FINAL_CHECKPOINTS_DIR",
       "relative_path": "mlp_pool1/model.pt",
       "sha256": "977b37b1917ed8fc629d246db49f6f7a04c8e90ef0d341f2020e1abfb1ba2ab7",
-      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "access": "Included in repository under training/final_models; available in a normal Git clone.",
       "catalog": "training/final_models/model_manifest.json"
     },
     {

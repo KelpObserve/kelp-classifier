@@ -1,7 +1,8 @@
 # Repository structure
 
 Only the current workflow and its scientific evidence belong in the active tree.
-Large image arrays, caches and model binaries are ignored. New runs belong under
+Large image arrays, caches, the pretrained backbone and comparison model binaries
+are ignored. Only the two published final classifier checkpoints are included. New runs belong under
 `runs/`, separate from the included result tables.
 
 ```text
@@ -35,7 +36,7 @@ chip_generation/              S2 acquisition, array consolidation and visual QC
 training/
   full_nuisance_features/     Eligible whole-chip features and quality audit
   full_nuisance_balance/      Current partitions, metrics and classifier comparison
-  final_models/              Final train/validation manifests, metrics and catalogs
+  final_models/              Final manifests, metrics, catalog and two model.pt files
   sesimbra_evaluation/        Current field predictions, maps and verification evidence
   pneo_september/            Current PNEO feature evaluation
   report_templates/         Maintained narrative inputs for generated reports
@@ -134,7 +135,7 @@ Fresh-run commands and required configuration keys are documented in
 [REPRODUCIBILITY.md](REPRODUCIBILITY.md). The included scientific reports describe
 saved experiments; successful syntax or table checks do not certify GPU replay.
 
-The versioned [artifact inventory](../configs/artifacts.json) identifies external
+The versioned [artifact inventory](../configs/artifacts.json) identifies included final checkpoints and external
 inputs by configuration key and checksum. `scripts/check_artifacts.py` verifies
 supplied files without recording private locations. The field-map
 [asset manifest](../data_collection/field_map/assets.json) records geographic

@@ -1,4 +1,4 @@
-"""Verify externally supplied published artifacts against the versioned inventory."""
+"""Verify included and externally supplied published artifacts against the versioned inventory."""
 import argparse
 import hashlib
 import json

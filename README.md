@@ -114,8 +114,11 @@ The [reproducibility matrix](docs/REPRODUCIBILITY.md#reproducibility-matrix)
 distinguishes table checks, checkpoint replay, retraining and source reconstruction.
 
 Saved partitions, selection inventories, predictions, metrics, model catalogs
-and scientific reports are included. Image arrays, embeddings and model binaries
-must be supplied separately at the configured paths.
+and scientific reports are included, together with the two final trained heads:
+[`small_mlp_pool5/model.pt`](training/final_models/small_mlp_pool5/model.pt) and
+[`mlp_pool1/model.pt`](training/final_models/mlp_pool1/model.pt). These are ordinary
+Git files, available in a normal clone. Image arrays, embeddings, the pretrained
+Clay backbone and the 24 comparison checkpoints remain external inputs.
 The full CUDA environment is pinned in `requirements-cuda.lock`.
 
 The included results cover twelve original-architecture MLPs, twelve simpler

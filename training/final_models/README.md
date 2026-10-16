@@ -46,7 +46,7 @@ Clay v1.5 remains frozen and encodes the full chip with derived GSD 128 × 10 / 
 
 ## Reproduction and reuse
 
-[Selected chips](selected.csv), [split](split.json), [split protocol](split_protocol.json), [metrics](metrics.csv), [model catalog](model_manifest.json) identify the reusable models. Binary checkpoints are excluded from Git; paths and external inputs are described in [example_config.json](../../example_config.json).
+[Selected chips](selected.csv), [split](split.json), [split protocol](split_protocol.json), [metrics](metrics.csv), [model catalog](model_manifest.json) identify the reusable models. The two final checkpoints are included in Git: [small_mlp_pool5/model.pt](small_mlp_pool5/model.pt) and [mlp_pool1/model.pt](mlp_pool1/model.pt). Their SHA-256 checksums are recorded in the model catalog. The pretrained backbone and embedding cache remain external inputs described in [example_config.json](../../example_config.json).
 
 Configure a fresh FINAL_MODELS_DIR and the full-chip embedding cache configured as FULL_NUISANCE_EMBEDDINGS, then run:
 
