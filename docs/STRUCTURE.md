@@ -2,7 +2,9 @@
 
 Only the current workflow and its scientific evidence belong in the active tree.
 Large image arrays, caches, the pretrained backbone and comparison model binaries
-are ignored. Only the two published final classifier checkpoints are included. New runs belong under
+are Git-ignored. Comparison checkpoints live alongside their result tables in
+`training/full_nuisance_balance/`. Only the two published final classifier
+checkpoints are tracked. New runs belong under
 `runs/`, separate from the included result tables.
 
 ```text

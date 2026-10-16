@@ -140,6 +140,15 @@ Preserve these inputs and their hashes when transferring the experiment.
 The consolidation command makes acquisition outputs usable, but does not
 reconstruct published HDF5 indices or independently validate depth estimates.
 
+## Checkpoint storage
+
+Keep all trained classifiers in this repository directory. The two published
+final checkpoints under `training/final_models/` are tracked in Git. The 24
+comparison checkpoints belong under `training/full_nuisance_balance/`, using
+the relative filenames in `training/model_manifest.json`; their `.pt` and
+`.joblib` files are Git-ignored. The default `CHECKPOINTS_DIR` already selects
+that directory. They must be supplied separately after a fresh Git clone.
+
 ## Artifact inventory and access
 
 [configs/artifacts.json](../configs/artifacts.json) is the versioned inventory
