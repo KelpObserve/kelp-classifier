@@ -33,7 +33,6 @@ while _here != _here.parent:
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import KELP_SPECIES
 
-HERE = _path_config.get_path("JNCC_DIR")
 MDB = str(_path_config.get_path("JNCC_DATABASE"))
 
 

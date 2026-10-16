@@ -25,7 +25,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import is_kelp_species, stats
 
-HERE = _path_config.get_path("GBIF_DIR")
 SRC = _path_config.get_path("GBIF_MASTER")
 
 

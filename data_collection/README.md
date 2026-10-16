@@ -69,6 +69,14 @@ This check uses original coordinates and all available presence evidence,
 including taxa outside the training list.
 The exclusion is one-way: an absence never removes a presence.
 
+The canonical acquisition input is
+[`s2_sesimbra_like_observations.csv`](s2_sesimbra_like_observations.csv).
+Split it by class with
+`python data_collection/prepare_acquisition_candidates.py --output runs/candidates`;
+see the [acquisition commands](../chip_generation/README.md). Basic
+`deduped_*_candidates.csv` exports are intermediate source inventories, not the
+current policy-filtered acquisition inputs.
+
 ## Obtaining Sentinel-2 chips
 
 The collection starts from **8,275 PRESENT and 219 ABSENT candidate observations**

@@ -3,15 +3,12 @@ from collections import Counter
 
 
 KELP_SPECIES = [
-    # 7 target species for European kelp detection + 3 synonyms
+    # Source-extraction names; the current PRESENT allowlist is in configs/species.yaml.
     "Laminaria hyperborea", "Laminaria digitata", "Saccharina latissima",
     "Alaria esculenta", "Saccorhiza polyschides", "Laminaria ochroleuca",
     "Chorda filum", "Undaria pinnatifida", "Phyllariopsis brevipes",
     "Laminaria saccharina",  # synonym for S. latissima
 ]
-
-# Europe bounding box (rough) — used to filter records with valid coords
-EUROPE_BBOX = dict(lat_min=30, lat_max=72, lon_min=-25, lon_max=45)
 
 
 def is_kelp_species(scientific_name: str) -> bool:

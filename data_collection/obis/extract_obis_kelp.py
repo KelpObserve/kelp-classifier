@@ -25,7 +25,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import KELP_SPECIES
 
-HERE = _path_config.get_path("OBIS_DIR")
 BASE = _path_config.get_service("obis_occurrences")
 EUROPE_WKT = "POLYGON ((-25 30, 45 30, 45 72, -25 72, -25 30))"
 START_DATE = "2016-01-01"  # S2 era

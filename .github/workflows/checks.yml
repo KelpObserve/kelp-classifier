@@ -9,9 +9,11 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - run: python -m pip install -r requirements-data.txt
+      - run: python -m pip install -r requirements-data.txt ruff==0.17.1 vulture==2.16
       - run: python -m pip check
-      - run: python scripts/check_repository.py
+      - run: python scripts/check_repository.py --external
+      - run: ruff check --select F401,F811,F821,F841 .
+      - run: vulture . --min-confidence 80
       - run: python -m unittest discover -s tests -v
       - run: python training/run_location_baselines.py --check
       - run: python scripts/check_inputs.py reports
@@ -19,3 +21,6 @@ jobs:
       - run: python training/summarize_final_models.py
       - run: python training/report_sesimbra_campaigns.py
       - run: python scripts/check_repository.py
+      - run: python data_collection/field_map/render_map.py
+      # PNG bytes vary with platform fonts and rasterization; render them above.
+      - run: git diff --exit-code -- . ":(exclude)*.png"

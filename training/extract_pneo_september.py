@@ -13,7 +13,6 @@ BAND_NAMES=['R','G','B','NIR','RE','DB']
 LYZ_PAIRS=[('DB','B'),('DB','G'),('B','G'),('G','R'),('B','R'),('DB','R')]
 KERNEL=5
 CHIP_PX=224
-GSD_M=1.2
 def load_stack(pneo_dir: Path):
     rgb_path = next(pneo_dir.glob("IMG_*_RGB_*.JP2"))
     ned_path = next(pneo_dir.glob("IMG_*_NED_*.JP2"))

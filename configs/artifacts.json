@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "release": "published-study-2026-10-16",
+  "artifacts": [
+    {
+      "id": "clay-v1.5-large",
+      "group": "training",
+      "path_key": "CLAY_CKPT",
+      "sha256": "21432069250b9b3f9a65ffd0071c5ad56b793247285ab0604edf7f531d4798d0",
+      "access": "Obtain from the official weights collection; select by checksum.",
+      "reference": "https://huggingface.co/made-with-clay"
+    },
+    {
+      "id": "canonical-chips",
+      "group": "training",
+      "path_key": "CANONICAL_CHIPS_H5",
+      "sha256": "e3f1f1c5f0bf7bde7e2adf8198d1c40bf914d12b0b38970b5c278b69ac138ea5",
+      "access": "Request the published canonical array bundle from the project artifact holder. No public download is recorded."
+    },
+    {
+      "id": "comparison-mlp_pool1_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_1/seed_42/model.pt",
+      "sha256": "13ccf7b3938093c5f2d0e30236c2c8bf14f4733e6d1e5eabf57dbe75adbfb7ca",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool1_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_1/seed_123/model.pt",
+      "sha256": "6fa0646a4eba45aa43d0863c15fe09da83feded54d012e44b45c72434050458f",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool1_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_1/seed_456/model.pt",
+      "sha256": "274bedbb6d7eb40b68386d0ad372782410a46028d1e7d78cddd1fa2db042d33a",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool2_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_2/seed_42/model.pt",
+      "sha256": "74127bea3dac75e0123bdf656fd0d89bb1078f435ccdeffccb53928823a8ecd0",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool2_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_2/seed_123/model.pt",
+      "sha256": "92735e7ed27ef1b279dd073999d938426cf6dfd32f66e3aeb3d1b0f9d996e68b",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool2_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_2/seed_456/model.pt",
+      "sha256": "bbe05a0c7add70ffbdb5fce42e57ee2e4584dc356f28a9b0c6d88a8551b71639",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool3_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_3/seed_42/model.pt",
+      "sha256": "73ffa1297576f2bff30cdf03444f794b7fb029039c75d8d62f06426c0ab48312",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool3_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_3/seed_123/model.pt",
+      "sha256": "76411b2106b220d82d589ff01d3bfd58b7ff7963472e8ea6a1576cb3638a95b1",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool3_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_3/seed_456/model.pt",
+      "sha256": "07b5f8aaee0dc9a563d6af1da26a8309545a5aa73e7ea977c5979ff5e8e7bceb",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool5_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_5/seed_42/model.pt",
+      "sha256": "ab20aa967684eade2d638b27d59a00ccea787ac7491844322d04c15953286e45",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool5_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_5/seed_123/model.pt",
+      "sha256": "45b8b289e3489ae5152c99c257ab7ab7bfae267695bb23dee87f52aa3bcc1eba",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-mlp_pool5_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "clay_full_sweep/pool_5/seed_456/model.pt",
+      "sha256": "6f183d344ea03adc94496d416bba727310050e94aa428abd3831756a6827da11",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool1_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p1_seed42/model.pt",
+      "sha256": "d7f313681ff64cc7401345bfbd4ae60a028cdcc5a59fbc2dcc67a22eafb10024",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool1_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p1_seed123/model.pt",
+      "sha256": "06c492ea6875e844a36a8e0ffce9489eb00739653731cf7e7dcab6de87e993a8",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool1_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p1_seed456/model.pt",
+      "sha256": "07ebc18e655e8d069d53662797d76494cbeed9e9586b508b3cfd1e903f9383c4",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool5_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p5_seed42/model.pt",
+      "sha256": "197cdf715fb1453995304966b2b68e08e054ace286e53ab56ba2f1fe00b7a838",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool5_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p5_seed123/model.pt",
+      "sha256": "cc4477304eb2f002c8481a3888e68905b7d7cf0a12c25f78830de4b8069ad157",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-small_mlp_pool5_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/small_mlp_p5_seed456/model.pt",
+      "sha256": "a1814995dacfa7d454a7122e275d5f0df8c414c53f0621bfa84e365114889a14",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool1_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p1_seed42/model.joblib",
+      "sha256": "c2dcfc3370fcdab4ab57c4db2971d8b8954148c8b9d361b0a7b0467957192d26",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool1_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p1_seed123/model.joblib",
+      "sha256": "ea72fe9e43084e79401d049204c9fcffe7675dbedae431d68c37976991c561a9",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool1_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p1_seed456/model.joblib",
+      "sha256": "40f4c9d739425a801e7e572a2afb5751849f5aaddf31d981d0da33c850be3528",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool5_seed42",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p5_seed42/model.joblib",
+      "sha256": "e6d26056bed0e9fea374105eca57d590a51f70d1e8f6f3713f577d743469d666",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool5_seed123",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p5_seed123/model.joblib",
+      "sha256": "f8a897dd71b42378c1191cc483dc13c9e425b177456a6adb62445f6a000cac98",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "comparison-logistic_pool5_seed456",
+      "group": "comparison",
+      "path_key": "CHECKPOINTS_DIR",
+      "relative_path": "simple_heads/logistic_p5_seed456/model.joblib",
+      "sha256": "8de6c70870dafddca1c7b41274783e70057354e962cd3c9f3fc713674898b482",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/model_manifest.json"
+    },
+    {
+      "id": "final-small_mlp_pool5",
+      "group": "final",
+      "path_key": "FINAL_CHECKPOINTS_DIR",
+      "relative_path": "small_mlp_pool5/model.pt",
+      "sha256": "9226d83f958d86d5fb4c4cbdc11ed1fa57ea4e296e26feca97eda35003037c87",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/final_models/model_manifest.json"
+    },
+    {
+      "id": "final-mlp_pool1",
+      "group": "final",
+      "path_key": "FINAL_CHECKPOINTS_DIR",
+      "relative_path": "mlp_pool1/model.pt",
+      "sha256": "977b37b1917ed8fc629d246db49f6f7a04c8e90ef0d341f2020e1abfb1ba2ab7",
+      "access": "Request the published checkpoint bundle from the project artifact holder.",
+      "catalog": "training/final_models/model_manifest.json"
+    },
+    {
+      "id": "measurements",
+      "group": "sources",
+      "path_key": "FIELD_MEASUREMENTS",
+      "sha256": "87f4b768cf6ec2ac10f7c2b585518ec79eadab52703df684b820207b76fcdf09",
+      "access": "Request the original field source named in the provenance file from the project artifact holder.",
+      "catalog": "data_collection/sesimbra_field_observations.provenance.json"
+    },
+    {
+      "id": "coordinates",
+      "group": "sources",
+      "path_key": "JUNE_JULY_COORDINATES",
+      "sha256": "9b146941be97ffbebf8df1b6da9fedbcb8f9158326048ec7b4ab8d87b7d02cf2",
+      "access": "Request the original field source named in the provenance file from the project artifact holder.",
+      "catalog": "data_collection/sesimbra_field_observations.provenance.json"
+    },
+    {
+      "id": "september_coordinates",
+      "group": "sources",
+      "path_key": "SEPTEMBER_COORDINATES",
+      "sha256": "70439b4957120af74c1b7bbabbdf0324b83609938abef5a07a945cdff40c8e0a",
+      "access": "Request the original field source named in the provenance file from the project artifact holder.",
+      "catalog": "data_collection/sesimbra_field_observations.provenance.json"
+    },
+    {
+      "id": "s2-june",
+      "group": "field",
+      "path_key": "S2_CAMPAIGNS_DIR",
+      "relative_path": "june/scene.npz",
+      "sha256": "bdadf703c9f2eee3331b212b7c7eb6d9c1f9a0bec21d20c94e690ebbbe6ba834",
+      "access": "Run python data_collection/sesimbra_s2_campaigns/download_scene.py june",
+      "catalog": "data_collection/sesimbra_s2_campaigns/june/acquisition.json"
+    },
+    {
+      "id": "s2-july",
+      "group": "field",
+      "path_key": "S2_CAMPAIGNS_DIR",
+      "relative_path": "july/scene.npz",
+      "sha256": "f86bb18ffa91f3dcfbd41c0ac308f59f1984b682f45482fdb0eaa13155fb4f85",
+      "access": "Run python data_collection/sesimbra_s2_campaigns/download_scene.py july",
+      "catalog": "data_collection/sesimbra_s2_campaigns/july/acquisition.json"
+    },
+    {
+      "id": "s2-september",
+      "group": "field",
+      "path_key": "S2_CAMPAIGNS_DIR",
+      "relative_path": "september/scene.npz",
+      "sha256": "99322f0b281549ba4aeb0c35157a7b2600b178f0fc1d6a5327595e895a0c8fb6",
+      "access": "Run python data_collection/sesimbra_s2_campaigns/download_scene.py september",
+      "catalog": "data_collection/sesimbra_s2_campaigns/september/acquisition.json"
+    },
+    {
+      "id": "full-chip-embeddings",
+      "group": "training",
+      "path_key": "FULL_NUISANCE_EMBEDDINGS",
+      "sha256": "a803f7be65fa3a97a7633ce086cbf2daf0059e50a87c5546bfc41fa6cd4ea422",
+      "bytes": 148860912,
+      "access": "Request the published embedding cache together with its companion protocol.json from the project artifact holder.",
+      "catalog": "training/full_nuisance_balance/clay_full_sweep/protocol.json"
+    }
+  ],
+  "access_notes": "Private access locations belong in Git-ignored config.json resource metadata; KELP_CONFIG may select an alternate file. No public distribution or permission to redistribute restricted inputs is implied.",
+  "unresolved": [
+    "Original GBIF download DOI and exact retrieval recipe are not recorded.",
+    "Upstream depth preparation and country-lookup reconstruction are incomplete.",
+    "Licensed PNEO source imagery requires separate access."
+  ]
+}

@@ -14,9 +14,7 @@ import config as _path_config
 import csv
 import re
 from collections import defaultdict
-from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
 DC = _path_config.get_path("DATA_COLLECTION_DIR")
 
 MIN_EVENT_YEAR = 2016

@@ -13,6 +13,7 @@ requirements*.txt / *.lock    Reporting, data and locked CUDA environments
 configs/
   metadata.yaml               Frozen Clay band statistics
   species.yaml                Current PRESENT species allowlist
+  artifacts.json              Versioned artifact inventory and access status
   services.json               Runtime service endpoints
   references.json             Source-reference inventory
 scripts/                      Repository/input checks, resource links and fresh-run setup
@@ -26,6 +27,8 @@ data_collection/
   gbif/, obis/, jncc/         Source extraction; raw exports are external
   field_map/                  Published observation map and geographic source assets
   sesimbra_s2_campaigns/      Saved scene metadata, labels and downloader
+  s2_sesimbra_like_observations.csv  Canonical policy-filtered acquisition input
+  deduped_*_candidates.csv    Broader intermediate exports; not current acquisition inputs
   eligible_chips.csv          1,198-chip inventory before final QC
   split_initialization.csv   ABSENT initialization for the partition search
 chip_generation/              S2 acquisition, array consolidation and visual QC
@@ -46,9 +49,11 @@ training/
 | `data_collection/obis/extract_obis_kelp.py` | Obtain source records from the OBIS API |
 | `data_collection/jncc/download_snapshot.py` | Obtain the pinned public database snapshot |
 | `data_collection/jncc/extract_jncc_kelp.py` | Extract records from the JNCC Access snapshot |
+| `data_collection/prepare_acquisition_candidates.py` | Split the canonical observation export into acquisition classes |
 | `data_collection/dedup_candidates.py` | Basic source-export deduplication |
 | `data_collection/build_observation_summary_tables.py` | Current source, uncertainty, species and absence-consistency policy |
 | `data_collection/match_sesimbra_field_coordinates.py` | Match all three field campaigns directly from source files |
+| `data_collection/field_map/render_map.py` | Rebuild the observation map from included geographic assets |
 | `data_collection/count_training_pixel_dates.py` | Count observations/chips/pixel-dates in current selected manifests |
 | `data_collection/sesimbra_s2_campaigns/download_scene.py` | Reconstruct saved campaign image crops |
 | `data_collection/sesimbra_s2_campaigns/count_pixel_dates.py` | Rebuild combined S2/PNEO labels using image geometry |
@@ -128,3 +133,9 @@ campaign metrics. Do not edit generated READMEs as the sole source of a change.
 Fresh-run commands and required configuration keys are documented in
 [REPRODUCIBILITY.md](REPRODUCIBILITY.md). The included scientific reports describe
 saved experiments; successful syntax or table checks do not certify GPU replay.
+
+The versioned [artifact inventory](../configs/artifacts.json) identifies external
+inputs by configuration key and checksum. `scripts/check_artifacts.py` verifies
+supplied files without recording private locations. The field-map
+[asset manifest](../data_collection/field_map/assets.json) records geographic
+asset hashes and known source provenance.

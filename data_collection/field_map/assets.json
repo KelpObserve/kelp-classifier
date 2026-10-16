@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "file": "arrabida_elevation_emodnet.tif",
+      "sha256": "ec98564bdf320f14710abf312aaeb5e56a48194c403826b0dfd8c2ff96fcc46c"
+    },
+    {
+      "file": "emodnet_bathy_arrabida.tif",
+      "sha256": "3692926776f38941eda00d75536d2d11af85ad7782864ab41ad852a81941f122"
+    },
+    {
+      "file": "arrabida_land_osm.geojson",
+      "sha256": "b81b415174ac0602da7b56f71ddc331b1c98245aee271ebfaf099fa6940c5b1a"
+    }
+  ],
+  "provenance": {
+    "coastline": {
+      "source": "https://api.openstreetmap.org/api/0.6/map?bbox=-9.24,38.39,-9.16,38.43",
+      "retrieved": "2026-10-14",
+      "license": "ODbL-1.0"
+    },
+    "bathymetry": {
+      "source": "EMODnet cached Arr\u00e1bida extract",
+      "release": "not recorded",
+      "native_resolution_m": "approximately 115",
+      "processing": "Elevation asset negates the depth-positive cache; grid is resampled to 10 m in EPSG:32629.",
+      "retrieval_status": "Exact original request and product release are not recorded; reproduce the map using the included checksum-identified assets."
+    }
+  }
+}

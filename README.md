@@ -15,6 +15,41 @@ Read the [technical study report](technical_report.md) for a paper-style account
 of the data, methods, results, figures and conclusions.
 See [methods and scientific results](docs/SCIENCE.md) for the full account.
 
+## Quick start: inspect and reproduce reports
+
+Use Python 3.11. Reporting does not need imagery, model weights or a GPU.
+
+```sh
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-reporting.txt
+python scripts/check_repository.py
+python training/summarize_full_nuisance_trial.py
+python training/summarize_final_models.py
+```
+
+The report commands regenerate their README and figures from included tables.
+The default report paths work without a private configuration. For execution,
+copy `example_config.json` to `config.json` in the repository root and edit its
+`paths`. This file is Git-ignored and loaded automatically. Inspect configured
+resources with `python scripts/show_resources.py`. Optionally, `KELP_CONFIG`
+selects a different JSON file. Relative paths resolve against the repository
+root, not the shell's working directory. Keep private configuration out of
+commits and source distributions. The [artifact inventory](configs/artifacts.json)
+records published input identities and access status.
+
+## Choose a workflow
+
+| Goal | Instructions | Additional inputs |
+|---|---|---|
+| Understand labels, model design and limitations | [Scientific account](docs/SCIENCE.md) | None |
+| Inspect sources and collection rules | [Data collection](data_collection/README.md) | None for saved tables |
+| Fetch and consolidate new S2 chips | [Chip generation](chip_generation/README.md) | Source candidates and network access |
+| Train or verify current classifiers | [Training](training/README.md) | Canonical arrays, Clay weights and CUDA |
+| Apply final classifiers to field campaigns | [Campaign evaluation](training/sesimbra_evaluation/README.md) | Campaign images and final weights |
+| Supply required artifacts and configure paths | [Reproduction and inputs](docs/REPRODUCIBILITY.md) | Depends on workflow |
+| Find scripts and understand outputs | [Repository structure](docs/STRUCTURE.md) | None |
+
 ## What the pool sizes mean
 
 Clay converts each image into a grid of learned feature vectors, called **patch
@@ -73,39 +108,6 @@ not change the original image footprint or create finer spatial resolution.
   independently verified across the complete collection; no resulting bias
   has been demonstrated.
 
-## Quick start: inspect and reproduce reports
-
-Use Python 3.11. Reporting does not need imagery, model weights or a GPU.
-
-```sh
-python3.11 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-reporting.txt
-python scripts/check_repository.py
-python training/summarize_full_nuisance_trial.py
-python training/summarize_final_models.py
-```
-
-The report commands regenerate their README and figures from included tables.
-The default report paths work without a local configuration. For execution,
-`config.json` supplies local data/model paths; inspect configured resources with
-`python scripts/show_resources.py`. For overrides, copy
-`example_config.json` to the ignored `config.json`, or set `KELP_CONFIG` to a
-separate JSON file containing a `paths` object. Relative paths are resolved
-against the repository root, not the shell's working directory.
-
-## Choose a workflow
-
-| Goal | Instructions | Additional inputs |
-|---|---|---|
-| Understand labels, model design and limitations | [Scientific account](docs/SCIENCE.md) | None |
-| Inspect sources and collection rules | [Data collection](data_collection/README.md) | None for saved tables |
-| Fetch and consolidate new S2 chips | [Chip generation](chip_generation/README.md) | Source candidates and network access |
-| Train or verify current classifiers | [Training](training/README.md) | Canonical arrays, Clay weights and CUDA |
-| Apply final classifiers to field campaigns | [Campaign evaluation](training/sesimbra_evaluation/README.md) | Campaign images and final weights |
-| Supply required artifacts and configure paths | [Reproduction and inputs](docs/REPRODUCIBILITY.md) | Depends on workflow |
-| Find scripts and understand outputs | [Repository structure](docs/STRUCTURE.md) | None |
-
 ## Reproducibility status
 
 The [reproducibility matrix](docs/REPRODUCIBILITY.md#reproducibility-matrix)
@@ -113,7 +115,7 @@ distinguishes table checks, checkpoint replay, retraining and source reconstruct
 
 Saved partitions, selection inventories, predictions, metrics, model catalogs
 and scientific reports are included. Image arrays, embeddings and model binaries
-must be supplied separately at the paths configured in `config.json`.
+must be supplied separately at the configured paths.
 The full CUDA environment is pinned in `requirements-cuda.lock`.
 
 The included results cover twelve original-architecture MLPs, twelve simpler

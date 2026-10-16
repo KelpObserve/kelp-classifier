@@ -58,6 +58,11 @@ data requirements. PNEO input imagery requires a separate license.
 `example_config.json` contains portable defaults and resource descriptions.
 `config.py` loads these defaults and overlays `config.json` when present.
 Alternatively, `KELP_CONFIG` selects a separate JSON file; it must exist.
+Keep private overrides in the Git-ignored `config.json` in the repository root.
+Copy `example_config.json` to `config.json`, then edit its `paths`; it is loaded
+automatically without setting an environment variable. Use `KELP_CONFIG` only
+when selecting an alternate configuration. Do not commit private overrides or
+include them in source distributions.
 Unknown path keys and circular references fail explicitly. `resources` describes
 input provenance and availability; `python scripts/show_resources.py` displays
 configured resources. Paths can reference other keys, such as
@@ -133,6 +138,36 @@ Preserve these inputs and their hashes when transferring the experiment.
 The consolidation command makes acquisition outputs usable, but does not
 reconstruct published HDF5 indices or independently validate depth estimates.
 
+## Artifact inventory and access
+
+[configs/artifacts.json](../configs/artifacts.json) is the versioned inventory
+for the published study. Entries identify inputs by configuration key, optional
+relative filename, SHA-256, and access route. Model catalogs retain the complete
+architecture and selection metadata. The inventory identifies the published
+artifacts, not new training outputs.
+
+For project-controlled arrays, caches, checkpoints and original field files,
+request the inventory's artifact IDs and checksums from the project artifact
+holder. No public download location or designated contact is recorded. Store
+any supplied private access locations in the ignored configuration's
+`resources` metadata; `python scripts/show_resources.py` displays them. Public
+campaign imagery has downloader commands in the inventory; licensed imagery
+still requires separate access.
+
+After configuring the supplied files, verify their identities:
+
+```sh
+python scripts/check_artifacts.py --group training --group comparison --group final
+python scripts/check_artifacts.py --group field
+python scripts/check_artifacts.py --group sources
+```
+
+A missing file or checksum mismatch fails the command. The missing original
+GBIF DOI, depth-preparation recipe and country-lookup reconstruction remain
+source-reconstruction gaps; an inventory cannot recreate that provenance.
+The field-map assets have their own checksum inventory and an offline
+[rendering command](../data_collection/field_map/README.md).
+
 ## Verify included evidence without imagery
 
 ```sh
@@ -145,8 +180,9 @@ python data_collection/count_training_pixel_dates.py
 
 `check_repository.py` checks syntax, Markdown files/anchors, script references,
 configuration references and prohibited machine-specific wording. Add
-`--external` to probe external Markdown links. Configuration endpoints and
-saved scene asset URLs are outside this checker's network coverage. Access-denied responses and timeouts are
+`--external` to probe public web links. The network check also covers public URLs in configuration, saved scene metadata,
+Python, HTML, CSV and dependency files. It uses HEAD requests to avoid downloading
+large imagery and resolves pinned GitHub dependency revisions to commit pages. Access-denied responses and timeouts are
 unverified links, not proof of missing pages. Tests also check the saved
 partition counts, labels and recomputed metrics. Baseline refitting defaults to
 an absolute tolerance of 1e-12. A refit with the same package versions on a
@@ -270,3 +306,13 @@ Configure the resulting arrays and prepared eligible inventory before feature
 preparation and selection. To fit a newly selected union, use
 `python training/train_final_models.py --new-split`; omit the flag to replay the
 included final split. Regenerate embeddings whenever their source arrays change.
+
+## Automated maintenance checks
+
+CI installs the pinned data environment, runs the regression tests and baseline
+check, checks public links, and runs Ruff and high-confidence Vulture checks.
+It regenerates the three scientific reports and field observation map, then
+requires all non-PNG tracked files to remain unchanged. PNGs are rendered as a
+smoke check; font and rasterization differences between platforms can change
+image bytes, so those bytes are not required to match. Regenerate published
+outputs when their maintained inputs change; do not edit generated reports alone.

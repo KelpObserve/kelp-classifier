@@ -61,7 +61,6 @@ QC_RELAXED_ABSENT = dict(
 SCL_BAND_IDX = 7
 CLOUD_SCL = (3, 8, 9, 10)   # cloud_shadow, cloud_med, cloud_high, cirrus
 WATER_SCL = (6,)
-LAND_SCL = (4, 5, 7, 11)    # vegetation, bare, unclassified, snow
 NODATA_SCL = (0,)           # S2 fill / no_data — appears at tile edges & masked pixels
 # Prediction region: 23x23 pixel block at chip centre, maps to Clay's centre-pool
 # patches[11:16, 11:16] on the 28x28 patch grid after 128->224 resize.

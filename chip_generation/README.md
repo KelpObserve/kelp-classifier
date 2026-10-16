@@ -7,12 +7,20 @@ The [data-collection policy](../data_collection/README.md#obtaining-sentinel-2-c
 describes date windows, quality checks and retained labels.
 
 ```sh
-python chip_generation/fetch_absent.py data_collection/deduped_absent_candidates.csv runs/absent
-python chip_generation/fetch_present.py data_collection/deduped_present_candidates.csv runs/present
+python data_collection/prepare_acquisition_candidates.py --output runs/candidates
+python chip_generation/fetch_absent.py runs/candidates/absent.csv runs/absent
+python chip_generation/fetch_present.py runs/candidates/present.csv runs/present
 python chip_generation/consolidate_chips.py --output runs/collection runs/absent runs/present
 ```
 
-Use fresh acquisition and consolidation directories. Fetchers preserve the
+The preparation command splits the included policy-filtered
+`data_collection/s2_sesimbra_like_observations.csv` into 8,275 PRESENT and
+219 ABSENT candidates, preserving observation IDs and provenance. Its manifest
+records the input checksum and class counts. Use `--source` for a newly rebuilt
+policy-filtered export. The broader `deduped_*_candidates.csv` files are basic
+source deduplication outputs and do not implement the current selection policy.
+
+Use fresh candidate, acquisition and consolidation directories. Fetchers preserve the
 original observation identifier in `observation_id`, separately from the
 scene-specific output ID. Acquisition depends on current STAC availability;
 it does not recreate a fixed published dataset automatically.

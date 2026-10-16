@@ -114,7 +114,6 @@ def record_id(r):
 all_presence=[prep(r) for r in all_dated_rows if r['occurrenceStatus']=='PRESENT' and r['date']>='2015-12-27']
 # Broaden the veto to every PRESENT kelp record in the GBIF master, including
 # genus-level identifications and species outside the classifier target list.
-master_added=0
 for r0 in csv.DictReader((_path_config.get_path("GBIF_MASTER")).open()):
  if r0.get('occurrenceStatus')!='PRESENT':continue
  date=(r0.get('eventDate') or '').strip()[:10]
@@ -125,7 +124,7 @@ for r0 in csv.DictReader((_path_config.get_path("GBIF_MASTER")).open()):
  except (ValueError,KeyError,TypeError,AssertionError):continue
  if date<'2015-12-27':continue
  r=dict(r0);r.update(source='gbif',date=date,lat=lat,lon=lon,species_set={(r0.get('species') or r0.get('scientificName') or r0.get('genus') or 'unresolved kelp').lower()})
- all_presence.append(prep(r));master_added+=1
+ all_presence.append(prep(r))
 presence_index=collections.defaultdict(list)
 for r in all_presence:presence_index[r['cell']].append(r)
 

@@ -27,7 +27,7 @@ def centre_pool_slice(pool_size, grid=PATCH_GRID):
 # once; any POOL_SIZE ≤ CACHE_K is served by a sub-slice at load time. Bumping
 # this requires re-running precompute to widen the stored window.
 CACHE_K = 7
-CACHE_LO, CACHE_HI = centre_pool_slice(CACHE_K)  # (10, 17)
+CACHE_LO = centre_pool_slice(CACHE_K)[0]  # 10
 
 
 def cache_local_slice(pool_size):
