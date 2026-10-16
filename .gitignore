@@ -1,10 +1,9 @@
-# ---- Python ----
+# Python and development environment
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
-
-# ---- venvs / editor / OS ----
+.ruff_cache/
 .venv*/
 venv/
 .env
@@ -12,56 +11,52 @@ venv/
 .idea/
 .vscode/
 
-# ---- ALL data + derivatives (users bring their own) ----
-data/
-logs/
-tmp/
-backups/
+# External arrays, caches and model binaries
+/data/
 *.h5
 *.npz
 *.ckpt
 *.pt
+*.joblib
 
-# ---- Raw source pulls under data_collection/ ----
-data_collection/gbif/*.csv
-data_collection/gbif/*.tsv
-data_collection/obis/*.csv
-data_collection/obis/*.json
-data_collection/jncc/*.csv
-data_collection/jncc/*.mdb
-data_collection/source_statistics.csv
+# Raw source exports
+/data_collection/gbif/*.csv
+/data_collection/gbif/*.tsv
+/data_collection/obis/*.csv
+/data_collection/obis/*.json
+/data_collection/jncc/*.csv
+/data_collection/jncc/*.mdb
+/data_collection/source_statistics.csv
 
-# ---- Exploratory / other sources (kept only for the pull script) ----
-data_collection/other_sources_tried/*
-!data_collection/other_sources_tried/*.py
-!data_collection/other_sources_tried/*.md
-
-# ---- Pipeline outputs (regenerable) ----
-training/splits/*.json
-training/splits/*.txt
-training/results/
-
-# ---- Backups / legacy leftovers ----
-*.backup*
-*.legacy_*
-*.pre_*bak
-*.pre_b02match
-
-# ---- Runtime scratch ----
+# Private configuration and generated working files
+/config.json
+/runs/
+/logs/
+/tmp/
+/backups/
 *.log
+*.backup*
 
-# Licensed imagery must never be reintroduced.
-training/results_submerged/*_over_pneo.png
+# Generated audit and verification reports (regenerate locally)
+**/audit.json
+**/verification.json
+/chip_generation/boundary_audit.json
+/data_collection/observation_summary_audit.json
 
-# Published deployment artifacts; other generated heads remain ignored.
-!training/results/
-training/results/*
-!training/results/pool_sweep_metrics.png
-!training/results/head_single_p1/
-training/results/head_single_p1/*
-!training/results/head_single_p1/model.pt
-!training/results/head_single_p1/results.json
-!training/results_submerged/head_single_p1/model.pt
-!training/results_submerged/head_single_p5/model.pt
-!training/results_submerged/head_single_pixel/model.pt
-!training/splits/split_single.json
+# Retired outputs and temporary review material
+/.local_archive/
+/legacy/
+/archive/
+/validation/
+/docs/REVIEW.md
+/docs/VALIDATION.md
+/docs/RELEASE_CHECKS.md
+/docs/rerun_*.json
+/chip_generation/tools_output_examples/
+/training/results/
+/training/results_submerged/
+/training/splits/
+/training/splits_submerged/
+/training/release_run_summary.json
+*.legacy_*
+*.pre_*

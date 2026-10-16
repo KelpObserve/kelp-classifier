@@ -1,0 +1,46 @@
+{
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "pools": [
+    1,
+    5
+  ],
+  "selection": "Validation macro F1 at .5; ties prefer stronger regularization. Then tune threshold on validation .05:.95 step .01, ties prefer .5.",
+  "logistic_C": [
+    0.0001,
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "small_mlp_weight_decay": [
+    0.1,
+    0.01,
+    0.0001
+  ],
+  "logistic": "Training-only StandardScaler; L2 logistic, unweighted cross entropy, no class resampling, lbfgs max_iter=10000",
+  "small_mlp": "2048->32 ReLU dropout .3->1; unscaled cached features as in original MLP; same focal alpha .5 gamma 2; Adam .001; batch64 max100 patience25; checkpoint by val macroF1@.5",
+  "parameter_counts": {
+    "logistic": 2049,
+    "small_mlp": 65601,
+    "reference_mlp": 1114881
+  },
+  "limitations": "Exploratory comparison after examining existing tests; not a fresh confirmatory test. No field-label tuning. Linear head also changes loss and scaling; small MLP isolates capacity more closely.",
+  "device": "cuda",
+  "input_sha256": {
+    "embedding_cache": "a803f7be65fa3a97a7633ce086cbf2daf0059e50a87c5546bfc41fa6cd4ea422",
+    "seed_42/selected.csv": "22b1a488ae079434f56accb0d5284032cfc15bccbcbcb22851ca73ddcd1c022d",
+    "seed_42/split_seed42.json": "2a98318a292a25e8668f9d3c748be82438a5aee433b888c72235c4ed5e6512d4",
+    "seed_123/selected.csv": "7118ac611650e08595049e81bcb7be62521a54282bd5364f3e3492ca6e21b41c",
+    "seed_123/split_seed123.json": "c4f8f309e1a86b142af5ce53a8005491f10edb34f1e1cc2f76890c8f2689e8e5",
+    "seed_456/selected.csv": "bc70f6feee3676c06ba3671e0cbb6f60b79f3e2b5525d707225a8deb37866549",
+    "seed_456/split_seed456.json": "17148f649a95364c061add378a5562ea33b062ffe906df7911cd2cbbc37893a4"
+  },
+  "script_sha256": "5e397afb3de07cd0278c2311b5d03dca21a0c0c80cfcf71e35052e92dbafe934",
+  "encoder_protocol_sha256": "66660665f12e6a2ad57c76364b214537e2202e58920e227ceec7fea9bd719c78",
+  "encoder_scope": "Full native 128x128 resized to 224x224; CLS plus centre pooled patch tokens; encoder spacing preserves the 1280 m footprint"
+}

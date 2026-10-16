@@ -1,0 +1,37 @@
+{
+  "source_hashes": {
+    "seed_42/selected.csv": "22b1a488ae079434f56accb0d5284032cfc15bccbcbcb22851ca73ddcd1c022d",
+    "seed_123/selected.csv": "7118ac611650e08595049e81bcb7be62521a54282bd5364f3e3492ca6e21b41c",
+    "seed_456/selected.csv": "bc70f6feee3676c06ba3671e0cbb6f60b79f3e2b5525d707225a8deb37866549"
+  },
+  "all_selected_chips_retained": true,
+  "counts": {
+    "train": {
+      "0": 180,
+      "1": 436
+    },
+    "val": {
+      "0": 32,
+      "1": 77
+    }
+  },
+  "solver": {
+    "status": 1,
+    "message": "Time limit reached. (HiGHS Status 13: Time limit reached)",
+    "objective": 0.3849025062315447,
+    "relative_gap": 0.4394969882748646,
+    "features": [
+      "depth_m",
+      "nuisance_cloud",
+      "nuisance_missing",
+      "nuisance_saturated_defective"
+    ],
+    "seed": 42,
+    "objective_description": "PRESENT/ABSENT means and CDF differences in both partitions, plus each class validation distribution versus full union; no spectral or acquisition variables.",
+    "target_validation": {
+      "0": 32,
+      "1": 77
+    }
+  },
+  "limitation": "Internal validation on previously explored observations; no independent test set."
+}

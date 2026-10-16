@@ -1,0 +1,412 @@
+gbifID,decimalLatitude,decimalLongitude,eventDate,species,occurrenceStatus,source,coordinateUncertaintyInMeters
+5106985289,50.314965,-4.108999,2022-07-16,"Alaria esculenta, Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106985056,47.271257,-2.476402,2022-07-14,"Alaria esculenta, Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Undaria pinnatifida",ABSENT,gbif,200.0
+5106986668,48.546292,-4.746773,2022-07-17,"Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106990213,45.628156,-1.062833,2022-07-13,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5918262304,41.25395,-8.7286,2022-07-11,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262348,41.23198,-8.72852,2022-07-11,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262402,41.05013,-8.65983,2022-07-06,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262442,41.27,-8.74043,2022-07-04,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262481,41.287869,-8.736911,2022-07-04,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262519,41.26327,-8.73505,2022-07-04,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262527,41.1275,-8.6716,2022-07-12,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262546,41.32642,-8.74458,2022-07-05,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262580,41.24385,-8.73028,2022-07-11,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262440,41.50295,-8.80508,2023-06-06,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262473,41.38458,-8.77763,2023-06-06,Laminaria hyperborea,ABSENT,gbif,10.0
+5106984821,39.014175,-9.422721,2022-03-01,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106988612,37.074458,-8.303817,2022-03-22,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106992392,37.520117,-8.789007,2022-03-21,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106989840,41.839089,-8.875937,2022-03-31,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106984514,43.043331,-9.290875,2022-04-19,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106986103,40.178473,-8.905834,2022-04-20,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106985914,43.484302,-1.563392,2022-04-29,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106992525,43.394823,-4.440069,2022-04-30,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106990426,41.309707,-8.742638,2022-04-15,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106985179,54.972346,-5.179356,2022-05-18,"Alaria esculenta, Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106987731,53.750704,-9.904551,2022-05-16,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106991209,52.125869,-10.109911,2022-05-15,"Alaria esculenta, Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106984320,53.319644,-4.660771,2022-05-14,"Chorda filum, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106986939,43.565163,-6.828318,2022-05-01,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+5106984381,36.063726,-5.727717,2022-06-14,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5106987104,36.661621,-6.404615,2022-06-14,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+5918262309,41.79947,-8.88502,2022-08-12,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262458,41.71635,-8.86908,2022-08-13,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262530,41.71812,-8.8696,2022-08-13,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262418,41.39418,-8.78312,2023-07-06,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262541,41.3401,-8.75535,2023-07-07,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262581,41.35025,-8.7619,2023-07-07,Laminaria hyperborea,ABSENT,gbif,10.0
+5918262584,41.38515,-8.7798,2023-07-06,Laminaria hyperborea,ABSENT,gbif,10.0
+3356291444,41.74292,-8.87591,2021-01-29,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291629,41.31052,-8.74136,2021-01-14,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291871,41.3622,-8.76045,2021-01-13,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291519,41.34108,-8.75073,2021-01-13,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291463,41.41663,-8.78827,2021-01-15,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291734,41.33355,-8.73993,2021-01-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291433,41.27309,-8.729,2021-01-16,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292365,41.26187,-8.72686,2021-01-31,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356293349,41.6429,-8.82338,2021-01-12,"Laminaria hyperborea, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292006,41.38542,-8.77433,2021-01-15,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3447237301,41.15903,-8.68538,2021-02-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291361,40.61955,-8.75398,2021-03-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291369,40.99809,-8.64944,2021-03-12,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291491,40.93121,-8.66139,2021-03-12,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291513,39.37344,-9.37773,2021-03-02,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291557,41.37615,-8.76433,2021-03-28,"Laminaria hyperborea, Saccharina latissima, Saccorhiza polyschides",ABSENT,gbif,200.0
+3356291625,41.38149,-8.7715,2021-03-30,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291662,40.62783,-8.75108,2021-03-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291764,40.14684,-8.86726,2021-03-13,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291792,41.67923,-8.83669,2021-03-15,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291829,40.61949,-8.74819,2021-03-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291902,41.18622,-8.7076,2021-03-31,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291913,41.33919,-8.74709,2021-03-30,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291392,40.17751,-8.90354,2021-03-03,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356291978,40.64102,-8.75212,2021-03-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides",ABSENT,gbif,200.0
+3356291481,40.75763,-8.70055,2021-03-12,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292011,41.26615,-8.72829,2021-03-31,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291828,39.60384,-9.08041,2021-03-01,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291703,40.48955,-8.79457,2021-03-13,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291918,41.54149,-8.79361,2021-03-28,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291897,40.97362,-8.65141,2021-03-12,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292308,41.51551,-8.78768,2021-03-28,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292482,39.37586,-9.33981,2021-03-02,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291739,39.91612,-8.95537,2021-04-12,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291332,43.04423,-9.2881,2021-05-24,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291447,42.79679,-9.14016,2021-05-25,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356291656,42.74564,-9.07681,2021-05-25,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356291811,42.11185,-8.89945,2021-05-27,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356292071,42.9365,-9.18958,2021-05-26,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291894,42.15921,-8.8194,2021-05-27,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356292334,41.91017,-8.87801,2021-05-28,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291887,42.90442,-9.26077,2021-05-26,"Laminaria hyperborea, Saccharina latissima",ABSENT,gbif,200.0
+3356291356,41.06846,-8.65848,2021-06-24,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291539,41.04613,-8.65325,2021-06-24,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291699,42.57665,-9.08985,2021-06-26,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356291478,41.16722,-8.6902,2021-06-23,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291494,41.178,-8.69908,2021-06-23,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292239,42.54606,-8.98397,2021-06-26,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,gbif,200.0
+3356291856,41.83908,-8.87529,2021-06-25,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292415,41.84,-8.87598,2021-06-25,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291844,39.51151,-9.14207,2021-07-26,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291396,41.16746,-8.69016,2020-10-15,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291417,41.06894,-8.65836,2020-10-18,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291901,41.04554,-8.65282,2020-10-18,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291575,41.22115,-8.71577,2020-10-17,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291846,41.78072,-8.87014,2020-10-19,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292425,41.83815,-8.87491,2020-10-19,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291537,41.08964,-8.657,2020-11-18,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291569,41.24163,-8.72795,2020-11-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291670,41.24931,-8.72591,2020-11-15,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291480,41.69959,-8.85507,2020-11-16,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291843,41.26041,-8.72494,2020-11-15,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291955,41.69983,-8.85472,2020-11-16,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291751,41.12148,-8.66652,2020-11-18,"Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291541,41.61095,-8.80893,2020-12-16,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291835,41.78439,-8.87168,2020-12-17,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291436,41.57362,-8.79846,2020-12-16,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291723,41.29241,-8.73419,2020-12-15,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291892,41.8194,-8.87205,2020-12-17,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291379,41.15903,-8.68538,2020-12-14,"Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291479,41.27956,-8.72914,2020-12-15,"Laminaria hyperborea, Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3450283339,37.05,-25.1,2018-08-29,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283413,37.05,-25.15,2018-08-31,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283328,37.0,-25.15,2018-08-31,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3500.0
+3450283441,37.05,-25.15,2018-08-30,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283387,37.05,-25.05,2018-08-29,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283315,39.5,-31.15,2018-06-16,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3000.0
+3450283558,39.45,-31.15,2018-06-07,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3000.0
+3450283406,39.7,-31.05,2018-06-13,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283636,39.7,-31.15,2018-06-11,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283658,38.45,-28.2,2018-06-04,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283378,39.75,-31.15,2018-06-12,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3000.0
+3450283858,39.35,-31.25,2018-06-09,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283305,39.1,-28.0,2017-06-22,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283310,39.1,-28.05,2017-06-21,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283340,39.1,-28.0,2017-06-29,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283452,39.1,-28.05,2017-06-22,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283488,39.05,-27.95,2017-06-22,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283359,39.1,-28.05,2017-06-29,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283554,39.05,-28.1,2017-06-21,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3000.0
+3450283664,39.1,-28.0,2017-06-23,Laminaria ochroleuca,ABSENT,gbif,2000.0
+3450283762,39.0,-27.95,2017-06-22,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283828,39.1,-28.0,2017-06-27,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283788,39.1,-28.0,2017-06-28,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283376,39.05,-28.05,2017-06-21,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283433,39.75,-31.15,2016-08-23,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283692,39.65,-31.1,2016-08-23,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283313,36.95,-25.2,2018-09-01,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283323,37.05,-25.1,2018-09-07,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2000.0
+3450283515,36.9,-25.05,2018-09-04,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3500.0
+3450283536,36.95,-25.1,2018-09-04,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3450283639,37.0,-25.2,2018-09-01,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,3000.0
+3450283393,36.95,-25.1,2016-09-12,"Laminaria ochroleuca, Phyllariopsis brevipes",ABSENT,gbif,2500.0
+3356291915,41.2651,-8.72818,2021-01-16,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291538,41.19231,-8.70742,2020-10-16,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291765,41.23528,-8.72433,2020-10-17,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291905,41.20458,-8.71553,2020-10-16,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356291318,41.5059,-8.78829,2020-11-17,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+3356292520,41.48267,-8.77886,2020-11-17,"Saccharina latissima, Undaria pinnatifida",ABSENT,gbif,200.0
+4413318496,54.058056,-5.980278,2018-01-26,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413320470,54.0675,-5.958056,2018-01-26,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413323370,50.212227,-3.697717,2018-10-23,Alaria esculenta,ABSENT,gbif,
+4413318320,54.824417,-4.217389,2017-03-11,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413327165,54.811444,-4.212389,2017-03-12,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413320507,54.820893,-4.220992,2017-04-10,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413324731,54.718056,-5.797222,2017-04-02,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413328636,54.842254,-4.300337,2017-04-11,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413317935,50.605606,-2.129568,2017-05-25,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413316701,54.064957,-4.66154,2017-06-19,Alaria esculenta,ABSENT,gbif,
+4413324193,54.393611,-5.578611,2017-06-26,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413323066,51.200351,-4.177784,2017-07-24,Alaria esculenta,ABSENT,gbif,
+4413323196,51.026068,-4.270584,2017-08-24,Alaria esculenta,ABSENT,gbif,
+4413325902,55.216997,-6.545734,2017-09-05,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413317196,51.045639,-4.235208,2017-11-07,Alaria esculenta,ABSENT,gbif,
+4413323042,51.133333,-4.238889,2017-11-21,Alaria esculenta,ABSENT,gbif,
+4413317018,56.0102,-3.3901,2016-02-10,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413322291,54.678028,-5.624083,2016-02-17,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413315620,54.667484,-5.721538,2016-03-09,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413316435,56.342,-2.7862,2016-03-25,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413318362,56.3331,-2.7711,2016-03-14,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413324172,56.3045,-2.6442,2016-03-13,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413328956,54.899167,-5.860083,2016-03-20,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413318229,54.388806,-5.56,2016-04-15,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413322959,54.718056,-5.797222,2016-04-05,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413325399,54.299444,-5.554333,2016-04-18,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413333352,50.355375,-4.125296,2016-04-08,Alaria esculenta,ABSENT,gbif,
+4413316527,54.248111,-5.681944,2016-05-05,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413321012,54.040361,-6.106583,2016-05-03,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413325474,55.045,-5.963389,2016-05-16,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413326341,54.112833,-5.89275,2016-05-31,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413317668,50.209591,-3.702305,2016-06-24,Alaria esculenta,ABSENT,gbif,
+4413320223,54.678056,-5.623778,2016-06-10,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413320648,54.860781,-5.806979,2016-06-10,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413326026,54.713933,-5.805884,2016-06-13,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413328770,54.393611,-5.578611,2016-06-24,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413332858,50.3612,-4.3119,2016-06-06,Alaria esculenta,ABSENT,gbif,
+4413316358,51.026068,-4.270584,2016-07-22,Alaria esculenta,ABSENT,gbif,
+4413319509,51.703455,-5.150563,2016-07-31,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+4413320425,50.209591,-3.702305,2016-07-06,Alaria esculenta,ABSENT,gbif,
+4413322404,51.200351,-4.177784,2016-07-20,Alaria esculenta,ABSENT,gbif,
+4413333611,50.429417,-5.05873,2016-08-04,Alaria esculenta,ABSENT,gbif,
+4413330539,50.316493,-4.098372,2016-10-16,Alaria esculenta,ABSENT,gbif,
+4413321778,50.322423,-4.766752,2016-11-17,"Alaria esculenta, Undaria pinnatifida",ABSENT,gbif,
+5995456376,40.93195,-8.660563,2019-02-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456393,41.679869,-8.835172,2019-02-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456493,41.807008,-8.865841,2019-02-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456483,41.807008,-8.865841,2019-03-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456488,41.679869,-8.835172,2019-03-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456501,40.93195,-8.660563,2019-03-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456434,40.968493,-8.651105,2019-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456464,41.679869,-8.835172,2019-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456511,40.93195,-8.660563,2019-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456557,41.807008,-8.865841,2019-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456447,41.679869,-8.835172,2019-06-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456467,40.93195,-8.660563,2019-06-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456521,40.968493,-8.651105,2019-06-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456412,40.968493,-8.651105,2019-07-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456490,40.93195,-8.660563,2019-07-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456539,41.807008,-8.865841,2019-07-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456570,41.679869,-8.835172,2019-07-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456495,40.968493,-8.651105,2019-08-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5918262419,41.678475,-8.845587,2023-06-06,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262491,41.46143,-8.79345,2023-06-20,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262508,41.46117,-8.78682,2023-06-20,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262599,41.4765,-8.78488,2023-06-20,Saccorhiza polyschides,ABSENT,gbif,10.0
+5995456450,40.968493,-8.651105,2020-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456492,40.93195,-8.660563,2020-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456532,41.807008,-8.865841,2020-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456544,41.679869,-8.835172,2020-05-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456463,40.93195,-8.660563,2019-10-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456489,41.679869,-8.835172,2019-11-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456516,40.968493,-8.651105,2019-11-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456574,40.93195,-8.660563,2019-11-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456449,40.93195,-8.660563,2019-12-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456509,40.968493,-8.651105,2019-12-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456535,41.679869,-8.835172,2019-12-01,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456425,40.968493,-8.651105,2019-01-07,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456526,41.679869,-8.835172,2019-01-07,Saccorhiza polyschides,ABSENT,gbif,5.0
+5995456555,40.93195,-8.660563,2019-01-07,Saccorhiza polyschides,ABSENT,gbif,5.0
+5918262340,41.68335,-8.84975,2022-08-14,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262469,41.68765,-8.86715,2022-08-14,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262623,41.69437,-8.87178,2022-08-14,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262630,41.68967,-8.86127,2022-08-14,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262334,41.31622,-8.74508,2022-07-05,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262385,41.31665,-8.745,2022-07-05,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262494,41.26453,-8.7329,2022-07-04,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262523,41.31352,-8.75153,2022-07-05,Saccorhiza polyschides,ABSENT,gbif,10.0
+5918262615,41.26817,-8.73353,2022-07-04,Saccorhiza polyschides,ABSENT,gbif,10.0
+3450283490,37.05,-25.05,2018-06-09,Phyllariopsis brevipes,ABSENT,gbif,3500.0
+3450283402,37.05,-25.1,2018-08-30,Phyllariopsis brevipes,ABSENT,gbif,2000.0
+3450283501,39.05,-27.95,2018-08-01,Phyllariopsis brevipes,ABSENT,gbif,2000.0
+3450283967,39.1,-28.0,2017-06-17,Phyllariopsis brevipes,ABSENT,gbif,2000.0
+3450283417,37.05,-25.1,2016-06-11,Phyllariopsis brevipes,ABSENT,gbif,2000.0
+5106068316,39.5116,-9.1426,2024-02-11,Undaria pinnatifida,ABSENT,gbif,
+5106068334,40.1778,-8.9056,2024-02-12,Undaria pinnatifida,ABSENT,gbif,
+5106068304,37.5202,-8.7893,2024-03-24,Undaria pinnatifida,ABSENT,gbif,
+5106068319,37.4457,-8.8003,2024-03-25,Undaria pinnatifida,ABSENT,gbif,
+5106068336,37.7181,-8.7926,2024-03-26,Undaria pinnatifida,ABSENT,gbif,
+4413326548,56.000991,-3.368144,2016-03-13,Undaria pinnatifida,ABSENT,gbif,
+6032393640,50.359648,-4.129144,2016-03-11,Undaria pinnatifida,ABSENT,gbif,70.7
+4413318958,54.854528,-5.761806,2016-04-04,Undaria pinnatifida,ABSENT,gbif,
+4413318996,55.746083,-4.911806,2016-04-13,Undaria pinnatifida,ABSENT,gbif,
+4413319134,55.208889,-6.653528,2016-04-08,Undaria pinnatifida,ABSENT,gbif,
+4413324690,55.2405,-6.506528,2016-05-09,Undaria pinnatifida,ABSENT,gbif,
+4413326331,55.04475,-5.963361,2016-05-16,Undaria pinnatifida,ABSENT,gbif,
+6032393306,50.359782,-4.310526,2016-05-06,Undaria pinnatifida,ABSENT,gbif,70.7
+4413315379,55.216917,-6.54525,2016-06-22,Undaria pinnatifida,ABSENT,gbif,
+4413316212,54.39,-5.458333,2016-06-26,Undaria pinnatifida,ABSENT,gbif,
+4413319925,55.211465,-6.658337,2016-06-17,Undaria pinnatifida,ABSENT,gbif,
+4413325545,55.291389,-6.192778,2016-06-02,Undaria pinnatifida,ABSENT,gbif,
+5106068309,36.077,-5.425,2024-05-08,Undaria pinnatifida,ABSENT,gbif,
+5106068320,36.1827,-6.031,2024-05-06,Undaria pinnatifida,ABSENT,gbif,
+5106068324,37.0733,-8.3025,2024-05-09,Undaria pinnatifida,ABSENT,gbif,
+5106068330,36.7384,-6.4423,2024-05-05,Undaria pinnatifida,ABSENT,gbif,
+5106068331,36.655,-6.3979,2024-05-05,Undaria pinnatifida,ABSENT,gbif,
+5106068332,36.0069,-5.609,2024-05-07,Undaria pinnatifida,ABSENT,gbif,
+5106068340,36.0587,-5.7092,2024-05-07,Undaria pinnatifida,ABSENT,gbif,
+5106068314,42.5786,-8.8239,2024-07-23,Undaria pinnatifida,ABSENT,gbif,
+5106068322,42.8011,-8.9008,2024-07-22,Undaria pinnatifida,ABSENT,gbif,
+5106068342,42.4291,-8.6554,2024-07-24,Undaria pinnatifida,ABSENT,gbif,
+5106068302,43.6187,-8.1498,2024-08-24,Undaria pinnatifida,ABSENT,gbif,
+5106068308,43.5518,-6.5404,2024-08-20,Undaria pinnatifida,ABSENT,gbif,
+5106068313,43.5801,-5.9698,2024-08-19,Undaria pinnatifida,ABSENT,gbif,
+5106068321,43.5548,-7.0464,2024-08-21,Undaria pinnatifida,ABSENT,gbif,
+5106068328,43.5653,-6.8285,2024-08-22,Undaria pinnatifida,ABSENT,gbif,
+5106068325,41.3411,-8.7525,2024-09-17,Undaria pinnatifida,ABSENT,gbif,
+5106068305,43.4194,-4.7458,2024-10-20,Undaria pinnatifida,ABSENT,gbif,
+5106068307,43.2943,-2.1845,2024-10-17,Undaria pinnatifida,ABSENT,gbif,
+5106068312,43.5866,-5.7601,2024-10-21,Undaria pinnatifida,ABSENT,gbif,
+5106068318,43.4218,-4.1062,2024-10-19,Undaria pinnatifida,ABSENT,gbif,
+5106068327,43.3856,-3.2217,2024-10-18,Undaria pinnatifida,ABSENT,gbif,
+5106068339,41.0467,-8.6544,2024-10-19,Undaria pinnatifida,ABSENT,gbif,
+5106068341,42.4638,-8.9438,2024-11-19,Undaria pinnatifida,ABSENT,gbif,
+6003584208,50.60811,-1.949401,2021-08-03,Undaria pinnatifida,ABSENT,gbif,70.7
+6003583759,50.60776,-1.950306,2020-07-02,Undaria pinnatifida,ABSENT,gbif,70.7
+obis:0896888f-21cc-43bb-93d5-d8fcf642b30c,57.35822,-5.667953,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:096d61a4-a836-476a-bcae-06020a8c3c9a,57.36367,-5.653474,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:0b9dd937-87b4-4fe9-95e1-67557ff29929,57.35849,-5.546595,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:13207e4c-234b-4a4e-a9cd-ddaf00660ff7,57.36311,-5.650589,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:15d8784d-88a9-44c8-8112-accce48d155c,57.35881,-5.545661,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:12fc2ed0-a3bb-479f-a5cf-72e16ff57a3a,31.51451,-9.77198,2023-01-24,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Saccharina latissima",ABSENT,obis,200
+obis:1c5edaf4-7edf-4d9a-a75d-dd6ba282630c,57.3602,-5.650266,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:28d279e7-8f01-4218-a872-1cdb7d65b536,57.34425,-5.61032,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:2d55e822-7f8d-4df4-90d7-243da69cf859,57.36292,-5.650155,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:32091aad-8ca0-4714-a8de-73ec9f3a35a7,57.36306,-5.652731,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:116ad0a8-6d5c-4a81-8a61-485d0cbe7c6b,35.7815,-5.93038,2023-01-21,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides",ABSENT,obis,200
+obis:3eec9bd8-8b21-4658-9e24-5e9a0a35bf24,57.36004,-5.652164,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:1f9d2be4-4a92-449f-87d7-11e4ce6581a7,57.35904,-5.662229,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:22e5b07c-2c3e-44ab-b8e8-47916546c9e3,57.36416,-5.651375,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:09a85b1b-1314-49d8-ade2-7ae50ae038a4,57.35832,-5.547942,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:1fd76735-9f8b-4597-b12b-d63bad9e3a1a,57.35748,-5.544135,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:57e3bbb9-e2a4-4f56-a172-2f72188c4e0b,57.34473,-5.612345,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:529f0e3c-a608-4cfb-8bcf-0e59feb33b9e,57.3629,-5.649754,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:646e45f4-aba3-485f-aefa-7f3319486d80,57.3643,-5.651839,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:66b4149f-5c66-47ba-beed-48c0ccc4f999,57.34378,-5.618837,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:14eef5c7-3701-4bed-850c-8487e3443aa4,57.35758,-5.554025,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:546ddb26-3c8b-4540-80c1-fe04cc759d68,57.35571,-5.563093,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:176d5ff8-9908-4bd3-99bf-bf45f1989096,57.35855,-5.662314,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:100c3228-e403-4226-bfad-b87b3582f635,57.36306,-5.650501,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:707cbce1-6775-422d-a95e-9b750d2c9a2d,57.35807,-5.551095,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:7480458c-7ff7-485b-8433-a84da0cb56df,57.3439,-5.616354,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:76609e0b-d0bc-4d17-b4b5-e264a6e3de58,57.35733,-5.575292,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:82317e12-846a-435b-a83f-f8985a6f545e,57.35841,-5.553424,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:24001dd7-be2e-4845-a86e-73942d4c3350,30.55135,-9.73916,2023-01-25,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides",ABSENT,obis,200
+obis:5250e335-2eac-42a0-b62e-6fd5dcc754c6,57.35816,-5.662423,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:89d909be-83db-4459-be5f-15b0984cac8a,57.35867,-5.666517,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:11124e5d-6659-4fac-a04e-1f13d6900c0a,33.61123,-7.65217,2023-01-23,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima",ABSENT,obis,200
+obis:91138f40-9cc2-40e3-9ffc-2a63ec71824d,57.36371,-5.652396,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:66d6916f-5e87-4984-be7b-7625eded61ff,57.35971,-5.654561,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:32e90971-67f7-4e3d-be25-a0aa3e236a8e,57.36432,-5.651858,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:9c47cd6e-b72f-4610-97d0-f72eba22bd24,57.36388,-5.652679,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:07d2864a-62de-4e3b-9659-d48271dc2aac,57.35737,-5.544824,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:3e1ec7c3-0e41-4f23-affe-c5d7a232a93b,57.35858,-5.666824,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:b42df105-f9c1-4aa2-bbc0-ae58e5973f95,57.36352,-5.652078,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:2d97bb39-bc82-4a33-ac5b-ca1b0fdb2a04,34.03116,-6.84438,2023-01-22,"Alaria esculenta, Chorda filum, Laminaria digitata, Laminaria hyperborea, Laminaria ochroleuca, Saccharina latissima, Saccorhiza polyschides",ABSENT,obis,200
+obis:68a372de-5659-44a4-aa8c-c32accfd5464,57.35839,-5.54725,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:6d6074e6-3ccc-4736-a77a-96635d94cd65,57.35731,-5.54565,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:3840db20-aeec-47d9-8ae0-7ee6f556b483,57.35734,-5.575792,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:3aa93f1f-cf2b-41a9-9980-97a737cf3fa4,57.3596,-5.654833,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:200e335f-205c-4cd9-9d9b-8c6d261aec1d,57.35983,-5.654123,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:c97cecd5-9cc0-4bed-b5c4-916cde615d47,57.35573,-5.590722,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:6877b890-0248-4833-bf17-5ed83a9efc30,57.35874,-5.662299,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:520a6791-b0bc-46ec-b4f7-58b9d9e5c2c0,57.35748,-5.576721,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:4a1b277f-36a8-40e8-a3db-5b678981a3c9,57.35821,-5.667902,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:d0a581c0-8ab3-4414-a416-4aa9a7d1063a,57.34388,-5.617133,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:d13bb076-aeeb-443e-9c25-f92714fee355,57.35796,-5.55373,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:d224c25d-ec29-430f-845c-4f0c38d7b339,57.34381,-5.618075,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:a3b908d9-b070-4580-8f73-68ccbaba3d25,57.35749,-5.544353,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:2b54ef3f-0b54-4434-bdb1-79dffee72509,57.36331,-5.652988,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:46e00f1d-48ee-4cb7-b339-ff155be21f4d,57.36016,-5.650612,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:bc4e2675-e1dc-402e-93ac-91152e3e7979,57.35756,-5.577228,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:dc9dd517-1e7e-4633-b956-2cf4800d0c77,57.35841,-5.667256,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:e0d6e7f1-7d49-4852-8ca3-258fd3e21eae,57.35808,-5.553625,2017-07-31,Laminaria hyperborea,ABSENT,obis,
+obis:353ef311-0a2a-426d-bde4-a65d68fd291c,57.35871,-5.545901,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:012d9ad7-905f-4b05-87ae-46a3933d5a2f,57.36299,-5.650344,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:6552a038-ab15-43ba-b2c0-895d305bdde3,57.35814,-5.54859,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:3dce2fe0-e9f5-49ee-87d1-4e499b4e8fcc,57.35932,-5.662224,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:addd344f-4452-4e5b-aeff-bdf85c93efe4,57.35828,-5.662386,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:2c380fc6-c1a8-461f-b92a-c686656c55b7,57.36016,-5.651027,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:ccc46c82-b171-4ed1-921b-077c60c63aac,57.36351,-5.653241,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:45605a7a-30a5-48e6-ad3d-99d670e6392c,57.3574,-5.57633,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:3ba3d190-7cdb-47ff-9ed8-8912ed83e883,57.35833,-5.667615,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:d219953b-f7d2-422e-9a42-f4f3b2dec963,57.35724,-5.546091,2017-07-31,"Laminaria hyperborea, Saccharina latissima",ABSENT,obis,
+obis:10eb689f-3c41-4cde-993d-a1d1b26a3d40,57.34413,-5.614664,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:115586a0-b982-412d-9c1b-1de2e21fb551,57.35571,-5.561063,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:132c288c-827d-42eb-a3b1-26de1d9d3ac8,57.35772,-5.553855,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:171a380c-9302-4d35-ac20-a5401b8bfae7,57.34448,-5.611107,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:1ae94d8b-0de9-4ccd-8062-efb5804a7ebd,57.35676,-5.557556,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:1c029b0a-53f5-40f9-9744-ec1d9109c050,57.3555,-5.542132,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:1fba9fbb-aa8f-4a15-8fe7-fcc1072b99af,57.36335,-5.651744,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:20b9681c-6fd2-42f8-95bd-1814f88460ea,57.36005,-5.651749,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:20df31ed-da30-4164-9dae-a08fec412cda,57.35695,-5.548193,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:2178ce4b-53bc-4d16-a293-9975d2786234,57.35564,-5.575593,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:22ad8a40-417b-4cae-86d9-7ac180ac47a0,57.34406,-5.609303,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:25a07ab8-673b-4f80-8f78-303e3b9dd622,57.35531,-5.544742,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:29cf1610-c51e-436d-a983-147b48c7ca86,57.35542,-5.543438,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:2ac7eed7-cd0a-420e-b16d-7790f2853a0b,57.35711,-5.547293,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:2ae1d9eb-fc66-44f3-8ed9-c0e1b45cd368,57.35189,-5.586339,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:2bfd615e-75e2-45bc-89b3-79f77738a9ca,57.35528,-5.547466,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:2d7b7c55-da70-4abd-9e1c-a3b59dfb3f51,57.35715,-5.5623,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:3f4e85df-06ad-4cbe-a76b-ea37097b879e,57.36336,-5.653942,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:40a8a00b-6340-4d70-825a-1e0879440ae6,57.3458,-5.627168,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:40ce8ae4-48b2-4a78-a437-37516be08313,57.35792,-5.552528,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:460b1764-2e54-4ff4-bebb-942a731f0dbb,57.35787,-5.554053,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:4f498cba-707b-4478-80da-207fbb8f9c59,57.35562,-5.559042,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:53046184-60e7-4173-b67f-37a865d8af33,57.36285,-5.653176,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:5963fefa-bc82-465b-beaf-24fb3d958631,57.34583,-5.628102,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:6127ee45-424e-4ce5-b30e-e16e4db54099,57.35522,-5.548807,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:67e173cd-d0fa-459e-9ca2-e20f22fb86ff,57.35711,-5.561315,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:6cabda50-3edf-431c-853e-dfc8eea2749c,57.35072,-5.588453,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:75b38c13-3247-46a7-b3a0-97d695f6e381,57.35792,-5.553841,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:769b32dd-5b5b-4373-8ab7-28c9385c6e06,57.35704,-5.558947,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:7d51bfa7-8981-43b6-92b3-7f02b18fbd38,57.34463,-5.611887,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:90e0cb90-58e3-4914-9444-5b3d381a87d9,57.36304,-5.653461,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:999b23c1-129c-40a3-84ec-2a0b03f10db3,57.35368,-5.598173,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:9a62e7ae-92e0-4539-916b-3a2d14cd2d18,57.35231,-5.585682,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:9b3da765-6f1d-4595-be33-42ea2dd85e47,57.35698,-5.554516,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:9ccb5b45-4fa8-4a23-928c-66bff1670daa,57.35689,-5.548319,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:9f3afa20-0eb4-4ee9-b666-c62f53a43885,57.35711,-5.5605,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:af4f9045-493b-40a7-a432-0ef661134f7a,57.35799,-5.55187,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:b867d080-c69a-4abb-a016-94dc90a31ee6,57.35645,-5.585669,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:c1451d03-e668-49cb-9641-7d9e6376d36f,57.1021165,-5.521875,2022-03-02,Saccharina latissima,ABSENT,obis,
+obis:cb6992f9-4caf-4fc4-8b47-3dc9feaded0f,57.36366,-5.655219,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:cfdac486-44f2-4fa0-a9de-270aff04d3e0,57.3601,-5.652669,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:d0cdc2e4-fd11-41f3-b7ee-cccac507330d,57.35609,-5.587731,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:de43bd3b-f772-43a4-8f0b-cd4cbe093257,57.35658,-5.556939,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:e043f845-bbc8-423e-bf43-0cafd70a7fee,57.35627,-5.586734,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:e6944a44-5a49-494d-bf08-067876fdbcf5,57.35992,-5.6536,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:e6f08869-3a3e-4f25-9e2d-85f9a5d84390,57.36349,-5.654603,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:e8115786-4549-4080-805d-cea1c46331bf,57.3569,-5.558202,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:e97b760f-05b4-4956-b8e6-6116e3eb6e16,57.35527,-5.546034,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:f1fa866f-c7be-409b-8cd2-e4f60d05beec,57.35018,-5.589415,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:f358002c-7dea-4e40-99c3-bee8579f0110,57.35814,-5.55037,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:f3c30f96-632c-4303-b8d4-e19419bc3ddb,57.35352,-5.599155,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:f415d1ea-b395-4178-baae-a5e6c6b2e2c4,57.35708,-5.559732,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:fa37595d-f8c5-4fcc-a27a-fc0d56fc7097,57.36004,-5.653079,2017-07-31,Saccharina latissima,ABSENT,obis,
+obis:17b3c485-c807-4ce0-9b60-3ab85bc4d7c5,56.3046,-2.64399,2016-03-14,Alaria esculenta,ABSENT,obis,100
+obis:258db7fd-05ce-4249-8dc9-e89c10fbcc9c,56.06082,-2.69773,2016-03-14,Alaria esculenta,ABSENT,obis,100
+obis:8c7eeb7f-0d2e-44e2-b267-b25915fcba2a,56.34239,-2.7886,2016-02-10,Alaria esculenta,ABSENT,obis,100
+obis:a0a39a00-f194-4c85-bedd-38e279901401,56.18499,-2.81437,2016-03-25,Alaria esculenta,ABSENT,obis,100
+obis:babe5d37-a266-4bf8-bd8c-36492af80dee,54.84832,-4.31674,2016-03-13,Alaria esculenta,ABSENT,obis,100
+jncc:MRCED00500001942.001,55.21946,-6.545316,2019-10-04,Alaria esculenta,ABSENT,jncc,
+jncc:MRLRC0240000007D.002,50.60834,-1.951665,2020-07-02,Undaria pinnatifida,ABSENT,jncc,

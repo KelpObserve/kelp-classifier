@@ -1,40 +1,23 @@
-"""dedup_candidates.py — collapse the 6 raw source CSVs (GBIF/OBIS/JNCC × P/A)
-into two deduplicated candidate CSVs (present + absent), grouping any rows
-that share (occurrenceStatus, round(lat, 4), round(lon, 4), eventDate) even
-across sources.
+"""Deduplicate configured GBIF, OBIS and JNCC class exports by location and date.
 
-Rules:
-  1. Key = (occurrenceStatus, round(decimalLatitude, 4), round(decimalLongitude, 4), eventDate[:10]).
-     4-decimal rounding = ~11 m precision; tighter than the 50 m location-safety
-     radius, so we only merge rows that really point at the same spot on the
-     same day.
-  2. Species names of all rows in a group are combined into a comma-separated
-     list (unique, alphabetically sorted).
-  3. Representative row: preferred source order GBIF > OBIS > JNCC, then
-     alphabetically-first ID within the winning source.
-  4. Rows with missing/blank eventDate or lat/lon are dropped.
-  5. Filter: eventDate must be >= 2016-01-01 (Sentinel-2 coverage window).
-
-Output columns (fetch_present/fetch_absent expect these):
-  gbifID (source-prefixed for OBIS/JNCC), decimalLatitude, decimalLongitude,
-  eventDate, species, occurrenceStatus, source, coordinateUncertaintyInMeters.
-
-Reads:
-  data_collection/gbif/kelp_gbif_europe_{present,absent}.csv
-  data_collection/obis/kelp_obis_europe_{present,absent}.csv
-  data_collection/jncc/kelp_jncc_{present,absent}.csv
-
-Writes:
-  data_collection/deduped_present_candidates.csv
-  data_collection/deduped_absent_candidates.csv
+Use build_observation_summary_tables.py for the complete current selection policy.
 """
+
+# Discover the configuration module; data locations come from config.json.
+import sys as _path_sys
+from pathlib import Path as _ConfigPath
+_path_root = _ConfigPath(__file__).resolve().parent
+while not (_path_root / "example_config.json").is_file() and _path_root != _path_root.parent:
+    _path_root = _path_root.parent
+_path_sys.path.insert(0, str(_path_root))
+import config as _path_config
 import csv
 import re
 from collections import defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-DC = REPO / "data_collection"
+DC = _path_config.get_path("DATA_COLLECTION_DIR")
 
 MIN_EVENT_YEAR = 2016
 
@@ -140,24 +123,24 @@ def write_csv(rows, out_path, status):
             row = {k: r.get(k, "") for k in fields}
             row["occurrenceStatus"] = status
             w.writerow(row)
-    print(f"  wrote {out_path.relative_to(REPO)} ({len(rows)} rows)")
+    print(f"  wrote {out_path} ({len(rows)} rows)")
 
 
 def main():
     print("=== PRESENT ===")
     p_rows = []
-    p_rows += load_source(DC / "gbif" / "kelp_gbif_europe_present.csv", "gbif")
-    p_rows += load_source(DC / "obis" / "kelp_obis_europe_present.csv", "obis")
-    p_rows += load_source(DC / "jncc" / "kelp_jncc_present.csv",        "jncc")
+    p_rows += load_source(_path_config.get_path("GBIF_PRESENT"), "gbif")
+    p_rows += load_source(_path_config.get_path("OBIS_PRESENT"), "obis")
+    p_rows += load_source(_path_config.get_path("JNCC_PRESENT"),        "jncc")
     p_dedup = dedup(p_rows)
     write_csv(p_dedup, DC / "deduped_present_candidates.csv", "PRESENT")
 
     print()
     print("=== ABSENT ===")
     a_rows = []
-    a_rows += load_source(DC / "gbif" / "kelp_gbif_europe_absent.csv", "gbif")
-    a_rows += load_source(DC / "obis" / "kelp_obis_europe_absent.csv", "obis")
-    a_rows += load_source(DC / "jncc" / "kelp_jncc_absent.csv",        "jncc")
+    a_rows += load_source(_path_config.get_path("GBIF_ABSENT"), "gbif")
+    a_rows += load_source(_path_config.get_path("OBIS_ABSENT"), "obis")
+    a_rows += load_source(_path_config.get_path("JNCC_ABSENT"),        "jncc")
     a_dedup = dedup(a_rows)
     write_csv(a_dedup, DC / "deduped_absent_candidates.csv", "ABSENT")
 

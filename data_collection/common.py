@@ -1,13 +1,5 @@
-"""Shared functions for kelp record filtering, dedup, and statistics.
-
-Used by:
-  data_collection/gbif/extract_gbif_kelp.py
-  data_collection/obis/extract_obis_kelp.py
-  data_collection/jncc/extract_jncc_kelp.py
-"""
-import csv
+"""Shared species recognition and summary statistics for source extraction."""
 from collections import Counter
-from pathlib import Path
 
 
 KELP_SPECIES = [
@@ -28,35 +20,10 @@ def is_kelp_species(scientific_name: str) -> bool:
     return any(scientific_name.startswith(k) for k in KELP_SPECIES)
 
 
-def in_europe(lat, lon) -> bool:
-    try:
-        lat = float(lat); lon = float(lon)
-    except (ValueError, TypeError):
-        return False
-    return (EUROPE_BBOX["lat_min"] <= lat <= EUROPE_BBOX["lat_max"] and
-            EUROPE_BBOX["lon_min"] <= lon <= EUROPE_BBOX["lon_max"])
 
 
-def has_valid_coord(row, latk="decimalLatitude", lonk="decimalLongitude"):
-    try:
-        float(row.get(latk, "")); float(row.get(lonk, ""))
-        return True
-    except (ValueError, TypeError):
-        return False
 
 
-def dedup_key(row, latk="decimalLatitude", lonk="decimalLongitude",
-              datek="eventDate", spk="species", precision=3):
-    """Return a canonical key (species, lat, lon, date) for deduplication."""
-    try:
-        lat = round(float(row.get(latk, "")), precision)
-        lon = round(float(row.get(lonk, "")), precision)
-    except (ValueError, TypeError):
-        return None
-    sp = (row.get(spk) or row.get("scientificName") or "").strip().lower()
-    date = (row.get(datek) or "")[:10]
-    if not sp or not date: return None
-    return (sp, lat, lon, date)
 
 
 def stats(records, source_name: str, klass: str) -> dict:
@@ -82,15 +49,3 @@ def stats(records, source_name: str, klass: str) -> dict:
         "geo_bbox": (f"lat[{min(lats):.2f},{max(lats):.2f}] "
                      f"lon[{min(lons):.2f},{max(lons):.2f}]") if lats else "",
     }
-
-
-STATS_FIELDS = ["source","class","n_records","n_species","top_species",
-                "year_min","year_max","year_post2016","geo_bbox"]
-
-
-def write_stats_csv(stats_rows: list, out_path: Path) -> None:
-    out_path.parent.mkdir(exist_ok=True, parents=True)
-    with out_path.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=STATS_FIELDS)
-        w.writeheader()
-        w.writerows(stats_rows)

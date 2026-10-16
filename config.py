@@ -1,70 +1,58 @@
-"""Central configuration for kelp-observe-classifier.
-
-All data paths are derived from KELP_DATA_DIR (default: ~/kelp-data). Set that
-env var to point at your local data directory. The Clay v1.5 checkpoint is
-expected to live at $KELP_DATA_DIR/clay/v1.5/clay-v1.5.ckpt (override via
-KELP_CLAY_CKPT if you keep it elsewhere).
-
-Nothing here reads from the environment lazily — attribute access is safe.
-"""
-from pathlib import Path
+"""Resolve workflow paths from portable defaults and optional local overrides."""
+import json
 import os
+from pathlib import Path
 
-# Repository root (this file lives at repo/config.py)
 REPO_ROOT = Path(__file__).resolve().parent
 
-# --- Data root (all data + intermediate artefacts live here) ------------------
-DATA_DIR = Path(os.environ.get("KELP_DATA_DIR", "~/kelp-data")).expanduser()
 
-# --- Chip subset selector ----------------------------------------------------
-# Chooses which pool of chips scripts read from. Default "merged" preserves
-# historical behaviour; "submerged" points at the deep-submerged-kelp subset
-# assembled by chip_generation/assemble_submerged.py. Splits + Clay cache +
-# results dirs are also suffixed when subset != "merged" so runs on different
-# pools don't overwrite each other.
-CHIPS_SUBSET = os.environ.get("KELP_CHIPS_SUBSET", "merged")
-_SUFFIX = "" if CHIPS_SUBSET == "merged" else f"_{CHIPS_SUBSET}"
+def configured_paths():
+    """Load defaults, then apply paths from KELP_CONFIG or config.json."""
+    defaults = json.loads((REPO_ROOT / "example_config.json").read_text())["paths"]
+    override = Path(os.environ.get("KELP_CONFIG", REPO_ROOT / "config.json")).expanduser()
+    if not override.is_absolute():
+        override = REPO_ROOT / override
+    if override.exists():
+        supplied = json.loads(override.read_text())["paths"]
+        unknown = set(supplied) - set(defaults)
+        if unknown:
+            raise ValueError(f"Unknown path settings in {override.name}: {sorted(unknown)}")
+        defaults.update(supplied)
+    elif "KELP_CONFIG" in os.environ:
+        raise FileNotFoundError(override)
+    return defaults
 
-# --- Sentinel-2 chips (subset per KELP_CHIPS_SUBSET) -------------------------
-CHIPS_DIR  = DATA_DIR / f"s2_chips_{CHIPS_SUBSET}"
-CHIPS_H5   = CHIPS_DIR / "chips.h5"
-CHIPS_META = CHIPS_DIR / "chips_metadata.csv"
 
-# --- Clay v1.5 -----------------------------------------------------------------
-CLAY_CKPT = Path(os.environ.get("KELP_CLAY_CKPT", DATA_DIR / "clay" / "v1.5" / "clay-v1.5.ckpt"))
-CLAY_META = REPO_ROOT / "configs" / "metadata.yaml"
+def get_path(name):
+    """Resolve one path lazily; reject missing values and reference cycles."""
+    paths = configured_paths()
+    active = set()
 
-# --- Centre-pool size (spatial receptive field of the head) -------------------
-# Number of Clay patches per side averaged into the head's centre-pool component.
-# Full grid is 28×28 after Clay's 128→224 resize; each patch ≈ 46 m native
-# (8 px at 224² → 128/28·8 ≈ 8/28·1280 m). The chip centre falls at patch ≈13.9.
-# Valid values: 1, 2, 3, 5, 7. 5 matches the original run (~230 m footprint);
-# smaller values sharpen the classifier toward the chip centre pixel.
-# The cache stores the raw centre 7×7 patches (see training/patch_pool.py
-# CACHE_K), so POOL_SIZE is a train-time-only knob — no Clay re-run needed.
-# See training/README.md § "Centre-pool size".
-POOL_SIZE = int(os.environ.get("KELP_POOL_SIZE", 5))
-assert POOL_SIZE in {1, 2, 3, 5, 7}, (
-    f"KELP_POOL_SIZE must be one of 1, 2, 3, 5, 7 (got {POOL_SIZE})"
-)
+    class Values(dict):
+        def __missing__(self, key):
+            if key in active:
+                raise ValueError(f"Circular path reference: {key}")
+            value = paths.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"Set paths.{key} in your configuration before this workflow.")
+            active.add(key)
+            try:
+                value = value.format_map(self)
+            finally:
+                active.remove(key)
+            self[key] = value
+            return value
 
-# --- Cached Clay embeddings ---------------------------------------------------
-# Single cache file for all pool sizes: stores CLS + centre 7×7 patch tokens.
-# `train_head.py` slices + means at load time to build the 2048-D input for
-# the head. Cache filename is suffixed by the chip subset so pool-independent
-# caches for different subsets don't collide.
-CLAY_CACHE_DIR = DATA_DIR / "clay_cache"
-CLAY_CACHE_NPZ = CLAY_CACHE_DIR / f"identity{_SUFFIX}.npz"
+    value = Path(Values(REPO_ROOT=str(REPO_ROOT))[name]).expanduser()
+    return value if value.is_absolute() else REPO_ROOT / value
 
-# --- Per-record allowed_max_days annotations (built by data_collection) -------
-ABSENT_WINDOWS_JSON = DATA_DIR / "absent_windows.json"
 
-# --- Splits + results (regenerated locally, gitignored) -----------------------
-# Suffix by chip subset so runs on different pools don't overwrite each other
-# (backward-compatible: "merged" keeps the historical un-suffixed paths).
-SPLITS_DIR  = REPO_ROOT / "training" / f"splits{_SUFFIX}"
-RESULTS_DIR = REPO_ROOT / "training" / f"results{_SUFFIX}"
+def get_service(name):
+    """Return a named service endpoint from configs/services.json."""
+    return json.loads((REPO_ROOT / "configs/services.json").read_text())[name]
 
-# --- Logs / tmp (workspace only) ----------------------------------------------
-LOGS_DIR = Path(os.environ.get("KELP_LOGS_DIR", DATA_DIR.parent / "logs"))
-TMP_DIR  = Path(os.environ.get("KELP_TMP_DIR",  DATA_DIR.parent / "tmp"))
+
+def __getattr__(name):
+    if name in json.loads((REPO_ROOT / "example_config.json").read_text())["paths"]:
+        return get_path(name)
+    raise AttributeError(name)

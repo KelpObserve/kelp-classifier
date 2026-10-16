@@ -1,0 +1,21 @@
+name: Repository checks
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install -r requirements-data.txt
+      - run: python -m pip check
+      - run: python scripts/check_repository.py
+      - run: python -m unittest discover -s tests -v
+      - run: python training/run_location_baselines.py --check
+      - run: python scripts/check_inputs.py reports
+      - run: python training/summarize_full_nuisance_trial.py
+      - run: python training/summarize_final_models.py
+      - run: python training/report_sesimbra_campaigns.py
+      - run: python scripts/check_repository.py

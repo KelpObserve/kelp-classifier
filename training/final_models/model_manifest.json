@@ -1,0 +1,39 @@
+{
+  "models": [
+    {
+      "model": "small_mlp_pool5",
+      "path_key": "FINAL_CHECKPOINTS_DIR",
+      "relative_path": "small_mlp_pool5/model.pt",
+      "sha256": "9226d83f958d86d5fb4c4cbdc11ed1fa57ea4e296e26feca97eda35003037c87",
+      "bytes": 265152,
+      "architecture": "small_mlp",
+      "pool_size": 5,
+      "threshold": 0.5,
+      "best_epoch": 24,
+      "weight_decay": 0.0001,
+      "format_version": 1
+    },
+    {
+      "model": "mlp_pool1",
+      "path_key": "FINAL_CHECKPOINTS_DIR",
+      "relative_path": "mlp_pool1/model.pt",
+      "sha256": "977b37b1917ed8fc629d246db49f6f7a04c8e90ef0d341f2020e1abfb1ba2ab7",
+      "bytes": 4462708,
+      "architecture": "mlp",
+      "pool_size": 1,
+      "threshold": 0.5299999999999999,
+      "best_epoch": 21,
+      "weight_decay": 0.0001,
+      "format_version": 1
+    }
+  ],
+  "embedding_cache_sha256": "a803f7be65fa3a97a7633ce086cbf2daf0059e50a87c5546bfc41fa6cd4ea422",
+  "source_hashes": {
+    "seed_42/selected.csv": "22b1a488ae079434f56accb0d5284032cfc15bccbcbcb22851ca73ddcd1c022d",
+    "seed_123/selected.csv": "7118ac611650e08595049e81bcb7be62521a54282bd5364f3e3492ca6e21b41c",
+    "seed_456/selected.csv": "bc70f6feee3676c06ba3671e0cbb6f60b79f3e2b5525d707225a8deb37866549"
+  },
+  "script_sha256": "2c01b42f1fd33131d603fe90ec6abadad6491f8885928207e656a4d657d0c896",
+  "replay_checked": true,
+  "no_test_set": true
+}

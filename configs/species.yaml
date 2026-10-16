@@ -1,0 +1,10 @@
+# Current PRESENT allowlist. ABSENT uses explicit absence evidence across source taxa.
+species_present:
+  - Laminaria ochroleuca
+  - Saccorhiza polyschides
+  - Phyllariopsis brevipes
+  - Phyllariopsis purpurascens
+  - Undaria pinnatifida
+  - Laminaria hyperborea
+  - Saccharina latissima
+  - Alaria esculenta

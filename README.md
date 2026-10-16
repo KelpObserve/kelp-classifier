@@ -1,140 +1,144 @@
 # kelp-observe-classifier
 
-Detect kelp presence/absence in European coastal waters from Sentinel-2 L2A
-imagery, using [Clay v1.5](https://clay-foundation.github.io/model/) foundation-model
-embeddings plus a light MLP classification head.
+Kelp presence/absence classification for the Arrábida coast near Sesimbra,
+Portugal, using Sentinel-2 imagery, frozen Clay v1.5 features and classifier
+heads. The encoder uses resize-adjusted grid spacing of approximately 5.714 m
+for each 128→224 input; the native imagery and output grid remain 10 m.
+CCMAR diver observations provide the field evaluation reference.
+Pléiades Neo imagery supports a separate exploratory analysis.
 
-## Repository structure
+The three-seed comparison uses 50 m location groups and a 2:1 PRESENT/ABSENT
+ratio. Two final heads fit the 725-chip union. They predict
+PRESENT at all 52 labelled field pixel-dates, so it does not establish
+presence/absence discrimination. See the [campaign evaluation](training/sesimbra_evaluation/README.md).
+Read the [technical study report](technical_report.md) for a paper-style account
+of the data, methods, results, figures and conclusions.
+See [methods and scientific results](docs/SCIENCE.md) for the full account.
 
-- [`data_collection/`](data_collection/) — extract labelled kelp records from public
-  databases (GBIF, OBIS, JNCC).
-- [`chip_generation/`](chip_generation/) — pull Sentinel-2 chips for each record
-  (strict QC for PRESENT, relaxed for ABSENT, up to 8 scenes per ABSENT record)
-  and merge into a single HDF5.
-- [`training/`](training/) — build fixed matched splits, precompute Clay embeddings,
-  train the MLP head, evaluate.
-- [`configs/metadata.yaml`](configs/metadata.yaml) — Clay v1.5 band-stat file (kept
-  in the repo because it is required by every Clay forward pass).
-- [`config.py`](config.py) — single point of truth for filesystem paths
-  (driven by env vars, defaults documented below).
+## What the pool sizes mean
 
-## Setup
+Clay converts each image into a grid of learned feature vectors, called **patch
+tokens**, together with a summary of the whole image. **Central pooling** selects
+features around the observation and averages them into one feature vector:
 
-Python 3.11 in a virtualenv, then:
+- **Pool 1:** one central token.
+- **Pool 2:** the average of a central 2×2 square, containing 4 tokens.
+- **Pool 3:** the average of a central 3×3 square, containing 9 tokens.
+- **Pool 5:** the average of a central 5×5 square, containing 25 tokens.
 
-```bash
-git clone https://github.com/OceanStreamIO/kelp-observe-classifier.git
-cd kelp-observe-classifier
-python -m venv .venv
+The classifier receives both this central feature vector and the whole-image
+summary. Larger pools summarize a wider central area. The numbers describe
+learned feature tokens, **not satellite pixels**: Clay processes the full image
+before pooling, so even pool 1 can use surrounding image context. Pooling does
+not change the original image footprint or create finer spatial resolution.
+
+## Limitations
+
+- **Small dataset, especially ABSENT observations.** The training union reuses
+  51 distinct ABSENT location–observation-date records across image dates.
+  [Current counts](data_collection/README.md#current-experiment-observations-and-s2-pixel-date-labels) distinguish chips from independent observations. Multiple image dates for one observation do not create new
+  independent field evidence. The local field dataset has only 90 survey events
+  (73 PRESENT, 17 ABSENT), collected along nearby, repeatedly surveyed transects.
+- **Possible overfitting.** Frozen features reduce the number of fitted weights,
+  but the heads still learn from few independent observations. Repeated model,
+  regularization and threshold selection can overfit validation data. The final
+  models have no independent internal test set; the three split seeds reuse
+  observations and are not three independent experiments.
+- **Sentinel-2 collapses different Sesimbra observations into one pixel.** The 90 field
+  events become 52 labelled 10 m pixel-dates: 47 PRESENT and only 5 ABSENT.
+  Under the any-presence rule, an empty quadrat sharing a pixel with an occupied
+  quadrat does not supply an ABSENT pixel label. Fine-scale variation is lost,
+  and an empty sampled quadrat does not prove absence across the whole pixel.
+  Bands B05 and B11 are native 20 m measurements resampled to the 10 m grid;
+  resampling does not add spatial detail (see the
+  [Sentinel-2 mission specification](https://sentiwiki.copernicus.eu/web/s2-mission)).
+  Clay tokens also use whole-chip context.
+- **Spatial context crosses partitions.** Shared scenes and overlapping chip
+  footprints were allowed because the small dataset, particularly the limited
+  independent ABSENT observations, would otherwise not support the required
+  class-balanced train/validation/test partitions. This was a practical
+  compromise: the 50 m grouping rule keeps nearby observations together but
+  does not isolate the full image context. Reported split performance may
+  therefore be optimistic relative to evaluation on entirely new scenes or
+  geographically separated sites.
+- **Limited transfer evidence.** The [field evaluation](training/sesimbra_evaluation/README.md)
+  has only five ABSENT pixel-dates. Both heads predict PRESENT
+  for all 52 labels (ABSENT recall 0; Macro F1 0.475), so this does not establish
+  reliable operational presence/absence mapping. The 50 m grouping rule
+  allows shared scenes and overlapping 1.28 km chip footprints across splits.
+  New-site and new-campaign evaluation, with more independent absences and
+  uncertainty intervals computed over independent groups, remains necessary.
+- **Input consistency check.** All Sentinel-2 images use the same model
+  normalization. Source-image scaling and offset conventions have not been
+  independently verified across the complete collection; no resulting bias
+  has been demonstrated.
+
+## Quick start: inspect and reproduce reports
+
+Use Python 3.11. Reporting does not need imagery, model weights or a GPU.
+
+```sh
+python3.11 -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+python -m pip install -r requirements-reporting.txt
+python scripts/check_repository.py
+python training/summarize_full_nuisance_trial.py
+python training/summarize_final_models.py
 ```
 
-### Environment variables
+The report commands regenerate their README and figures from included tables.
+The default report paths work without a local configuration. For execution,
+`config.json` supplies local data/model paths; inspect configured resources with
+`python scripts/show_resources.py`. For overrides, copy
+`example_config.json` to the ignored `config.json`, or set `KELP_CONFIG` to a
+separate JSON file containing a `paths` object. Relative paths are resolved
+against the repository root, not the shell's working directory.
 
-Set these in your shell (`export …`) or in a `.env` file at the repo root (loaded with e.g. `set -a; source .env; set +a`; the file is git-ignored).
+## Choose a workflow
 
-| Variable | Default | Purpose |
+| Goal | Instructions | Additional inputs |
 |---|---|---|
-| `KELP_DATA_DIR` | `~/kelp-data` | Root for all data + intermediate artefacts (chips, embeddings, checkpoints) |
-| `KELP_CLAY_CKPT` | `$KELP_DATA_DIR/clay/v1.5/clay-v1.5.ckpt` | Path to the Clay v1.5 checkpoint (download from the [Clay Foundation release page](https://github.com/Clay-foundation/model/releases)) |
-| `KELP_LOGS_DIR` | `$KELP_DATA_DIR/../logs` | Where nohup / long-running scripts write logs |
-| `KELP_TMP_DIR`  | `$KELP_DATA_DIR/../tmp`  | Where one-off scripts drop scratch files |
-| `KELP_POOL_SIZE` | `5` | Centre-pool size (patches per side) for the head's spatial embedding. One of `1`, `2`, `3`, `5`, `7`. Smaller = tighter effective footprint around the chip centre pixel. See [`training/README.md`](training/README.md#centre-pool-size). |
+| Understand labels, model design and limitations | [Scientific account](docs/SCIENCE.md) | None |
+| Inspect sources and collection rules | [Data collection](data_collection/README.md) | None for saved tables |
+| Fetch and consolidate new S2 chips | [Chip generation](chip_generation/README.md) | Source candidates and network access |
+| Train or verify current classifiers | [Training](training/README.md) | Canonical arrays, Clay weights and CUDA |
+| Apply final classifiers to field campaigns | [Campaign evaluation](training/sesimbra_evaluation/README.md) | Campaign images and final weights |
+| Supply required artifacts and configure paths | [Reproduction and inputs](docs/REPRODUCIBILITY.md) | Depends on workflow |
+| Find scripts and understand outputs | [Repository structure](docs/STRUCTURE.md) | None |
 
-### Expected `KELP_DATA_DIR` layout
+## Reproducibility status
 
-```
-$KELP_DATA_DIR/
-├── clay/v1.5/clay-v1.5.ckpt         # Clay foundation-model weights (~4.9 GB)
-├── s2_chips_merged/
-│   ├── chips.h5                     # Merged 128×128 S2 chips (8 bands)
-│   └── chips_metadata.csv           # One row per chip
-├── clay_cache/identity.npz          # Cached Clay CLS + centre 7×7 patches (pool-independent)
-├── absent_windows.json              # Per-A time-window annotations
-└── jncc_mr/                         # Optional: JNCC MDB snapshot (~1.7 GB)
-```
+The [reproducibility matrix](docs/REPRODUCIBILITY.md#reproducibility-matrix)
+distinguishes table checks, checkpoint replay, retraining and source reconstruction.
 
-The repo does not ship data; the extractors in [`data_collection/`](data_collection/)
-build the CSVs from public sources, [`chip_generation/`](chip_generation/) turns them
-into HDF5 chips, and [`training/`](training/) does the rest.
+Saved partitions, selection inventories, predictions, metrics, model catalogs
+and scientific reports are included. Image arrays, embeddings and model binaries
+must be supplied separately at the paths configured in `config.json`.
+The full CUDA environment is pinned in `requirements-cuda.lock`.
 
-## Pipeline
+The included results cover twelve original-architecture MLPs, twelve simpler
+heads, two final heads and field predictions/rasters. Chip coverage and quality
+handling are part of the [acquisition procedure](chip_generation/README.md).
+Source preparation remains distinct from replaying these
+artifacts: the original GBIF export DOI is not recorded, and rebuilding upstream
+depth evidence requires the supplied preparation inputs. See
+[reproduction and inputs](docs/REPRODUCIBILITY.md) for commands and required inputs.
 
-```
-GBIF ┐
-OBIS ┼─▶ data_collection/  ─▶  per-source CSVs of PRESENT & ABSENT records
-JNCC ┘                              │
-                                    ▼
-                          chip_generation/   ─▶  128×128 S2 chips in HDF5, 8 bands
-                                    │              strict QC for PRESENT (1 scene)
-                                    │              relaxed QC for ABSENT (up to 8 scenes)
-                                    ▼
-                              training/      ─▶  make_splits.py  (3 fixed splits, no location
-                                                                   leakage; A stratified 75/15/15 by
-                                                                   (cloud, water) with 50 m safety; P
-                                                                   subselected per split to match A on
-                                                                   water exactly + b02_range greedily)
-                                                    precompute_clay_embeddings.py  (Clay v1.5 backbone)
-                                                    train_head.py  (MLP head, focal loss,
-                                                                    val-tuned threshold calibration)
+## Development checks
+
+```sh
+python -m pip install -r requirements-data.txt
+python scripts/check_repository.py
+python -m unittest discover -s tests -v
+python scripts/check_inputs.py reports
+python training/run_location_baselines.py --check --auc-tolerance 0.002
 ```
 
-## Dataset and run status (verified 2026-10-14)
+The baseline command reports any cross-platform AUC drift; classification metrics
+remain strict. Omit the tolerance option for exact refitting in the recorded
+execution environment. See [reproduction details](docs/REPRODUCIBILITY.md).
 
-The current training-server metadata contains:
-
-| Pool | PRESENT | ABSENT | Total |
-|---|---:|---:|---:|
-| Merged, all species | 6,077 | 1,533 | 7,610 |
-| Submerged, four target species | 2,202 | 1,533 | 3,735 |
-
-These are **current pool inventories**, not counts of chips used by every
-checkpoint. Matching, splitting and balancing select smaller training sets.
-The archived Sesimbra experiment page records an earlier submerged snapshot
-of 3,733 chips (2,200 P / 1,533 A). The 5,703-chip pool from 17 July is historical.
-Sources are GBIF, OBIS and JNCC; see the
-[source manifest](data_collection/DATA_SOURCES.md).
-
-## Reference results (merged, pool=5, seeds 42/123/456)
-
-Recomputed from the server's saved `head_seed{42,123,456}_p5/results.json`
-files on 2026-10-14; these are existing trained runs, not a new training run.
-The 0.893 initial baseline has been superseded. Machine-readable evidence is
-in [`training/release_run_summary.json`](training/release_run_summary.json).
-
-| Metric | Mean ± population std |
-|---|---|
-| Test ROC-AUC | 0.974 ± 0.005 |
-| Test balanced accuracy @ 0.5 | 0.903 ± 0.011 |
-| Test macro F1 @ 0.5 | 0.907 ± 0.007 |
-| Test ABSENT recall @ 0.5 | 0.856 ± 0.031 |
-| Test ABSENT precision @ 0.5 | 0.898 ± 0.014 |
-| Test PRESENT recall @ 0.5 | 0.950 ± 0.010 |
-| Test PRESENT precision @ 0.5 | 0.928 ± 0.013 |
-
-ROC-AUC is threshold-independent; the other metrics use threshold 0.5.
-These merged-pool scores must not be attributed to the submerged heads.
-For the submerged pool, the committed three-seed sweep reports ROC-AUC
-**0.866 ± 0.025** for pool=1 and **0.891 ± 0.009** for pool=5.
-The separate Sesimbra evaluation has only 34 unique S2 pixels (32 P / 2 A),
-so its high pool=5 ROC-AUC of 0.984 is not a Europe-wide performance estimate.
-See the [training documentation](training/README.md) for the evaluation protocols.
-
-## Model catalog
-
-Four deployment heads are versioned as explicit exceptions to the `*.pt` ignore rule.
-See the [checkpoint paths and checksums](training/model_manifest.json) for Zenodo packaging. All share the same MLP architecture
-(dropout 0.3, focal loss α=0.5 γ=2.0); they differ in *training subset*,
-*input dimensionality*, and *effective spatial footprint*.
-
-| Model | Subset | Input dim | Footprint | Purpose |
-|---|---|---:|---|---|
-| `merged_p1` | merged (all species) | 2048 | ~46 m | General Europe-wide model. |
-| `submerged_p1` | submerged (4 deep-water spp.) | 2048 | ~46 m | Sharpens response to *Saccorhiza polyschides* et al. |
-| `submerged_p5` | submerged | 2048 | ~229 m | Best on submerged pool sweep + Sesimbra CCMar. Deployment-recommended for wide-area maps. |
-| `submerged_pixel` | submerged | 2054 | ~46 m Clay context + 10 m raw S2 | Runs at every 10 m pixel during rasterisation. Sharper outputs; worse on the tiny CCMar test. |
-
-Full training-vs-test results and Sesimbra CCMar pixel-aggregated evaluation
-are in [`training/README.md`](training/README.md#model-catalog).
+Source citations and internal documentation links are retained. Runtime service
+endpoints are configured in `configs/services.json`. Run
+`python scripts/check_repository.py --external` for a network link check;
+access blocks and timeouts are reported separately from missing pages.

@@ -1,0 +1,6 @@
+{
+  "regularization": 0.001,
+  "threshold": 0.4699999999999999,
+  "best_epoch": null,
+  "history": []
+}

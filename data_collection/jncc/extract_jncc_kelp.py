@@ -7,6 +7,15 @@ Requires `mdbtools` package (Ubuntu: `sudo apt-get install mdbtools`).
 
 Output: kelp_jncc_present.csv, kelp_jncc_absent.csv
 """
+
+# Discover the configuration module; data locations come from config.json.
+import sys as _path_sys
+from pathlib import Path as _ConfigPath
+_path_root = _ConfigPath(__file__).resolve().parent
+while not (_path_root / "example_config.json").is_file() and _path_root != _path_root.parent:
+    _path_root = _path_root.parent
+_path_sys.path.insert(0, str(_path_root))
+import config as _path_config
 import csv
 import io
 import subprocess
@@ -20,18 +29,17 @@ while _here != _here.parent:
     if (_here / "config.py").exists():
         _sys.path.insert(0, str(_here)); break
     _here = _here.parent
-import config
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import KELP_SPECIES
 
-HERE = Path(__file__).resolve().parent
-MDB = str(config.DATA_DIR / "jncc_mr" / "SnapshotDatav52_PUBLIC_20220124.mdb")
+HERE = _path_config.get_path("JNCC_DIR")
+MDB = str(_path_config.get_path("JNCC_DATABASE"))
 
 
 # Rejection counter for JNCC date parses that fall through the format branches.
 # Populated by parse_mmddyy(); dumped once at end of main() so silent drops become
-# visible (reviewer finding #3).
+# visible.
 _DATE_REJECTS = {"empty": 0, "unparseable": 0, "samples": []}
 
 def parse_mmddyy(s: str) -> str:
@@ -121,7 +129,7 @@ def main():
             joined.append({**ss, **s, "occurrenceStatus": klass})
         # Filter post-2016 (S2 era)
         post = [j for j in joined if j["eventDate"] >= "2016-01-01"]
-        out = HERE / f"kelp_jncc_{klass.lower()}.csv"
+        out = _path_config.get_path("JNCC_" + klass.upper())
         fields = ["sample_ref","species","scientificName","decimalLatitude","decimalLongitude",
                   "eventDate","occurrenceStatus","pa","sacf","aphia","sampling_notes",
                   "datasetKey","basisOfRecord"]

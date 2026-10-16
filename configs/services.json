@@ -1,0 +1,5 @@
+{
+  "earth_search": "https://earth-search.aws.element84.com/v1",
+  "obis_occurrences": "https://api.obis.org/v3/occurrence",
+  "jncc_snapshot": "https://data.jncc.gov.uk/data/b9934e31-39b6-41f9-9364-d1e93db68307/SnapshotDatav52-PUBLIC-20220124.zip"
+}

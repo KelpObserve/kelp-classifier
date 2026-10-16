@@ -1,10 +1,4 @@
-"""Shared constants + helpers for slicing Clay's centre patches.
-
-Both `precompute_clay_embeddings.py` (writes the cache) and `train_head.py`
-(reads the cache, aggregates at load time) need the same view of Clay's
-patch grid and the centre-pool convention. Kept in one place so they can't
-drift.
-"""
+"""Shared Clay patch-grid and central-pooling conventions for training and inference."""
 
 # Clay v1.5 patch grid on our chips: 128→224 resize, patch=8 → 28×28 tokens.
 PATCH_GRID = 28

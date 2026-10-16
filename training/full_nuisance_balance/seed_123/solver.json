@@ -1,0 +1,18 @@
+{
+  "seed": 123,
+  "status": 0,
+  "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+  "objective": 1.0391342665349175,
+  "gap": 0.00690897274529075,
+  "fixed_group_fallback": false,
+  "absent_partition": {
+    "method": "Five seeded annealing restarts, 8000 group proposals each; heuristic, no optimality guarantee",
+    "objective": 0.1472538306500571,
+    "initial_objective": 0.41506204064576707,
+    "group_counts": [
+      20,
+      7,
+      7
+    ]
+  }
+}

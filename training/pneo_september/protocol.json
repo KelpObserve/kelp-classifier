@@ -1,0 +1,21 @@
+{
+  "scene": "000618890",
+  "image_date": "2026-09-03",
+  "observation_date": "2026-09-02",
+  "N": 30,
+  "P": 20,
+  "A": 10,
+  "transects": 6,
+  "field_labels_and_coordinates_verified": true,
+  "input_hashes": {
+    "PNEO_SEPTEMBER_FEATURES": "8cd4b7d83986e5277fbf706496564c3844b7dd0dc35df678a05bf58109131904",
+    "PNEO_CLAY_METADATA": "b0b63da5ae69a184c0a53d259f7778144a95607673c517315de92b32bae46b89",
+    "PNEO_CLAY_EMBEDDINGS": "ac237fdd9d21af3b1def99597b5eece200b2d6a64e368241db05bf49169aa383",
+    "FIELD_OBSERVATIONS": "eab8cafa8dcf4446417b3277500abc2512d3b7b55e81bc4f93b1b1bd1595754e"
+  },
+  "source": "September feature and embedding exports; checked against current matched field observations.",
+  "features": "Six bands R G B NIR RE DB; 5x5 means/std/ranges plus Lyzenga log-difference indices. Full-scene water statistics for unsupervised normalization. Clay native224x224, GSD1.2, scene-water normalization, geographic/week encodings and central token14 preserve the PNEO exploration conventions.",
+  "evaluation": "Leave one depth-by-transect group out; train-only StandardScaler; LR C0.01 class_weight balanced; threshold0.5 fixed; every September quadrat evaluated once.",
+  "limitations": "Exploratory same-scene evaluation on six adjacent transects; overlapping image windows and reused analysis. Not the final S2 models or independent geographic validation. Transect centring removes a shared offset, not all confounders. Multiple feature tests corrected with Benjamini-Hochberg separately per test family.",
+  "script_sha256": "e87c3bfcad1713594c76ba3919d7af637a0e216e2df9b8c04966f5560346dc10"
+}

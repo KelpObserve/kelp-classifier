@@ -1,179 +1,87 @@
-# Chip generation
+# Sentinel-2 chip acquisition
 
-Pull 128×128 Sentinel-2 L2A chips for each labelled kelp record.
+`fetch_present.py` and `fetch_absent.py` use the shared `chip_common.py` engine.
+Install `requirements-data.txt`. Candidate CSVs use source columns including
+`gbifID`, `decimalLatitude`, `decimalLongitude`, `eventDate` and `species`.
+The [data-collection policy](../data_collection/README.md#obtaining-sentinel-2-chips)
+describes date windows, quality checks and retained labels.
 
-## Chip format
+```sh
+python chip_generation/fetch_absent.py data_collection/deduped_absent_candidates.csv runs/absent
+python chip_generation/fetch_present.py data_collection/deduped_present_candidates.csv runs/present
+python chip_generation/consolidate_chips.py --output runs/collection runs/absent runs/present
+```
 
-- **Size**: 128×128 pixels (10 m Sentinel-2 native → 1.28 × 1.28 km footprint on the ground)
-- **Bands** (dim 0): `B01, B02, B03, B04, B05, B08, B11, SCL` — coastal, blue, green, red, red-edge-1, NIR, SWIR16, scene-classification
-- **Dtype**: uint16
-- **Storage**: HDF5 with `chunks=(1, 8, 128, 128)`, `compression="lzf"`
-- **Metadata**: one CSV row per chip alongside `chips.h5` with sceneID, sceneDate, cloud/water/fill metrics, snap fields (see below), gbifID, class_tag.
+Use fresh acquisition and consolidation directories. Fetchers preserve the
+original observation identifier in `observation_id`, separately from the
+scene-specific output ID. Acquisition depends on current STAC availability;
+it does not recreate a fixed published dataset automatically.
 
-## Prediction region
+## Consolidated files
 
-All QC operates on the **23×23-pixel prediction region** at chip centre (rows/cols 50:73). This region maps to Clay's centre-pool patches `[11:16, 11:16]` on the 28×28 patch grid after 128→224 resize. Aligning QC with what the model actually looks at prevents ABSENT chips from passing on flat-zero centres and PRESENT chips from landing on land in the region the model emphasises.
-
-## QC profiles ([`chip_common.py`](chip_common.py))
-
-Both profiles use the same chip reader; only the time window and downstream fetch policy differ.
-
-| Parameter | STRICT (PRESENT) | RELAXED (ABSENT) |
-|---|---|---|
-| Scene cloud filter (STAC) | ≤ 60 % | ≤ 60 % |
-| Region cloud reject | > 40 % SCL cloud/shadow/cirrus | > 40 % (same) |
-| **Region water minimum (`region_water_min`)** | **≥ 30 %** | **≥ 30 % (fixed to match PRESENT)** |
-| Region fill reject | > 70 % no-data pixels | > 70 % (same) |
-| Region B02 dynamic range | ≥ 30 uint16 P05-P95 spread | ≥ 30 (same) |
-| Time window around eventDate | ± 30 d | ± 60 d |
-| Chips per record (default) | 1 (best scene) | up to 8 (multi-scene) |
-| **Snap cap (m)** | **300** | **300** |
-
-### Post-review symmetry fix
-
-Earlier the ABSENT profile had `region_water_min = 0.0` — no water requirement — which meant ABSENT chips could land anywhere including entirely on land, while PRESENT chips were pre-filtered to sit clearly over water. A code-review sanity check (`L2`) showed a logistic classifier trained on QC metadata alone (no image content) predicted PRESENT vs ABSENT at ROC-AUC **0.859** — higher than the model's headline 0.841 — because the water-fraction distributions of PRESENT and ABSENT were disjoint. Symmetrising `region_water_min` to 0.30 closes that leak on the water axis.
-
-## Snap-to-water (`snap_to_water`)
-
-When a candidate's reported coord fails the water QC (`region_water_min < 0.30`), the pipeline tries a single snap step before rejecting:
-
-1. Read the item's SCL band over a widened window (`128 + 2·cap_px` pixels, e.g. 188×188 for a 300 m cap).
-2. Find the nearest water pixel (`SCL == 6`) to the chip centre inside the cap.
-3. If none exists inside the cap → drop the scene as `snap_no_water`.
-4. Otherwise re-read the full 8-band chip centred on the snapped water pixel and re-run QC.
-5. If the snapped chip passes → keep it with metadata `snap_dist_m`, `snap_lat`, `snap_lon` recording the shift; original observer coords are preserved unchanged in `decimalLatitude` / `decimalLongitude`.
-
-### Why it's sound
-
-A shore observer's *"no kelp seen"* claim is really about the water they were looking at, not the rock they stood on. Symmetrically, an observer at the top of a rocky Portuguese cliff logging a kelp bed offshore has a valid observation, just anchored at their standpoint. Snapping ≤ 300 m to a defined water pixel re-anchors the chip on the water surface the observation actually described.
-
-Enabled by default via `snap_cap_m=300` in both QC dicts; set to 0 to disable.
-
-### Metadata columns added
-
-| Column | Meaning |
+| File | Meaning |
 |---|---|
-| `snap_dist_m` | Distance (m) between reported and snapped chip centre. `0.0` if no snap was needed. |
-| `snap_lat`, `snap_lon` | Snapped coords (WGS-84). Blank if no snap was applied. |
+| `chips.h5` | Unique uint16 arrays, eight bands, 128×128 pixels; deduplicated by SHA-256 |
+| `chips_metadata.csv` | Array index, hash-based chip ID and contradictory-label flag |
+| `observation_chips.csv` | Every accepted observation/scene association, including source quality fields and coordinates |
+| `consolidation.json` | Counts and input collection names |
 
-## Coordinate uncertainty filter
+Contradictory labels are flagged, not silently discarded or resolved. HDF5 indices
+follow input order. Do not apply published manifests to this new file unless
+all referenced indices and array hashes match. Depth preparation and eligible
+inventory construction require the evidence described in the
+[reproduction guide](../docs/REPRODUCIBILITY.md).
 
-- **PRESENT** (`fetch_present.py`): candidates with `coordinateUncertaintyInMeters > 115` are dropped pre-fetch. 115 m is the half-width of the 23×23 prediction region — a PRESENT record whose true location is outside the region the model looks at is a noisy label. In practice we go tighter: the current PRESENT candidate list (`high_precision_candidates.csv`) restricts to `coordinateUncertaintyInMeters <= 10 m`, so the fetch operates well inside the 115 m safety filter.
-- **ABSENT** (`fetch_absent.py`): no unc pre-filter. An "no kelp seen" claim over an area is robust to positional imprecision — unlike a PRESENT record, which pinpoints a specific kelp bed. (Reviewer C2 originally symmetrised this filter for P/A parity; the intentional revert trades a small symmetry cost for meaningful ABSENT coverage.)
+`render_chips.py` visualizes selected canonical arrays using their explicit
+`h5_index` and SHA-256. It writes RGB/SCL panels under `runs/chip_inspection/`.
+Run `python chip_generation/render_chips.py --limit 8` after configuring the
+canonical arrays.
 
-## Usage
+## Complete footprints and overlapping tiles
 
-### Present chips
+Every chip represents a 1,280 m square on a 128×128 grid at 10 m spacing.
+`chip_common.py` checks all eight source raster windows before reading them.
+An incomplete window is never clipped and resized into a full chip.
 
+The normal acquisition procedure is:
+
+1. Search within the observation's class-specific date window and scene-cloud
+   threshold. Keep overlapping tiles in the candidate list until a usable chip
+   is found; accept at most one scene per calendar day.
+2. Read the requested footprint. If it crosses a tile boundary,
+   `tile_coverage.py` tries a fully covering overlapping tile with the same
+   platform, datatake and processing baseline and matching band scale, offset,
+   nodata and data-type metadata. This does not move the observation or change
+   its label or acquisition date. Missing acquisition identity prevents substitution.
+3. Preserve the requested projected grid. For an adjacent UTM zone, reproject
+   onto that grid using bilinear interpolation for spectral bands and nearest
+   neighbour for categorical SCL. Validate coverage in both STAC metadata and
+   the opened source raster. Record the actual `sceneID` and `output_crs`;
+   the source tile's CRS can differ from the output grid.
+4. Apply the same regional and central-water quality checks to every chip,
+   including overlapping-tile reads. If there is no complete tile, reject that
+   candidate and continue the normal scene search. Water snapping remains a
+   separate, explicitly recorded fallback for water-QC failures, capped at
+   300 m; its wider search window must also be complete.
+5. Consolidate accepted arrays by SHA-256, keeping observation associations and
+   flagging conflicting labels. Apply the additional training central-SCL
+   exclusion during feature preparation. Any pixel change requires new hashes,
+   features, partitions, embeddings and model fits; caches from different arrays
+   are not interchangeable.
+
+The current eligible inventory contains 1,198 chips (984 PRESENT, 214 ABSENT).
+The training central-SCL exclusion leaves 1,196 (984 PRESENT, 212 ABSENT).
+The coverage audit checked all 1,198 eligible footprints; none extends beyond
+its source assets. Audit reports are generated locally and excluded from Git.
+To audit a configured collection:
+
+```sh
+python chip_generation/audit_boundaries.py --output runs/boundary_audit.json
+# Optional: --manifest path/to/chip_inventory.csv
 ```
-python fetch_present.py <candidates.csv> <out_dir>
-```
 
-Reads candidates with columns `gbifID, decimalLatitude, decimalLongitude, eventDate`. Writes `<out_dir>/chips.h5` and `<out_dir>/chips_metadata.csv`.
-
-### Absent chips (up to 8 scenes)
-
-```
-python fetch_absent.py <candidates.csv> <out_dir> [--scenes 8] [--single] \
-       [--exclude-existing <prev_chips_metadata.csv>]
-```
-
-- `--scenes N` sets the maximum scenes per record (default 8).
-- `--single` shortcut for `--scenes 1`.
-- `--exclude-existing` skips sceneIDs already recorded in a previous metadata CSV — used to top up an existing dataset with fresh scenes without duplicating.
-
-Under the hood both wrappers call [`chip_common.fetch_chips(...)`](chip_common.py), which:
-1. Queries STAC (Element84 Earth-Search) for candidate scenes in the record's time window.
-2. Sorts by scene-level cloud coverage.
-3. Reads the 128×128 chip at the record's coord for each candidate scene.
-4. Runs `qc_chip(...)`. If `bad_water` and `snap_cap_m > 0`, tries `snap_to_water(...)` + re-read + re-QC.
-5. Writes passing chips (and one metadata row each) to the output HDF5/CSV.
-
-### Merging fetches
-
-Individual fetches land in per-source directories under `$KELP_DATA_DIR/`. [`merge_all_chips.py`](merge_all_chips.py) picks up **any** directory whose name contains `s2_chips_` (with a valid `chips.h5`), so future OBIS / JNCC / snap-fetch dirs are folded in automatically. It applies a `gbifID`-based dedup at merge time to collapse same-source refetches of the same scene.
-
-Cross-source duplicates (same observation reported in both GBIF and OBIS) are handled *pre-fetch* — see [`../data_collection/dedup_candidates.py`](../data_collection/dedup_candidates.py) which unifies the six raw source CSVs into deduplicated PRESENT/ABSENT candidate lists.
-
-Field names in the output CSV are the **union** across all source rows, so columns present in only some sources (e.g. `snap_lat/snap_lon/snap_dist_m` from snap-enabled fetches) are preserved rather than silently dropped. Chip data is **streamed** — each source `chips.h5` is opened once and chips are written to the merged file one at a time, so peak RAM stays O(one chip) instead of O(all chips).
-
-- **Merged output**: `$KELP_DATA_DIR/s2_chips_merged/chips.h5` (+ `chips_metadata.csv`)
-
-This is the file consumed by [`../training/`](../training/) (via `precompute_clay_embeddings.py`).
-## Historical chip counts (2026-07-17)
-
-Historical snapshot of `$KELP_DATA_DIR/s2_chips_merged/chips.h5`.
-For the verified 2026-10-14 inventory, see the [top-level README](../README.md):
-
-| Class | Chips |
-|---|---:|
-| PRESENT | 4,089 |
-| ABSENT (single + multi-scene) | 1,614 |
-| **Total** | **5,703** |
-
-These are the counts consumed by the training pipeline. Cross-source dedup runs at candidate time (`data_collection/dedup_candidates.py`); QC metadata (`wf_region`, `cloud_region`, `fill_region`, `b02_range`) is written by `chip_common.qc_chip` at fetch time.
-
-## Post-fetch cleanup (`filter_merged.py`)
-
-After the initial merge, [`filter_merged.py`](filter_merged.py) applies three
-correctness rules to the merged pool. This is a one-shot cleanup — indexes
-are renumbered afterwards, so **do not run consumers that reference
-`chipIndex` / `merged_index` between this and the split/cache rebuild**.
-
-| Rule | What it removes | Why |
-|---|---|---|
-| **1. Multi-species same-day ABSENT contradictions** | Any ABSENT chip whose `(lat, lon, eventDate)` also carries a PRESENT of a different species. | An any-kelp binary detector treats these ABSENT rows as wrong labels: kelp of *some* species was there on that date. |
-| **2. Mixed-fetch bases** | All chips (single-scene "original" + all `_sN` multi-scene siblings) at any base gbifID that has both. | The pattern that produced the OBIS misalignment bug. Re-fetched cleanly in the next stage. |
-| **3. Beyond-window ABSENT chips** | ABSENT chips whose \|sceneDate − eventDate\| exceeds their per-record `allowed_max_days` (30 or 60), flagged by `find_absent_beyond_window.py` against `absent_windows.json`. | An "no kelp seen" claim is only valid within a bounded time window around the observation date. |
-
-Two helper scripts feed rule 3:
-
-| Script | Role |
-|---|---|
-| [`find_absent_beyond_window.py`](find_absent_beyond_window.py) | For each ABSENT chip in the merged pool, checks whether `|sceneDate − eventDate|` exceeds its `allowed_max_days` (looked up in `$KELP_DATA_DIR/absent_windows.json`; fallback 30 d if the gbifID isn't in the JSON). Emits `absent_beyond_window.csv` — the flag list consumed by `filter_merged.py` rule 3. |
-| [`../data_collection/annotate_absent_windows.py`](../data_collection/annotate_absent_windows.py) | Produces `absent_windows.json` in the first place: for every raw ABSENT record, `30` if a PRESENT within 1 km + ±90 d exists, else `60`. |
-
-Backs up the merged HDF5/CSV before rewriting.
-
-## Submerged subset (`assemble_submerged.py`)
-
-Deep-water kelp species (blade sub-surface at 5-30 m) have a distinct
-spectral signature from surface-floating species (e.g. *Chorda filum*). The
-Sesimbra site targets four such species, so the training pool is subset to
-just those:
-
-- *Saccorhiza polyschides*
-- *Laminaria hyperborea*
-- *Laminaria ochroleuca*
-- *Phyllariopsis brevipes*
-
-[`assemble_submerged.py`](assemble_submerged.py) copies matching chips from
-`s2_chips_merged/` to `s2_chips_submerged/` without refetching:
-
-- **PRESENT filter (strict):** the chip's species field (a comma-separated
-  list preserved from `dedup_candidates.py`) must contain one of the four
-  target species. Falls back to raw source CSVs when the merged CSV row is
-  missing a species label.
-- **ABSENT filter (species-agnostic):** no species requirement. For an
-  "any target-species kelp" detector, any chip where the surveyor reported
-  no kelp of *any* species is valid negative signal — a JNCC survey that
-  checked 8 species and found none is a stronger negative than one that
-  only checked one.
-- **Output:** `$KELP_DATA_DIR/s2_chips_submerged/{chips.h5,chips_metadata.csv}`.
-  Same schema as the merged pool.
-
-To grow the submerged pool with observations that were never fetched into
-the merged pool in the first place, run
-[`../data_collection/build_submerged_candidates.py`](../data_collection/build_submerged_candidates.py)
-first (produces `submerged_{present,absent}_candidates.csv`), feed those
-CSVs to `fetch_present.py` / `fetch_absent.py`, re-run `merge_all_chips.py`,
-then re-run `assemble_submerged.py`.
-
-**Current submerged counts** (used by the deep-water-species training runs
-described in [`../training/README.md#chip-subsets-kelp_chips_subset`](../training/README.md#chip-subsets-kelp_chips_subset)):
-
-| Class | Chips |
-|---|---:|
-| PRESENT (4 target species) | ~2,200 |
-| ABSENT (any species) | ~1,500 |
-| **Total** | **3,733** |
+The inventory must provide `chip_id`, `sceneID`, `chip_center_lon`,
+`chip_center_lat` and, when different from the source grid, `output_crs`.
+This metadata audit checks coverage, not internal nodata, radiometric consistency
+across acquisitions or source-asset immutability. See the
+[scientific limitations](../docs/SCIENCE.md#additional-unresolved-assumptions).

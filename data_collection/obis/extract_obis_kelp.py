@@ -1,10 +1,19 @@
 """Extract kelp PRESENT + ABSENT from OBIS via their API.
 
-OBIS API: https://api.obis.org/v3/occurrence
+Endpoint: configs/services.json, obis_occurrences.
 No API key required. Rate-limits are generous for occurrence queries.
 
 Output: kelp_obis_europe_present.csv, kelp_obis_europe_absent.csv
 """
+
+# Discover the configuration module; data locations come from config.json.
+import sys as _path_sys
+from pathlib import Path as _ConfigPath
+_path_root = _ConfigPath(__file__).resolve().parent
+while not (_path_root / "example_config.json").is_file() and _path_root != _path_root.parent:
+    _path_root = _path_root.parent
+_path_sys.path.insert(0, str(_path_root))
+import config as _path_config
 import csv
 import json
 import sys
@@ -14,10 +23,10 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common import KELP_SPECIES, stats
+from common import KELP_SPECIES
 
-HERE = Path(__file__).resolve().parent
-BASE = "https://api.obis.org/v3/occurrence"
+HERE = _path_config.get_path("OBIS_DIR")
+BASE = _path_config.get_service("obis_occurrences")
 EUROPE_WKT = "POLYGON ((-25 30, 45 30, 45 72, -25 72, -25 30))"
 START_DATE = "2016-01-01"  # S2 era
 
@@ -84,9 +93,7 @@ def project(o: dict) -> dict:
 
 
 def main():
-    # KELP_SPECIES[:7] already contains "Chorda filum" at index 6 — the trailing
-    # append was a duplicate (reviewer finding #1) which inflated OBIS counts
-    # in source_statistics.csv and gave cross-source dedup extra work later.
+    # The seven marine target species include Chorda filum.
     target = KELP_SPECIES[:7]
     for klass, absence in [("present", False), ("absent", True)]:
         all_records = []
@@ -95,7 +102,7 @@ def main():
             print(f"  OBIS {klass:>7s}  {sp}: {len(recs)}", flush=True)
             all_records.extend(recs)
         rows = [project(o) for o in all_records]
-        out = HERE / f"kelp_obis_europe_{klass}.csv"
+        out = _path_config.get_path("OBIS_" + klass.upper())
         with out.open("w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=OUT_FIELDS, extrasaction="ignore")
             w.writeheader(); w.writerows(rows)

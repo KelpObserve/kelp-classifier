@@ -1,4 +1,4 @@
-"""Thin wrapper: fetch ABSENT chips (relaxed QC).
+"""Thin wrapper: fetch ABSENT chips within ±30 days (up to eight scenes).
 
 Modes:
   --scenes N       : up to N scenes per record (default 8 for multi-scene)
@@ -12,24 +12,10 @@ import csv
 import sys
 from collections import defaultdict
 from pathlib import Path
-# Locate repo root by walking up until config.py is found
-import sys as _sys
-from pathlib import Path as _P
-_here = _P(__file__).resolve().parent
-while _here != _here.parent:
-    if (_here / "config.py").exists():
-        _sys.path.insert(0, str(_here)); break
-    _here = _here.parent
-import config
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from chip_generation.chip_common import QC_RELAXED_ABSENT, fetch_chips
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from chip_common import QC_RELAXED_ABSENT, fetch_chips
-
-# No coord-uncertainty pre-filter for ABSENT. An observer's "no kelp seen"
-# over an area is robust to positional imprecision — unlike a PRESENT record,
-# which pinpoints a specific kelp bed. Originally added for P/A symmetry
-# (reviewer C2) but reverted because it costs ABSENT coverage without
-# meaningfully improving label quality.
+# No coordinate-uncertainty cutoff: very few ABSENT candidates are available.
 
 
 def main():
@@ -43,39 +29,21 @@ def main():
     ap.add_argument("--exclude-existing", type=str,
                     help="path to previously-fetched chips_metadata.csv "
                          "to derive sceneIDs to skip per gbifID")
-    ap.add_argument("--absent-windows", type=str,
-                    default=str(config.ABSENT_WINDOWS_JSON),
-                    help="path to absent_windows.json — per-gbifID "
-                         "allowed_max_days lookup produced by "
-                         "01_annotate_absent_windows.py. Missing entries "
-                         "default to 30 (strict).")
     ap.add_argument("--disable-snap", action="store_true",
-                    help="hard-off snap-to-water for this run (e.g. A2 top-ups)")
+                    help="hard-off snap-to-water for this run")
     ap.add_argument("--workers", type=int, default=6,
                     help="concurrent worker threads (default: 6)")
     args = ap.parse_args()
 
     if args.single: args.scenes = 1
-    candidates = list(csv.DictReader(open(args.candidates)))
+    if not 1 <= args.scenes <= 8:
+        ap.error("--scenes must be between 1 and 8")
+    with open(args.candidates) as stream:
+        candidates = list(csv.DictReader(stream))
     print(f"loaded {len(candidates)} candidates (no unc pre-filter for ABSENT)")
 
-    # Stamp allowed_max_days on each candidate from the pre-computed lookup.
-    # Missing → 30 (strict default), so a stale/absent lookup doesn't silently
-    # widen the fetch window.
-    import json as _json
-    try:
-        windows = _json.load(open(args.absent_windows))
-        print(f"loaded {len(windows)} absent-window annotations from {args.absent_windows}")
-    except FileNotFoundError:
-        print(f"WARN: {args.absent_windows} not found — every candidate defaults to allowed_max_days=30")
-        windows = {}
-    default_days = 30
     for r in candidates:
-        gid = r.get("gbifID", "")
-        r["allowed_max_days"] = int(windows.get(gid, default_days))
-    n_extended = sum(1 for r in candidates if r["allowed_max_days"] == 60)
-    n_strict   = len(candidates) - n_extended
-    print(f"per-record windows: {n_strict} at ±30 (strict), {n_extended} at ±60 (extended)")
+        r["allowed_max_days"] = 30
 
     exclude = defaultdict(set)
     if args.exclude_existing:
@@ -87,7 +55,7 @@ def main():
               f"across {len(exclude)} gbifIDs to skip")
 
     fetch_chips(candidates, QC_RELAXED_ABSENT, args.out_dir,
-                class_tag="absent_real", max_scenes_per_record=args.scenes,
+                class_tag="absent", max_scenes_per_record=args.scenes,
                 exclude_scene_ids=dict(exclude),
                 disable_snap=args.disable_snap,
                 max_chips=args.max_chips,

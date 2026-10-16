@@ -1,0 +1,4 @@
+-c requirements-data.lock
+# Lightweight report rendering; Python 3.11.
+numpy==2.4.4
+matplotlib==3.11.0

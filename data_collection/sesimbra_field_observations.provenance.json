@@ -1,0 +1,27 @@
+{
+  "events": 90,
+  "matches": {
+    "exact": 30,
+    "july_date_alignment": 15,
+    "july_date_and_depth_alignment": 15,
+    "september_date_and_depth_alignment": 30
+  },
+  "sources": {
+    "measurements": {
+      "file": "TNA_Aquaserv_KelpData2026.xlsx",
+      "sha256": "87f4b768cf6ec2ac10f7c2b585518ec79eadab52703df684b820207b76fcdf09",
+      "sheet": "Folha1"
+    },
+    "coordinates": {
+      "file": "Transects JunJul26.xlsx",
+      "sha256": "9b146941be97ffbebf8df1b6da9fedbcb8f9158326048ec7b4ab8d87b7d02cf2",
+      "sheet": "Transetos Jul26"
+    },
+    "september_coordinates": {
+      "file": "Transects kelp AQUASERV Jun-Sep 2026.gpkg",
+      "sha256": "70439b4957120af74c1b7bbabbdf0324b83609938abef5a07a945cdff40c8e0a",
+      "sheet": "transects"
+    }
+  },
+  "note": "date/depth retain measurement values; gps_date/gps_depth_m retain coordinate source values. Explicit alignment does not establish which source date or depth is correct. September GPS year is taken from the named 2026 source; original date text is retained in gps_source_date."
+}

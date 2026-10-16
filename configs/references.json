@@ -1,0 +1,70 @@
+[
+  {
+    "title": "OBIS occurrence API",
+    "url": "https://api.obis.org/v3/occurrence"
+  },
+  {
+    "title": "Clay v1.5",
+    "url": "https://clay-foundation.github.io/model/"
+  },
+  {
+    "title": "official v1.5 model specification",
+    "url": "https://clay-foundation.github.io/model/release-notes/specification.html"
+  },
+  {
+    "title": "Copernicus product description",
+    "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/missions/pleiadesneo"
+  },
+  {
+    "title": "Lyzenga (1978), Applied Optics 17, 379–383",
+    "url": "https://doi.org/10.1364/AO.17.000379"
+  },
+  {
+    "title": "Earth Search",
+    "url": "https://earth-search.aws.element84.com/v1"
+  },
+  {
+    "title": "Clay source repository",
+    "url": "https://github.com/Clay-foundation/model"
+  },
+  {
+    "title": "mdbtools",
+    "url": "https://github.com/mdbtools/mdbtools"
+  },
+  {
+    "title": "Marine Recorder public UK snapshot v20220124",
+    "url": "https://jncc.gov.uk/resources/b9934e31-39b6-41f9-9364-d1e93db68307"
+  },
+  {
+    "title": "OBIS",
+    "url": "https://obis.org/about/visionmission/"
+  },
+  {
+    "title": "Epstein et al., 2019",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6584561/"
+  },
+  {
+    "title": "PyTorch's version-specific instructions",
+    "url": "https://pytorch.org/get-started/previous-versions/"
+  },
+  {
+    "title": "Portuguese Findkelp survey",
+    "url": "https://sapientia.ualg.pt/entities/publication/870b80f6-491a-4ada-8015-f2f932475461"
+  },
+  {
+    "title": "Logistic regression",
+    "url": "https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression"
+  },
+  {
+    "title": "GBIF download service",
+    "url": "https://www.gbif.org/occurrence/download"
+  },
+  {
+    "title": "GBIF",
+    "url": "https://www.gbif.org/what-is-gbif"
+  },
+  {
+    "title": "Sentinel-2 mission and native band resolutions",
+    "url": "https://sentiwiki.copernicus.eu/web/s2-mission"
+  }
+]

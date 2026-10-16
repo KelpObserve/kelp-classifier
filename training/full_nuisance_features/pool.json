@@ -1,0 +1,32 @@
+{
+  "input_sha256": "2ec58b05afe4d06e9f4e8f396121adf1f5fdbe460e857c9075db78ed9f710dc6",
+  "quality_exclusion_slice": "[62:67,62:67]",
+  "matching_scope": "full native 128x128",
+  "baseline_scope": "Six-band whole-chip statistics",
+  "quality_rule": "No central pixels flagged by SCL as cloud, cirrus, shadow, missing, or saturated/defective; identical rule for both classes.",
+  "matched": [
+    "depth_m",
+    "nuisance_cloud",
+    "nuisance_missing",
+    "nuisance_saturated_defective"
+  ],
+  "effective_matching": "Depth and whole-chip cloud/shadow, missing and defective fractions",
+  "unavailable": [
+    "Independent land overlap",
+    "Reliable sunglint flag"
+  ],
+  "not_balanced": [
+    "Spectral reflectance statistics",
+    "SCL water/land fractions",
+    "Acquisition and processing metadata"
+  ],
+  "inherited": "Starts from the existing depth-eligible fetched pool; original acquisition quality filters remain inherited.",
+  "before": {
+    "1": 984,
+    "0": 214
+  },
+  "after": {
+    "1": 984,
+    "0": 212
+  }
+}

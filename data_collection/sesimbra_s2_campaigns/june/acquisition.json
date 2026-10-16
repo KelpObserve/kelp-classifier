@@ -1,0 +1,53 @@
+{
+  "scene_id": "S2B_29SMC_20260602_0_L2A",
+  "acquisition_datetime": "2026-06-02T11:30:43.411000Z",
+  "observation_dates": [
+    "2026-06-02"
+  ],
+  "day_differences": {
+    "2026-06-02": 0
+  },
+  "selection": "Campaign-specific scene selected by date proximity and SCL checks at observation locations; see README.md.",
+  "catalogue": "https://earth-search.aws.element84.com/v1",
+  "tile_cloud_percent": 17.042984,
+  "bbox_wgs84": [
+    -9.235,
+    38.395,
+    -9.17,
+    38.425
+  ],
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "rededge1",
+    "nir",
+    "swir16",
+    "scl"
+  ],
+  "shape": [
+    7,
+    333,
+    570
+  ],
+  "crs": "EPSG:32629",
+  "transform": [
+    10.0,
+    0.0,
+    479470.0,
+    0.0,
+    -10.0,
+    4252990.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "radiometry": "Unmodified source digital numbers; scale and offset are in scene_item.json.",
+  "observation_scl_counts": {
+    "6": 30
+  },
+  "cloud_or_shadow_events": 0,
+  "nodata_events": 0,
+  "sha256": "bdadf703c9f2eee3331b212b7c7eb6d9c1f9a0bec21d20c94e690ebbbe6ba834",
+  "status": "Downloaded input imagery; classifier inference has not been run."
+}

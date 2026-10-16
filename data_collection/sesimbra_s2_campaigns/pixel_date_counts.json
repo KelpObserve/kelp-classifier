@@ -1,0 +1,61 @@
+[
+  {
+    "sensor": "S2",
+    "image_date": "2026-06-02",
+    "events": 30,
+    "pixels": 17,
+    "counts": {
+      "PRESENT": 17
+    },
+    "outside": 0,
+    "nodata_events": 0
+  },
+  {
+    "sensor": "S2",
+    "image_date": "2026-07-09",
+    "events": 30,
+    "pixels": 18,
+    "counts": {
+      "PRESENT": 16,
+      "ABSENT": 2
+    },
+    "outside": 0,
+    "nodata_events": 0
+  },
+  {
+    "sensor": "S2",
+    "image_date": "2026-09-03",
+    "events": 30,
+    "pixels": 17,
+    "counts": {
+      "PRESENT": 14,
+      "ABSENT": 3
+    },
+    "outside": 0,
+    "nodata_events": 0
+  },
+  {
+    "sensor": "PNEO",
+    "image_date": "2026-07-08",
+    "events": 30,
+    "pixels": 30,
+    "counts": {
+      "PRESENT": 24,
+      "ABSENT": 6
+    },
+    "outside": 0,
+    "nodata_events": 0
+  },
+  {
+    "sensor": "PNEO",
+    "image_date": "2026-09-03",
+    "events": 30,
+    "pixels": 30,
+    "counts": {
+      "PRESENT": 20,
+      "ABSENT": 10
+    },
+    "outside": 0,
+    "nodata_events": 0
+  }
+]

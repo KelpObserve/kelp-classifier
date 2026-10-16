@@ -1,10 +1,8 @@
 """Thin wrapper: fetch PRESENT chips (strict QC, 1 scene per record).
 
-Pre-filters candidates by coord uncertainty (records with declared
-coordinateUncertaintyInMeters > MAX_UNC_M are dropped) so the model isn't
-trained on labels whose true location might be outside its prediction
-region (~115 m half-width). Records with missing uncertainty are kept and
-filtered later by the QC water-in-region check.
+PRESENT candidates must have reported coordinate uncertainty at most 10 m or
+unknown uncertainty. Missing uncertainty is retained, not assumed to be zero.
+Images must be within 10 days of the observation date.
 
 Optional: --species-targets <json_path> — stop fetching when each target
 species reaches its chip count target. JSON is {species_name: target_count}.
@@ -15,10 +13,10 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from chip_common import QC_STRICT_PRESENT, fetch_chips
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from chip_generation.chip_common import QC_STRICT_PRESENT, fetch_chips
 
-MAX_UNC_M = 115.0
+MAX_UNC_M = 10.0
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

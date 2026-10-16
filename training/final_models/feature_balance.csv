@@ -1,0 +1,9 @@
+split,feature,ks,present_mean,absent_mean
+train,depth_m,0.1028032619775739,-6.769700352495553,-6.459150740504265
+train,nuisance_cloud,0.056269113149847096,0.03701614239893922,0.03421630859375
+train,nuisance_missing,0.0,0.0,0.0
+train,nuisance_saturated_defective,0.0,0.0,0.0
+val,depth_m,0.1497564935064935,-6.725245983521273,-7.189356043934822
+val,nuisance_cloud,0.1367694805194805,0.03891744242086039,0.050785064697265625
+val,nuisance_missing,0.0,0.0,0.0
+val,nuisance_saturated_defective,0.0,0.0,0.0

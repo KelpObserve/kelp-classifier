@@ -1,0 +1,91 @@
+lat,lon,date,depth,T,Q,label,gps_date,gps_depth_m,coordinate_match,gps_source,gps_source_date,gps_source_row_or_fid
+38.409111,-9.202501,2026-06-02,15,1,1,1,2026-06-02,15,exact,Transects JunJul26.xlsx,2026-06-02,47
+38.409097,-9.202431,2026-06-02,15,1,2,1,2026-06-02,15,exact,Transects JunJul26.xlsx,2026-06-02,48
+38.409068,-9.202397,2026-06-02,15,1,3,1,2026-06-02,15,exact,Transects JunJul26.xlsx,2026-06-02,49
+38.409074,-9.202347,2026-06-02,15,1,4,1,2026-06-02,15,exact,Transects JunJul26.xlsx,2026-06-02,50
+38.40904,-9.202299,2026-06-02,15,1,5,1,2026-06-02,15,exact,Transects JunJul26.xlsx,2026-06-02,51
+38.409028,-9.202021,2026-06-02,16,2,1,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,52
+38.409013,-9.201994,2026-06-02,16,2,2,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,53
+38.409028,-9.201946,2026-06-02,16,2,3,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,54
+38.408998,-9.201901,2026-06-02,16,2,4,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,55
+38.408992,-9.201843,2026-06-02,16,2,5,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,56
+38.408963,-9.201636,2026-06-02,16,3,1,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,57
+38.408954,-9.20159,2026-06-02,16,3,2,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,58
+38.408924,-9.201574,2026-06-02,16,3,3,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,59
+38.408927,-9.20152,2026-06-02,16,3,4,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,60
+38.408915,-9.201459,2026-06-02,16,3,5,1,2026-06-02,16,exact,Transects JunJul26.xlsx,2026-06-02,61
+38.409572,-9.202689,2026-06-02,8,1,1,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,32
+38.409559,-9.202652,2026-06-02,8,1,2,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,33
+38.409534,-9.202624,2026-06-02,8,1,3,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,34
+38.409546,-9.202587,2026-06-02,8,1,4,0,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,35
+38.409523,-9.202542,2026-06-02,8,1,5,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,36
+38.40948,-9.202326,2026-06-02,8,2,1,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,37
+38.40947,-9.202286,2026-06-02,8,2,2,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,38
+38.409475,-9.202239,2026-06-02,8,2,3,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,39
+38.409445,-9.202196,2026-06-02,8,2,4,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,40
+38.409482,-9.202135,2026-06-02,8,2,5,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,41
+38.409484,-9.201842,2026-06-02,8,3,1,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,42
+38.40949,-9.201801,2026-06-02,8,3,2,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,43
+38.409509,-9.20177,2026-06-02,8,3,3,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,44
+38.409498,-9.201738,2026-06-02,8,3,4,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,45
+38.409516,-9.20168,2026-06-02,8,3,5,1,2026-06-02,8,exact,Transects JunJul26.xlsx,2026-06-02,46
+38.40956523,-9.20250142,2026-07-06,7,1,1,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,2
+38.409573071,-9.202554316,2026-07-06,7,1,2,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,3
+38.409591333,-9.202634109,2026-07-06,7,1,3,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,4
+38.409610395,-9.202679377,2026-07-06,7,1,4,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,5
+38.409644679,-9.202717698,2026-07-06,7,1,5,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,6
+38.40955518,-9.20208674,2026-07-06,7,2,1,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,7
+38.409543796,-9.202117616,2026-07-06,7,2,2,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,8
+38.40956122,-9.20216038,2026-07-06,7,2,3,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,9
+38.4095396,-9.2022354,2026-07-06,7,2,4,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,10
+38.40955282,-9.20227983,2026-07-06,7,2,5,1,2026-07-07,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-07,11
+38.40959887,-9.20196991,2026-07-07,7,3,1,0,2026-07-08,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-08,12
+38.40958244,-9.20193759,2026-07-07,7,3,2,0,2026-07-08,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-08,13
+38.40957269,-9.20188495,2026-07-07,7,3,3,1,2026-07-08,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-08,14
+38.40956405,-9.20185264,2026-07-07,7,3,4,1,2026-07-08,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-08,15
+38.4095621,-9.20182534,2026-07-07,7,3,5,1,2026-07-08,7,july_date_alignment,Transects JunJul26.xlsx,2026-07-08,16
+38.4089044,-9.20262589,2026-07-07,16,1,1,0,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,17
+38.40890874,-9.20267967,2026-07-07,16,1,2,0,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,18
+38.40891642,-9.20270973,2026-07-07,16,1,3,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,19
+38.40894315,-9.20272209,2026-07-07,16,1,4,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,20
+38.40896486,-9.20274046,2026-07-07,16,1,5,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,21
+38.40883461,-9.20221997,2026-07-07,16,2,1,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,22
+38.40882732,-9.20229876,2026-07-07,16,2,2,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,23
+38.40883744,-9.20236458,2026-07-07,16,2,3,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,24
+38.4088502,-9.20241461,2026-07-07,16,2,4,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,25
+38.40885932,-9.20246078,2026-07-07,16,2,5,0,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,26
+38.40858937,-9.20208693,2026-07-07,16,3,1,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,27
+38.40858836,-9.20216247,2026-07-07,16,3,2,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,28
+38.40860166,-9.20221241,2026-07-07,16,3,3,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,29
+38.40861923,-9.20225005,2026-07-07,16,3,4,0,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,30
+38.40864483,-9.20229121,2026-07-07,16,3,5,1,2026-07-08,17,july_date_and_depth_alignment,Transects JunJul26.xlsx,2026-07-08,31
+38.409524,-9.201365,2026-09-02,6,1,1,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,61
+38.409524,-9.201419,2026-09-02,6,1,2,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,62
+38.409541,-9.201467,2026-09-02,6,1,3,0,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,63
+38.409547,-9.201526,2026-09-02,6,1,4,0,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,64
+38.409534,-9.201582,2026-09-02,6,1,5,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,65
+38.409557,-9.201824,2026-09-02,6,2,1,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,66
+38.409541,-9.201866,2026-09-02,6,2,2,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,67
+38.40955,-9.201916,2026-09-02,6,2,3,0,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,68
+38.409551,-9.20197,2026-09-02,6,2,4,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,69
+38.409521,-9.202008,2026-09-02,6,2,5,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,70
+38.409747,-9.20235,2026-09-02,6,3,1,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,71
+38.409754,-9.20241,2026-09-02,6,3,2,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,72
+38.409742,-9.202465,2026-09-02,6,3,3,0,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,73
+38.409763,-9.202517,2026-09-02,6,3,4,0,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,74
+38.409806,-9.202573,2026-09-02,6,3,5,1,2026-09-01,7,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,75
+38.409205,-9.202161,2026-09-02,15,1,1,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,76
+38.409169,-9.20223,2026-09-02,15,1,2,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,77
+38.409143,-9.202277,2026-09-02,15,1,3,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,78
+38.409125,-9.202331,2026-09-02,15,1,4,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,79
+38.409093,-9.202374,2026-09-02,15,1,5,0,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,80
+38.40896,-9.201881,2026-09-02,15,2,1,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,81
+38.408947,-9.201937,2026-09-02,15,2,2,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,82
+38.408941,-9.201974,2026-09-02,15,2,3,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,83
+38.408951,-9.202016,2026-09-02,15,2,4,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,84
+38.40894,-9.202071,2026-09-02,15,2,5,0,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,85
+38.408953,-9.201342,2026-09-02,15,3,1,0,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,86
+38.40894,-9.201402,2026-09-02,15,3,2,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,87
+38.408901,-9.201446,2026-09-02,15,3,3,0,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,88
+38.408862,-9.201466,2026-09-02,15,3,4,0,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,89
+38.408824,-9.201481,2026-09-02,15,3,5,1,2026-09-01,17,september_date_and_depth_alignment,Transects kelp AQUASERV Jun-Sep 2026.gpkg,01/set,90

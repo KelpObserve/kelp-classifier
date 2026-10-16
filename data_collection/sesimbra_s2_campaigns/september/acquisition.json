@@ -1,0 +1,50 @@
+{
+  "scene_id": "S2B_29SMC_20260903_0_L2A",
+  "acquisition_datetime": "2026-09-03T11:40:40.393000Z",
+  "observation_date": "2026-09-02",
+  "day_difference": 1,
+  "selection": "Closest acquisition date returned for this site; no acquisition on 2 September. Adjacent earlier date: 31 August.",
+  "catalogue": "https://earth-search.aws.element84.com/v1",
+  "tile_cloud_percent": 0.306642,
+  "bbox_wgs84": [
+    -9.235,
+    38.395,
+    -9.17,
+    38.425
+  ],
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "rededge1",
+    "nir",
+    "swir16",
+    "scl"
+  ],
+  "shape": [
+    7,
+    333,
+    570
+  ],
+  "crs": "EPSG:32629",
+  "transform": [
+    10.0,
+    0.0,
+    479470.0,
+    0.0,
+    -10.0,
+    4252990.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "radiometry": "Unmodified source digital numbers; scale and offset are in scene_item.json.",
+  "observation_scl_counts": {
+    "6": 28,
+    "7": 2
+  },
+  "cloud_or_shadow_events": 0,
+  "nodata_events": 0,
+  "sha256": "99322f0b281549ba4aeb0c35157a7b2600b178f0fc1d6a5327595e895a0c8fb6",
+  "status": "Downloaded input imagery; classifier inference has not been run."
+}

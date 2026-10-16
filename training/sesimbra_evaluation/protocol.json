@@ -1,0 +1,55 @@
+{
+  "encoder_gsd_m": 5.714285714285714,
+  "campaigns": [
+    {
+      "campaign": "june",
+      "scene_id": "S2B_29SMC_20260602_0_L2A",
+      "image_date": "2026-06-02",
+      "scene_sha256": "bdadf703c9f2eee3331b212b7c7eb6d9c1f9a0bec21d20c94e690ebbbe6ba834",
+      "events": 30,
+      "pixels": 17,
+      "P": 17,
+      "A": 0,
+      "raster_windows": 40,
+      "raster_sha256": "f00d62359325a4afc8b21e076804b0d0bd3679f365eb7413cf5f90f83ad1591a"
+    },
+    {
+      "campaign": "july",
+      "scene_id": "S2A_29SMC_20260709_0_L2A",
+      "image_date": "2026-07-09",
+      "scene_sha256": "f86bb18ffa91f3dcfbd41c0ac308f59f1984b682f45482fdb0eaa13155fb4f85",
+      "events": 30,
+      "pixels": 18,
+      "P": 16,
+      "A": 2,
+      "raster_windows": 40,
+      "raster_sha256": "0f12412b6aaa6e0ba40aafca81394047aaddebada0701584b69c015713c10183"
+    },
+    {
+      "campaign": "september",
+      "scene_id": "S2B_29SMC_20260903_0_L2A",
+      "image_date": "2026-09-03",
+      "scene_sha256": "99322f0b281549ba4aeb0c35157a7b2600b178f0fc1d6a5327595e895a0c8fb6",
+      "events": 30,
+      "pixels": 17,
+      "P": 14,
+      "A": 3,
+      "raster_windows": 40,
+      "raster_sha256": "e1af6e4d0d7fae074dd3b39014288e9ffdb16ff2410511fbad3676877cde01d9"
+    }
+  ],
+  "model_sha256": {
+    "small_mlp_pool5": "9226d83f958d86d5fb4c4cbdc11ed1fa57ea4e296e26feca97eda35003037c87",
+    "mlp_pool1": "977b37b1917ed8fc629d246db49f6f7a04c8e90ef0d341f2020e1abfb1ba2ab7"
+  },
+  "field_observations_sha256": "eab8cafa8dcf4446417b3277500abc2512d3b7b55e81bc4f93b1b1bd1595754e",
+  "pixel_labels_sha256": "e80893f4306dfe2d30458d441d39b7f1dec7eba5b650e9da6e72f9cfb0f43035",
+  "script_sha256": "f1432cdae1d7499f5f09dc9b6c0cda15bb7d0babd2a349732835681713d156b0",
+  "threshold_source": "Saved training-validation thresholds; no field tuning",
+  "centred_method": "Containing native pixel at chip64,64; full128->224 Clay with zero time/location; CLS plus training pool slice",
+  "raster_method": "Full-chip windows stride64; CLS plus each of 28x28 patch tokens, bilinear28->128 probability interpolation, equal overlap averaging. No depth clipping. Display/evaluation mask keeps SCL6 water and7 unclassified; other SCL classes masked. Raw raster also saved.",
+  "qc_policy": "Audit central and full-chip flags; retain all observed pixels to avoid label-dependent filtering. No coordinate snapping or padding.",
+  "labels": "Any PRESENT event makes its campaign pixel PRESENT; ABSENT requires all events in pixel absent. Pixel-date is evaluation unit.",
+  "single_class": "June has no ABSENT pixel labels; Macro F1 and ABSENT recall omitted for June.",
+  "limitations": "Only5 ABSENT pixel-dates across campaigns; repeated locations and overlapping windows are not independent. Scores are model outputs, not established calibrated probabilities. Dense raster deployment differs from centre-supervised fitting."
+}

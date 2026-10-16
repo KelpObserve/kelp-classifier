@@ -1,0 +1,165 @@
+{
+  "paths": {
+    "DATA_DIR": "data",
+    "CHIPS_DIR": "{DATA_DIR}/chips",
+    "CANONICAL_CHIPS_H5": "{CHIPS_DIR}/chips.h5",
+    "CLAY_CKPT": "{DATA_DIR}/clay/clay-v1.5.ckpt",
+    "CLAY_META": "configs/metadata.yaml",
+    "DATA_COLLECTION_DIR": "data_collection",
+    "FIELD_OBSERVATIONS": "data_collection/sesimbra_field_observations.csv",
+    "FIELD_MEASUREMENTS": "",
+    "JUNE_JULY_COORDINATES": "",
+    "SEPTEMBER_COORDINATES": "",
+    "SPECIES_POLICY": "configs/species.yaml",
+    "S2_CAMPAIGNS_DIR": "data_collection/sesimbra_s2_campaigns",
+    "ELIGIBLE_CHIPS": "data_collection/eligible_chips.csv",
+    "SPLIT_INITIALIZATION": "data_collection/split_initialization.csv",
+    "FULL_NUISANCE_MATCHING_POOL": "training/full_nuisance_features/pool.csv",
+    "FULL_NUISANCE_BALANCE_OUTPUT": "training/full_nuisance_balance",
+    "TRAINING_SELECTION": "{FULL_NUISANCE_BALANCE_OUTPUT}/selected.csv",
+    "FULL_NUISANCE_EMBEDDINGS": "{FULL_NUISANCE_BALANCE_OUTPUT}/clay_full_sweep/embeddings.npz",
+    "CHECKPOINTS_DIR": "{FULL_NUISANCE_BALANCE_OUTPUT}",
+    "FINAL_MODELS_DIR": "training/final_models",
+    "FINAL_CHECKPOINTS_DIR": "{FINAL_MODELS_DIR}",
+    "SESIMBRA_EVALUATION_DIR": "training/sesimbra_evaluation",
+    "PNEO_DIR": "",
+    "PNEO_SEPTEMBER_DIR": "",
+    "PNEO_SEPTEMBER_INPUTS": "runs/pneo_inputs",
+    "PNEO_SEPTEMBER_FEATURES": "{PNEO_SEPTEMBER_INPUTS}/features_per_quadrat.csv",
+    "PNEO_CLAY_METADATA": "{PNEO_SEPTEMBER_INPUTS}/meta.csv",
+    "PNEO_CLAY_EMBEDDINGS": "{PNEO_SEPTEMBER_INPUTS}/identity_pneo_field.npz",
+    "PNEO_SEPTEMBER_RESULTS": "training/pneo_september",
+    "GBIF_DIR": "{DATA_COLLECTION_DIR}/gbif",
+    "OBIS_DIR": "{DATA_COLLECTION_DIR}/obis",
+    "JNCC_DIR": "{DATA_COLLECTION_DIR}/jncc",
+    "GBIF_MASTER": "{GBIF_DIR}/gbif_kelp_europe.csv",
+    "JNCC_DATABASE": "{DATA_DIR}/jncc/SnapshotDatav52_PUBLIC_20220124.mdb",
+    "GBIF_PRESENT": "{GBIF_DIR}/kelp_gbif_europe_present.csv",
+    "GBIF_ABSENT": "{GBIF_DIR}/kelp_gbif_europe_absent.csv",
+    "OBIS_PRESENT": "{OBIS_DIR}/kelp_obis_europe_present.csv",
+    "OBIS_ABSENT": "{OBIS_DIR}/kelp_obis_europe_absent.csv",
+    "JNCC_PRESENT": "{JNCC_DIR}/kelp_jncc_present.csv",
+    "JNCC_ABSENT": "{JNCC_DIR}/kelp_jncc_absent.csv"
+  },
+  "resources": {
+    "CLAY_CKPT": {
+      "description": "Frozen Clay v1.5 large backbone for embedding extraction.",
+      "reference": "https://github.com/Clay-foundation/model",
+      "protocol": "training/full_nuisance_balance/clay_full_sweep/protocol.json",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "CLAY_META": {
+      "description": "Six-band normalization metadata used by the frozen Clay encoder.",
+      "reference": "configs/metadata.yaml",
+      "availability": "Included in repository."
+    },
+    "FULL_NUISANCE_MATCHING_POOL": {
+      "description": "Full-chip spectral statistics and nuisance measurements for eligible candidates.",
+      "reference": "training/full_nuisance_features/pool.csv",
+      "producer": "training/prepare_nuisance_pool.py",
+      "availability": "Included in repository; regenerate from canonical chips if needed."
+    },
+    "FULL_NUISANCE_BALANCE_OUTPUT": {
+      "description": "Current saved partitions, metrics and predictions; checkpoints and embeddings are external binary artifacts.",
+      "reference": "training/full_nuisance_balance/",
+      "producer": "training/train_frozen_sesimbra.py",
+      "availability": "Manifests and metrics included; classifier checkpoints and embeddings.npz are external generated artifacts."
+    },
+    "S2_CAMPAIGNS_DIR": {
+      "description": "Prepared Sentinel-2 campaign crops and scene metadata for June, July and September observations.",
+      "reference": "data_collection/sesimbra_s2_campaigns/",
+      "producer": "data_collection/sesimbra_s2_campaigns/download_scene.py",
+      "source": "https://earth-search.aws.element84.com/v1",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "PNEO_DIR": {
+      "description": "Licensed Pl\u00e9iades Neo source imagery for the Sesimbra campaigns; not redistributed.",
+      "reference": "data_collection/sesimbra_s2_campaigns/count_pixel_dates.py",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "GBIF_MASTER": {
+      "description": "Saved European kelp occurrence export used for source selection.",
+      "reference": "https://www.gbif.org/occurrence/download",
+      "producer": "data_collection/gbif/extract_gbif_kelp.py",
+      "availability": "External source export; download-specific DOI is not recorded."
+    },
+    "JNCC_DATABASE": {
+      "description": "Marine Recorder v52 Access database from public snapshot v20220124.",
+      "reference": "https://jncc.gov.uk/resources/b9934e31-39b6-41f9-9364-d1e93db68307",
+      "producer": "data_collection/jncc/extract_jncc_kelp.py",
+      "download": "https://data.jncc.gov.uk/data/b9934e31-39b6-41f9-9364-d1e93db68307/SnapshotDatav52-PUBLIC-20220124.zip",
+      "preparation": "data_collection/jncc/download_snapshot.py"
+    },
+    "OBIS_DIR": {
+      "description": "OBIS source exports used by the collection workflow.",
+      "reference": "https://api.obis.org/v3/occurrence",
+      "producer": "data_collection/obis/extract_obis_kelp.py"
+    },
+    "CHECKPOINTS_DIR": {
+      "description": "Root containing all 24 trained evaluation models: eighteen PyTorch heads and six logistic-regression pipelines. Each catalog relative_path is resolved beneath this directory; verify its SHA-256.",
+      "reference": "training/model_manifest.json",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "FINAL_MODELS_DIR": {
+      "description": "Final all-selected-chip train/validation manifests, metrics and model catalog. Training writes model.pt here; checkpoints remain Git-ignored.",
+      "reference": "training/train_final_models.py"
+    },
+    "FINAL_CHECKPOINTS_DIR": {
+      "description": "Contains small_mlp_pool5/model.pt and mlp_pool1/model.pt; resolve catalog relative paths here.",
+      "reference": "training/final_models/model_manifest.json",
+      "access_uri": "",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git."
+    },
+    "FULL_NUISANCE_EMBEDDINGS": {
+      "description": "Frozen full-chip Clay cache using 128-to-224 resizing and derived encoder GSD 128*10/224 m; companion protocol.json is required. Contains chip_ids, sha256, CLS vectors and central 7x7 patch-token windows. Used by comparison replay and to construct matching pool1 or pool5 embeddings for the final heads.",
+      "reference": "training/final_models/model_manifest.json",
+      "producer": "training/train_frozen_sesimbra.py",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "SESIMBRA_EVALUATION_DIR": {
+      "description": "Campaign-matched chip manifest, predictions and rasters. External generated observation_chips.h5 contains 52 native seven-layer chips; embeddings.npz contains CLS and central patch tokens; campaign raster_tokens.npz stores patch-score grids for verification.",
+      "reference": "training/evaluate_sesimbra_campaigns.py"
+    },
+    "PNEO_SEPTEMBER_FEATURES": {
+      "description": "Current six-band and Lyzenga quadrat feature table for September.",
+      "reference": "training/extract_pneo_september.py"
+    },
+    "PNEO_CLAY_METADATA": {
+      "description": "Quadrat IDs, coordinates and labels aligned with the PNEO embedding cache.",
+      "reference": "training/extract_pneo_september.py"
+    },
+    "PNEO_CLAY_EMBEDDINGS": {
+      "description": "External frozen Clay embeddings from licensed PNEO, containing CLS and centre patch arrays.",
+      "reference": "training/extract_pneo_september.py"
+    },
+    "PNEO_SEPTEMBER_RESULTS": {
+      "description": "September exploratory held-out-transect results, features and paired feature analysis.",
+      "reference": "training/evaluate_pneo_september.py"
+    },
+    "PNEO_SEPTEMBER_INPUTS": {
+      "description": "Fresh output directory for extracting September features and embeddings from licensed imagery.",
+      "reference": "training/extract_pneo_september.py"
+    },
+    "CANONICAL_CHIPS_H5": {
+      "description": "Canonical uint16 Sentinel-2 chips.h5: eight layers, 128x128 pixels. Required for embedding extraction and independent feature verification. Selected rows record h5_index and array SHA-256.",
+      "reference": "training/full_nuisance_balance/selected.csv",
+      "source": "https://earth-search.aws.element84.com/v1",
+      "availability": "External input; supply it at the configured filesystem path and verify hashes against its protocol or manifest. Binary data is excluded from Git.",
+      "access_uri": ""
+    },
+    "ELIGIBLE_CHIPS": {
+      "description": "1198 eligible chips before the final central-quality exclusion; array hashes and indices are included. Depth estimates and source provenance are prepared evidence, not reconstructed by image downloading.",
+      "availability": "Included CSV; exact upstream depth preparation is not fully recoverable from this repository."
+    },
+    "SPLIT_INITIALIZATION": {
+      "description": "Seeded ABSENT initialization assignments required by the partition search. Saved final partitions remain authoritative; solver reruns may produce equivalent different solutions.",
+      "availability": "Included CSV."
+    }
+  },
+  "configuration_notes": "Paths resolve relative to the repository root and may use {KEY} references. Empty values require supplied input. KELP_CONFIG selects an alternate JSON file; missing keys inherit defaults. Use fresh runs/ destinations for training. configs/services.json supplies API endpoints; configs/references.json records citations."
+}

@@ -1,12 +1,8 @@
 """Shared functions for fetching Sentinel-2 chips at kelp record locations.
 
-Two QC modes:
-  - STRICT  : for PRESENT records — cloud<10, requires water at chip centre
-  - RELAXED : for ABSENT records — cloud<60, no water requirement, wider time window
-
-Two fetch modes:
-  - single-scene : one chip per record (used for PRESENT and default for ABSENT)
-  - multi-scene  : up to K chips per record (used for ABSENT, K=8 default)
+PRESENT: uncertainty ≤10 m or unknown, ±10 days, one scene per observation.
+ABSENT: no uncertainty cutoff, ±30 days, up to eight scenes per observation.
+Both classes use the same regional and central-water quality checks.
 """
 import csv
 import datetime as dt
@@ -22,7 +18,10 @@ from pystac_client import Client
 from rasterio.warp import transform as warp_transform
 from rasterio.windows import from_bounds
 
-STAC_URL = "https://earth-search.aws.element84.com/v1"
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import config
+STAC_URL = config.get_service("earth_search")
 COLLECTION = "sentinel-2-l2a"
 BANDS = ["coastal", "blue", "green", "red", "rededge1", "nir", "swir16", "scl"]
 BAND_NAMES = ["B01", "B02", "B03", "B04", "B05", "B08", "B11", "SCL"]
@@ -41,7 +40,7 @@ QC_STRICT_PRESENT = dict(
     region_water_min=0.30,    # ≥30% water pixels in region
     region_fill_max=0.70,     # ≤70% no-data pixels in region
     region_b02_range_min=30,  # ≥30 uint16 dynamic range in B02 (rejects atmospheric distortion)
-    time_window_days=30,      # search ±30 d around eventDate
+    time_window_days=10,      # search ±10 d around eventDate
     snap_cap_m=300,           # if reported coord fails water QC, snap up to 300 m to nearest water
     sort="date",              # first-acceptable by date proximity (symmetric with ABSENT policy;
                               # avoids cherry-picking cleanest scene, which biased P cloud lower
@@ -51,10 +50,10 @@ QC_STRICT_PRESENT = dict(
 QC_RELAXED_ABSENT = dict(
     scene_cloud_max=60,       # STAC pre-screen: skip scenes with >60% global cloud (efficiency)
     region_cloud_max=0.40,    # same cloud cap in region
-    region_water_min=0.30,    # SYMMETRIC with PRESENT (fix for reviewer L2)
+    region_water_min=0.30,    # same water threshold as PRESENT
     region_fill_max=0.70,     # still reject mostly-fill chips (edge-of-tile black blocks)
     region_b02_range_min=30,  # same distortion filter
-    time_window_days=60,      # wider window because many absent sites are cloudy
+    time_window_days=30,      # search ±30 d around eventDate
     snap_cap_m=300,           # snap to nearest water within 300 m if reported coord is on land
 )
 
@@ -73,12 +72,25 @@ os.environ.setdefault("GDAL_HTTP_MULTIRANGE", "YES")
 os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 
 
+class IncompleteChipError(ValueError):
+    """The requested footprint extends outside the source raster."""
+
+
+def require_complete_window(window, width, height):
+    """Reject clipped reads before resizing can change the requested geometry."""
+    tolerance = 1e-6  # Pixel units; allow coordinate-transform roundoff only.
+    if (window.col_off < -tolerance or window.row_off < -tolerance
+            or window.col_off + window.width > width + tolerance
+            or window.row_off + window.height > height + tolerance):
+        raise IncompleteChipError("Requested footprint extends outside the source raster")
+
+
 # ---------------- chip reading + QC ----------------
 
 def read_chip(item, lon, lat) -> np.ndarray:
     """Read a 128x128, 8-band chip centred at (lon, lat) from an S2 STAC item.
 
-    E2: 8 COG reads are parallelised across a small thread pool. Each read is
+    Eight COG reads are parallelised across a small thread pool. Each read is
     network I/O bound so threading gives near-linear speedup up to ~8 workers.
     """
     from concurrent.futures import ThreadPoolExecutor
@@ -88,7 +100,7 @@ def read_chip(item, lon, lat) -> np.ndarray:
         # SCL is a categorical mask; anything but nearest-neighbour interpolates
         # class codes into fractional values that no longer equal WATER_SCL[0]==6
         # after uint16 rounding, undercounting water at coastal boundaries and
-        # over-triggering snap-to-water (reviewer finding N1).
+        # over-triggering snap-to-water.
         rsmpl = (rasterio.enums.Resampling.nearest if key == "scl"
                  else rasterio.enums.Resampling.bilinear)
         with rasterio.open(item.assets[key].href) as src:
@@ -96,6 +108,7 @@ def read_chip(item, lon, lat) -> np.ndarray:
             cx, cy = xs[0], ys[0]
             half = (CHIP_SIZE * PIXEL_M) / 2
             window = from_bounds(cx - half, cy - half, cx + half, cy + half, src.transform)
+            require_complete_window(window, src.width, src.height)
             data = src.read(1, window=window, out_shape=(CHIP_SIZE, CHIP_SIZE),
                             resampling=rsmpl)
         chip[i] = data.astype(np.uint16)
@@ -123,6 +136,7 @@ def snap_to_water(item, lon, lat, cap_m=300):
         cx, cy = xs[0], ys[0]
         half = (wide * PIXEL_M) / 2
         window = from_bounds(cx - half, cy - half, cx + half, cy + half, src.transform)
+        require_complete_window(window, src.width, src.height)
         scl = src.read(1, window=window, out_shape=(wide, wide),
                        resampling=rasterio.enums.Resampling.nearest).astype(np.int16)
         src_crs = src.crs
@@ -160,7 +174,7 @@ def qc_chip(chip: np.ndarray, qc: dict, lon=None, lat=None, item=None):
     All checks operate on the 23x23-pixel *prediction region* at chip centre
     (rows/cols 50:73) — the area Clay's centre-pool sees (patches[11:16, 11:16]).
     Aligning QC with what the model actually looks at prevents:
-      - ABSENT chips passing on flat-zero centres (finding #2 from review)
+      - ABSENT chips passing on flat-zero centres
       - PRESENT chips landing on land in the region the model emphasises
       - Chips with atmospheric distortion (very low B02 dynamic range) that
         look like flat unnatural surfaces
@@ -191,13 +205,18 @@ def qc_chip(chip: np.ndarray, qc: dict, lon=None, lat=None, item=None):
         return "bad_water", m
     if b02_range < qc.get("region_b02_range_min", 0):
         return "bad_distortion", m
+    central = chip[:, 62:67, 62:67]
+    valid = ((central[SCL_BAND_IDX] == 6) & (central[1] > 10) & (central[2] > 10))
+    m["central_valid_pixels"] = int(valid.sum())
+    if m["central_valid_pixels"] < 24:
+        return "bad_central_5x5", m
     return "ok", m
 
 
 # ---------------- STAC search helper ----------------
 
 def search_scenes(client, lon, lat, date, qc, time_window_days=None):
-    """Return (sort_key, item) tuples sorted, one per day.
+    """Return sorted candidate tiles; retain overlaps until acquisition succeeds.
 
     Sort ordering is controlled by qc["sort"]:
       - "cloud"  (default): cleanest-first, sort_key = eo:cloud_cover
@@ -214,15 +233,10 @@ def search_scenes(client, lon, lat, date, qc, time_window_days=None):
     aren't systematically cherry-picked to be cleaner than A chips at the
     same threshold.
 
-    time_window_days: optional int, overrides qc["time_window_days"] when
-    provided. Used by ABSENT fetch — each candidate carries a per-record
-    allowed_max_days (30 or 60) computed from spatial+temporal proximity to
-    raw PRESENT annotations. PRESENT calls with time_window_days=None to use
-    QC_STRICT_PRESENT's 30-day default.
+    An optional time_window_days can only narrow the class-specific window.
     """
-    # Clamp to qc["time_window_days"] so a rogue JSON value (e.g. 600) can't drive an unbounded STAC search (reviewer round 3, minor).
     twd = int(time_window_days) if time_window_days is not None else qc["time_window_days"]
-    twd = min(twd, qc["time_window_days"])
+    twd = max(0, min(twd, qc["time_window_days"]))
     start = date - dt.timedelta(days=twd)
     end   = date + dt.timedelta(days=twd)
     box = 0.005
@@ -233,12 +247,9 @@ def search_scenes(client, lon, lat, date, qc, time_window_days=None):
         query={"eo:cloud_cover": {"lt": qc["scene_cloud_max"]}},
         limit=100,
     ).items())
-    seen = set(); out = []
+    out = []
     for item in items:
         if item.datetime is None: continue
-        d = item.datetime.date().isoformat()
-        if d in seen: continue
-        seen.add(d)
         cc = item.properties.get("eo:cloud_cover", 100)
         days_off = abs((item.datetime.date() - date).days)
         out.append((cc, days_off, item))
@@ -253,11 +264,11 @@ def search_scenes(client, lon, lat, date, qc, time_window_days=None):
 # ---------------- driver: fetch chips for a set of records ----------------
 
 def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
+    from chip_generation.tile_coverage import read_acquisition_chip
     client = Client.open(STAC_URL)
     targets = state.get("species_targets") or {}
     disable_snap = state.get("disable_snap", False)
     snap_cap = 0 if disable_snap else qc.get("snap_cap_m", 0)
-    class_tag = state.get("class_tag", "")
     for record in subset:
         if state.get("stop"): return  # graceful global stop
         mc = state.get("max_chips")
@@ -279,11 +290,7 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
             date = dt.date.fromisoformat(record["eventDate"][:10])
         except Exception:
             continue
-        # Per-record time window (ABSENT only). allowed_max_days is stamped on
-        # the candidate row upstream (fetch_absent.py) based on
-        # nearby-PRESENT proximity — 30 by default, 60 when no PRESENT record
-        # exists within 1 km + ±90 d of this observation. Missing/blank falls
-        # back to the QC default. PRESENT candidates never carry the field.
+        # Optional annotations can narrow, but never extend, the class window.
         allowed = record.get("allowed_max_days")
         try:
             allowed = int(allowed) if allowed not in (None, "") else None
@@ -311,23 +318,29 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
         existing = exclude_scene_ids.get(gid, set())
 
         # ---- Pass 1: try all candidates without snap; collect passes ----
+        accepted_days = set()
         passes = []           # (item, chip, m, snap_dist_m, snap_lon, snap_lat)
         failed_items = []     # (days_off_abs, cc, item) for snap fallback pick
         any_bad_water = False
         for cc, item in candidates:
             if len(passes) >= max_scenes: break
-            if item.id in existing: continue
+            if item.id in existing or item.datetime.date() in accepted_days: continue
             chip = None
             for attempt in range(3):
                 try:
-                    chip = read_chip(item, lon, lat); break
+                    item, chip, output_crs = read_acquisition_chip(item, [(cc, tile) for cc, tile in candidates if tile.id not in existing], lon, lat)
+                    break
+                except IncompleteChipError:
+                    break
                 except Exception:
                     time.sleep(2 ** attempt)
             if chip is None:
                 state["counts"]["read_error"] = state["counts"].get("read_error", 0) + 1
                 continue
             status, m = qc_chip(chip, qc, lon=lon, lat=lat, item=item)
+            m["output_crs"] = output_crs
             if status == "ok":
+                accepted_days.add(item.datetime.date())
                 passes.append((item, chip, m, 0.0, "", ""))
             else:
                 state["counts"][status] = state["counts"].get(status, 0) + 1
@@ -336,11 +349,11 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
                 failed_items.append((days_off, cc, item, status))
 
         # ---- Pass 2: snap fallback — only if NO passing chip, snap enabled,
-        # AND at least one Pass 1 failure was bad_water (reviewer fix #2).
+        # AND at least one Pass 1 failure was bad_water.
         # Snap can only recover chips that failed for water reasons; cloud /
         # fill / distortion failures don't benefit from moving 300 m.
         if not passes and snap_cap > 0 and any_bad_water and failed_items:
-            # Reviewer round 2: filter to bad_water candidates before sorting.
+            # Filter to bad_water candidates before sorting.
             # cloud/fill/dynamic-range failures can't be fixed by moving 300 m.
             # any_bad_water=True already guarantees at least one bad_water candidate.
             bad_water_candidates = [f for f in failed_items if f[3] == "bad_water"]
@@ -358,11 +371,15 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
                 new_chip = None
                 for attempt in range(3):
                     try:
-                        new_chip = read_chip(item, s_lon, s_lat); break
+                        item, new_chip, output_crs = read_acquisition_chip(item, [(cc, tile) for cc, tile in candidates if tile.id not in existing], s_lon, s_lat)
+                        break
+                    except IncompleteChipError:
+                        break
                     except Exception:
                         time.sleep(2 ** attempt)
                 if new_chip is not None:
                     n_status, n_m = qc_chip(new_chip, qc, lon=s_lon, lat=s_lat, item=item)
+                    n_m["output_crs"] = output_crs
                     if n_status == "ok":
                         passes.append((item, new_chip, n_m, sd, s_lon, s_lat))
                         state["counts"]["snap_success"] = state["counts"].get("snap_success", 0) + 1
@@ -377,7 +394,9 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
                 state["idx"] += 1
             out_gid = f"{gid}_s{pi}" if max_scenes > 1 else gid
             row = dict(record)
+            row["observation_id"] = record.get("observation_id") or gid
             row["gbifID"] = out_gid
+            row["output_crs"] = m["output_crs"]
             row["sceneID"] = item.id
             row["sceneDate"] = item.datetime.date().isoformat() if item.datetime else ""
             row["daysOff"] = (item.datetime.date() - date).days if item.datetime else ""
@@ -387,6 +406,7 @@ def _worker(subset, qc, max_scenes, exclude_scene_ids, state, log):
             row["cloud_region"] = m["cloud_region"]
             row["fill_whole"] = m["fill_whole"]
             row["b02_range"] = m["b02_range"]
+            row["central_valid_pixels"] = m["central_valid_pixels"]
             row["snap_dist_m"] = round(snap_dist_m, 1)
             row["snap_lon"] = snap_lon
             row["snap_lat"] = snap_lat
@@ -415,14 +435,30 @@ def fetch_chips(candidates, qc, out_dir, class_tag,
       candidates    : list of dicts with gbifID, decimalLatitude, decimalLongitude, eventDate
       qc            : QC config dict (see QC_STRICT_PRESENT / QC_RELAXED_ABSENT)
       out_dir       : Path to write chips.h5 and chips_metadata.csv
-      class_tag     : label written into the CSV ('present' or 'absent_real')
+      class_tag     : label written into the CSV ('present' or 'absent')
       max_scenes_per_record : cap per gbifID (1 = classic, 8 = multi-scene)
       exclude_scene_ids     : dict {gbifID: {sceneID, ...}} — skip these scenes
                               (use when re-fetching to complement existing chips)
       workers       : concurrent worker threads
     """
+    if class_tag not in {"present", "absent"}:
+        raise ValueError("class_tag must be present or absent")
+    present = class_tag == "present"
+    qc = dict(qc)
+    qc["time_window_days"] = min(qc["time_window_days"], 10 if present else 30)
+    max_scenes_per_record = min(max_scenes_per_record, 1 if present else 8)
+    if present:
+        def acceptable_uncertainty(record):
+            try:
+                value = float(record.get("coordinateUncertaintyInMeters") or "nan")
+            except (ValueError, TypeError):
+                return True
+            return not np.isfinite(value) or value < 0 or value <= 10
+        candidates = [r for r in candidates if acceptable_uncertainty(r)]
     exclude_scene_ids = exclude_scene_ids or {}
     out_dir = Path(out_dir); out_dir.mkdir(exist_ok=True, parents=True)
+    if (out_dir / "chips.h5").exists() or (out_dir / "chips_metadata.csv").exists():
+        raise FileExistsError("Use a fresh output directory for chip acquisition")
     log_path = out_dir / "fetch.log"
     log_lock = threading.Lock()
 
@@ -437,10 +473,10 @@ def fetch_chips(candidates, qc, out_dir, class_tag,
     if not candidates:
         log("no candidates"); return
     fields = list(candidates[0].keys()) + [
-        "sceneID","sceneDate","daysOff","cloudCover",
-        "wf_region","fill_region","cloud_region","fill_whole","b02_range",
+        "sceneID","sceneDate","daysOff","cloudCover","output_crs",
+        "wf_region","fill_region","cloud_region","fill_whole","b02_range","central_valid_pixels",
         "snap_dist_m","snap_lon","snap_lat","allowed_max_days",
-        "status","chipIndex","class_tag"]
+        "status","chipIndex","class_tag","observation_id"]
     for r in candidates:
         r["class_tag"] = class_tag
 
